@@ -2,12 +2,16 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>La Quête du Héros — Jeu rétro HTML5</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+  >
+
+  <title>La Quête des Trois Royaumes</title>
 
   <style>
     /* =========================================================
-       STYLE GÉNÉRAL DE LA PAGE
+       RÉINITIALISATION GÉNÉRALE
        ========================================================= */
 
     * {
@@ -19,28 +23,86 @@
       width: 100%;
       min-height: 100%;
       margin: 0;
-      background: #101510;
-      color: white;
+      background:
+        radial-gradient(circle at top, #243124 0%, #111711 55%, #080b08 100%);
+      color: #ffffff;
       font-family: monospace;
+      overflow-x: hidden;
     }
 
     body {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      overflow: hidden;
+      padding: 18px;
     }
 
-    /* Conteneur principal du jeu */
-    #game-wrapper {
+    button {
+      font: inherit;
+    }
+
+    /* =========================================================
+       STRUCTURE PRINCIPALE
+       ========================================================= */
+
+    #game-shell {
+      width: 540px;
+      max-width: 100%;
+    }
+
+    #top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding: 10px;
+      border: 3px solid #d5bd68;
+      background: #171c17;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    }
+
+    #game-title {
+      color: #f3df91;
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .menu-button {
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 3px solid #f0dc86;
+      background: #34592d;
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow:
+        inset -3px -3px 0 #1d351a,
+        inset 3px 3px 0 #5f8b53;
+    }
+
+    .menu-button:hover,
+    .menu-button:focus-visible {
+      background: #4d7a42;
+      outline: 3px solid #ffffff;
+      outline-offset: 2px;
+    }
+
+    .menu-button:active {
+      transform: translateY(2px);
+    }
+
+    /* =========================================================
+       CANVAS
+       ========================================================= */
+
+    #canvas-container {
       position: relative;
       width: 512px;
       max-width: 100%;
-      user-select: none;
+      margin: 0 auto;
     }
 
-    /* Canvas rétro en 512 × 448 pixels */
     canvas {
       display: block;
       width: 512px;
@@ -51,47 +113,319 @@
       image-rendering: pixelated;
       image-rendering: crisp-edges;
       box-shadow:
-        0 0 0 4px #3e2c18,
-        0 12px 40px rgba(0, 0, 0, 0.65);
+        0 0 0 4px #49341d,
+        0 14px 35px rgba(0, 0, 0, 0.65);
     }
 
-    /* Petit rappel des commandes sous le jeu */
-    #instructions {
-      margin-top: 14px;
+    /* =========================================================
+       FENÊTRE DES COMMANDES
+       ========================================================= */
+
+    #controls-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.78);
+    }
+
+    #controls-modal.visible {
+      display: flex;
+    }
+
+    #controls-panel {
+      position: relative;
+      width: 460px;
+      max-width: 100%;
+      padding: 22px;
+      border: 5px solid #e0c66e;
+      background: #151a15;
+      box-shadow:
+        0 0 0 5px #5c4122,
+        0 18px 60px rgba(0, 0, 0, 0.75);
+    }
+
+    #controls-panel h2 {
+      margin: 0 0 18px;
+      color: #f3df91;
       text-align: center;
-      font-size: 14px;
-      line-height: 1.6;
-      color: #f3e8bb;
+      font-size: 22px;
     }
 
-    /* Adaptation aux écrans étroits */
-    @media (max-width: 560px) {
+    .control-row {
+      display: grid;
+      grid-template-columns: 155px 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #394139;
+    }
+
+    .control-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .key {
+      display: inline-block;
+      padding: 7px 9px;
+      border: 2px solid #cbb66c;
+      background: #303830;
+      color: #ffffff;
+      text-align: center;
+      box-shadow: inset -2px -2px 0 #1b211b;
+    }
+
+    #controls-note {
+      margin-top: 18px;
+      color: #c5d7c5;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    #close-controls {
+      width: 100%;
+      margin-top: 18px;
+    }
+
+    /* =========================================================
+       COMMANDES TACTILES POUR MOBILE
+       ========================================================= */
+
+    #mobile-controls {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 16px;
+      user-select: none;
+      touch-action: none;
+    }
+
+    #direction-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 52px);
+      grid-template-rows: repeat(3, 52px);
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .touch-button {
+      border: 3px solid #d9c477;
+      background: #293329;
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      touch-action: none;
+      box-shadow:
+        inset -3px -3px 0 #131813,
+        inset 3px 3px 0 #526252;
+    }
+
+    .touch-button.active,
+    .touch-button:active {
+      background: #4b6745;
+      transform: translateY(2px);
+    }
+
+    #touch-up {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    #touch-left {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    #touch-down {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    #touch-right {
+      grid-column: 3;
+      grid-row: 2;
+    }
+
+    #action-pad {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #touch-attack {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      background: #9a312f;
+      font-size: 16px;
+    }
+
+    /* =========================================================
+       TEXTE SOUS LE JEU
+       ========================================================= */
+
+    #status-text {
+      margin-top: 14px;
+      color: #f2e6b8;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* =========================================================
+       ADAPTATION MOBILE
+       ========================================================= */
+
+    @media (max-width: 700px), (pointer: coarse) {
       body {
+        align-items: flex-start;
         padding: 8px;
+      }
+
+      #mobile-controls {
+        display: grid;
+      }
+
+      #game-title {
+        font-size: 12px;
       }
 
       canvas {
         height: auto;
       }
+    }
 
-      #instructions {
-        font-size: 12px;
+    @media (max-width: 430px) {
+      #top-bar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      #direction-pad {
+        grid-template-columns: repeat(3, 46px);
+        grid-template-rows: repeat(3, 46px);
+      }
+
+      #touch-attack {
+        width: 80px;
+        height: 80px;
+      }
+
+      .control-row {
+        grid-template-columns: 1fr;
+        text-align: center;
       }
     }
   </style>
 </head>
 
 <body>
-  <div id="game-wrapper">
-    <canvas
-      id="game"
-      width="512"
-      height="448"
-      aria-label="Jeu d'aventure rétro"
-    ></canvas>
+  <main id="game-shell">
 
-    <div id="instructions">
-      Déplacement : flèches ou ZQSD — Attaque : Espace
+    <!-- Barre supérieure avec le bouton demandé -->
+    <header id="top-bar">
+      <div id="game-title">LA QUÊTE DES TROIS ROYAUMES</div>
+
+      <button
+        id="show-controls"
+        class="menu-button"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="controls-modal"
+      >
+        COMMANDES
+      </button>
+    </header>
+
+    <!-- Canvas rétro de 512 × 448 pixels -->
+    <div id="canvas-container">
+      <canvas
+        id="game"
+        width="512"
+        height="448"
+        tabindex="0"
+        aria-label="Jeu d'aventure rétro en trois tableaux"
+      ></canvas>
+    </div>
+
+    <!-- Commandes tactiles pour téléphone et tablette -->
+    <section id="mobile-controls" aria-label="Commandes tactiles">
+      <div id="direction-pad">
+        <button id="touch-up" class="touch-button" type="button">▲</button>
+        <button id="touch-left" class="touch-button" type="button">◀</button>
+        <button id="touch-down" class="touch-button" type="button">▼</button>
+        <button id="touch-right" class="touch-button" type="button">▶</button>
+      </div>
+
+      <div id="action-pad">
+        <button id="touch-attack" class="touch-button" type="button">
+          ÉPÉE
+        </button>
+      </div>
+    </section>
+
+    <div id="status-text">
+      Traversez les trois tableaux, éliminez les ennemis et atteignez la sortie.
+    </div>
+  </main>
+
+  <!-- Fenêtre qui apparaît lorsqu'on appuie sur COMMANDES -->
+  <div
+    id="controls-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="controls-title"
+  >
+    <div id="controls-panel">
+      <h2 id="controls-title">COMMANDES DU JEU</h2>
+
+      <div class="control-row">
+        <div>
+          <span class="key">↑ ↓ ← →</span>
+        </div>
+        <div>Déplacer le héros</div>
+      </div>
+
+      <div class="control-row">
+        <div>
+          <span class="key">Z Q S D</span>
+        </div>
+        <div>Déplacement alternatif</div>
+      </div>
+
+      <div class="control-row">
+        <div>
+          <span class="key">ESPACE</span>
+        </div>
+        <div>Attaquer avec l'épée</div>
+      </div>
+
+      <div class="control-row">
+        <div>
+          <span class="key">ENTRÉE</span>
+        </div>
+        <div>Continuer après un tableau</div>
+      </div>
+
+      <div class="control-row">
+        <div>
+          <span class="key">R</span>
+        </div>
+        <div>Recommencer la partie</div>
+      </div>
+
+      <p id="controls-note">
+        Éliminez tous les ennemis d'un tableau. La porte de sortie
+        apparaîtra ensuite à droite de l'écran.
+      </p>
+
+      <button id="close-controls" class="menu-button" type="button">
+        RETOUR AU JEU
+      </button>
     </div>
   </div>
 
@@ -99,78 +433,166 @@
     "use strict";
 
     /* =========================================================
-       CONFIGURATION GÉNÉRALE
+       CANVAS ET CONSTANTES GÉNÉRALES
        ========================================================= */
 
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
 
-    /* Désactive le lissage pour conserver un rendu rétro net */
     ctx.imageSmoothingEnabled = false;
 
-    const LARGEUR_CANVAS = canvas.width;
-    const HAUTEUR_CANVAS = canvas.height;
-
-    /*
-      La zone supérieure sert d'interface.
-      La carte commence donc à Y = 64.
-    */
+    const LARGEUR_CANVAS = 512;
+    const HAUTEUR_CANVAS = 448;
     const HAUTEUR_INTERFACE = 64;
 
-    /*
-      Taille logique d'une case de la grille.
-      512 / 32 = 16 colonnes.
-      (448 - 64) / 32 = 12 lignes.
-    */
     const TAILLE_CASE = 32;
     const COLONNES = 16;
     const LIGNES = 12;
 
-    /*
-      Types de cases :
-      0 = sol
-      1 = arbre
-      2 = mur
-      3 = eau
-    */
     const SOL = 0;
     const ARBRE = 1;
     const MUR = 2;
     const EAU = 3;
+    const ROCHE = 4;
 
     /* =========================================================
-       CARTE DU JEU
+       ÉLÉMENTS HTML
+       ========================================================= */
+
+    const boutonCommandes = document.getElementById("show-controls");
+    const boutonFermerCommandes = document.getElementById("close-controls");
+    const fenetreCommandes = document.getElementById("controls-modal");
+
+    /* =========================================================
+       GESTION DE LA FENÊTRE DES COMMANDES
+       ========================================================= */
+
+    let jeuEnPause = false;
+
+    function ouvrirCommandes() {
+      fenetreCommandes.classList.add("visible");
+      jeuEnPause = true;
+      boutonFermerCommandes.focus();
+    }
+
+    function fermerCommandes() {
+      fenetreCommandes.classList.remove("visible");
+      jeuEnPause = false;
+      boutonCommandes.focus();
+      canvas.focus();
+    }
+
+    boutonCommandes.addEventListener("click", ouvrirCommandes);
+    boutonFermerCommandes.addEventListener("click", fermerCommandes);
+
+    fenetreCommandes.addEventListener("click", function (event) {
+      if (event.target === fenetreCommandes) {
+        fermerCommandes();
+      }
+    });
+
+    /* =========================================================
+       DÉFINITION DES TROIS TABLEAUX
        ========================================================= */
 
     /*
-      Matrice représentant l'écran de jeu.
-      Chaque valeur correspond à une case solide ou libre.
+      Chaque tableau contient :
+      - un nom;
+      - une couleur principale;
+      - une matrice de terrain;
+      - des positions de départ pour les ennemis;
+      - une position de départ pour le joueur.
     */
-    const carte = [
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 2, 2, 0, 0, 0, 1, 1, 0, 0, 0, 2, 2, 0, 1],
-      [1, 0, 2, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 2, 0, 1],
-      [1, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 0, 0, 0, 1],
-      [1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 0, 1],
-      [1, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 0, 1],
-      [1, 0, 2, 0, 1, 0, 2, 0, 0, 1, 1, 0, 0, 0, 0, 1],
-      [1, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
-      [1, 0, 0, 0, 0, 0, 1, 0, 2, 2, 0, 0, 0, 0, 0, 1],
-      [1, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+    const tableaux = [
+      {
+        nom: "TABLEAU 1 — FORÊT DES ÉCHOS",
+        couleurSol: "#5daa4b",
+        couleurDetail: "#4b9340",
+        carte: [
+          [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+          [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+          [1,0,1,1,0,0,0,1,1,0,0,0,1,1,0,1],
+          [1,0,0,0,0,3,3,3,3,3,0,0,0,0,0,1],
+          [1,0,1,0,0,3,3,3,3,3,0,1,0,1,0,1],
+          [1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1],
+          [1,0,0,0,0,0,2,2,0,0,0,0,0,2,0,1],
+          [1,0,2,0,1,0,2,0,0,1,1,0,0,2,0,1],
+          [1,0,2,0,1,0,0,0,0,0,0,0,1,1,0,1],
+          [1,0,0,0,0,0,1,0,2,2,0,0,0,0,0,1],
+          [1,0,0,2,2,0,0,0,0,0,0,2,2,0,0,1],
+          [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ],
+        joueur: { colonne: 1, ligne: 1 },
+        ennemis: [
+          { colonne: 12, ligne: 1 },
+          { colonne: 3, ligne: 8 },
+          { colonne: 13, ligne: 9 }
+        ]
+      },
+
+      {
+        nom: "TABLEAU 2 — RUINES DU CRÉPUSCULE",
+        couleurSol: "#8b774f",
+        couleurDetail: "#77623d",
+        carte: [
+          [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+          [2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,2],
+          [2,0,2,2,0,4,0,2,0,2,2,2,0,4,0,2],
+          [2,0,0,2,0,4,0,0,0,2,0,0,0,4,0,2],
+          [2,4,0,2,0,0,0,2,2,2,0,4,0,0,0,2],
+          [2,0,0,0,0,2,0,0,0,0,0,4,0,2,0,2],
+          [2,0,2,2,0,2,2,2,0,4,0,0,0,2,0,2],
+          [2,0,0,2,0,0,0,0,0,4,2,2,0,0,0,2],
+          [2,4,0,2,2,2,0,4,0,0,0,2,0,4,0,2],
+          [2,0,0,0,0,0,0,4,2,2,0,2,0,0,0,2],
+          [2,0,2,2,0,4,0,0,0,0,0,0,0,2,0,2],
+          [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
+        ],
+        joueur: { colonne: 1, ligne: 1 },
+        ennemis: [
+          { colonne: 13, ligne: 1 },
+          { colonne: 5, ligne: 5 },
+          { colonne: 9, ligne: 7 },
+          { colonne: 13, ligne: 9 }
+        ]
+      },
+
+      {
+        nom: "TABLEAU 3 — FORTERESSE ROUGE",
+        couleurSol: "#644848",
+        couleurDetail: "#523838",
+        carte: [
+          [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+          [2,0,0,0,0,0,2,0,0,0,2,0,0,0,0,2],
+          [2,0,2,2,2,0,2,0,4,0,2,0,2,2,0,2],
+          [2,0,2,0,0,0,0,0,4,0,0,0,0,2,0,2],
+          [2,0,2,0,2,2,2,0,2,2,2,2,0,2,0,2],
+          [2,0,0,0,2,0,0,0,0,0,0,2,0,0,0,2],
+          [2,2,2,0,2,0,4,2,2,4,0,2,0,2,2,2],
+          [2,0,0,0,0,0,4,0,0,4,0,0,0,0,0,2],
+          [2,0,2,2,2,0,2,0,2,2,2,2,2,2,0,2],
+          [2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,2],
+          [2,0,2,0,0,0,2,2,0,0,2,2,0,2,0,2],
+          [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
+        ],
+        joueur: { colonne: 1, ligne: 1 },
+        ennemis: [
+          { colonne: 13, ligne: 1 },
+          { colonne: 7, ligne: 3 },
+          { colonne: 5, ligne: 7 },
+          { colonne: 13, ligne: 7 },
+          { colonne: 8, ligne: 9 }
+        ]
+      }
     ];
 
     /* =========================================================
-       GESTION DU CLAVIER
+       ÉTAT DU CLAVIER ET DES COMMANDES
        ========================================================= */
 
     const touches = Object.create(null);
 
-    /*
-      Certaines touches du clavier doivent être interceptées afin
-      d'empêcher la page de défiler pendant le jeu.
-    */
     const touchesBloquees = new Set([
       "ArrowUp",
       "ArrowDown",
@@ -184,24 +606,35 @@
         event.preventDefault();
       }
 
-      touches[event.code] = true;
-
-      /*
-        Si le joueur est sur l'écran de fin, n'importe quelle touche
-        permet de recommencer la partie.
-      */
-      if (jeuTermine) {
-        recommencerJeu();
+      if (event.code === "Escape" && fenetreCommandes.classList.contains("visible")) {
+        fermerCommandes();
         return;
       }
 
-      /*
-        L'attaque ne doit être déclenchée qu'une fois par pression.
-        event.repeat évite de relancer l'attaque automatiquement
-        lorsque la touche Espace reste enfoncée.
-      */
+      if (jeuEnPause) {
+        return;
+      }
+
+      touches[event.code] = true;
+
       if (event.code === "Space" && !event.repeat) {
         demarrerAttaque();
+      }
+
+      if (event.code === "KeyR" && !event.repeat) {
+        recommencerAventure();
+      }
+
+      if (
+        (event.code === "Enter" || event.code === "Space") &&
+        transitionTableau &&
+        !event.repeat
+      ) {
+        chargerTableau(indexTableau + 1);
+      }
+
+      if (jeuTermine && !event.repeat) {
+        recommencerAventure();
       }
     });
 
@@ -209,10 +642,6 @@
       touches[event.code] = false;
     });
 
-    /*
-      Réinitialise les touches lorsque la fenêtre perd le focus,
-      afin d'éviter qu'une direction reste bloquée.
-    */
     window.addEventListener("blur", function () {
       for (const code in touches) {
         touches[code] = false;
@@ -220,12 +649,68 @@
     });
 
     /* =========================================================
-       OUTILS GÉOMÉTRIQUES ET COLLISIONS
+       COMMANDES TACTILES
        ========================================================= */
 
-    /*
-      Retourne vrai lorsque deux rectangles se chevauchent.
-    */
+    function connecterBoutonDirection(id, codeTouche) {
+      const bouton = document.getElementById(id);
+
+      function activer(event) {
+        event.preventDefault();
+        touches[codeTouche] = true;
+        bouton.classList.add("active");
+        canvas.focus();
+      }
+
+      function desactiver(event) {
+        event.preventDefault();
+        touches[codeTouche] = false;
+        bouton.classList.remove("active");
+      }
+
+      bouton.addEventListener("pointerdown", activer);
+      bouton.addEventListener("pointerup", desactiver);
+      bouton.addEventListener("pointercancel", desactiver);
+      bouton.addEventListener("pointerleave", desactiver);
+    }
+
+    connecterBoutonDirection("touch-up", "ArrowUp");
+    connecterBoutonDirection("touch-down", "ArrowDown");
+    connecterBoutonDirection("touch-left", "ArrowLeft");
+    connecterBoutonDirection("touch-right", "ArrowRight");
+
+    const boutonAttaque = document.getElementById("touch-attack");
+
+    boutonAttaque.addEventListener("pointerdown", function (event) {
+      event.preventDefault();
+
+      if (jeuTermine) {
+        recommencerAventure();
+        return;
+      }
+
+      if (transitionTableau) {
+        chargerTableau(indexTableau + 1);
+        return;
+      }
+
+      demarrerAttaque();
+      boutonAttaque.classList.add("active");
+      canvas.focus();
+    });
+
+    boutonAttaque.addEventListener("pointerup", function () {
+      boutonAttaque.classList.remove("active");
+    });
+
+    boutonAttaque.addEventListener("pointercancel", function () {
+      boutonAttaque.classList.remove("active");
+    });
+
+    /* =========================================================
+       OUTILS GÉOMÉTRIQUES
+       ========================================================= */
+
     function rectanglesSeTouchent(a, b) {
       return (
         a.x < b.x + b.largeur &&
@@ -235,19 +720,190 @@
       );
     }
 
-    /*
-      Retourne la case de carte correspondant à une position.
-    */
-    function obtenirCaseDepuisPosition(x, y) {
-      const colonne = Math.floor(x / TAILLE_CASE);
-      const ligne = Math.floor((y - HAUTEUR_INTERFACE) / TAILLE_CASE);
-
-      return { colonne, ligne };
+    function limiter(valeur, minimum, maximum) {
+      return Math.max(minimum, Math.min(maximum, valeur));
     }
 
-    /*
-      Vérifie si une case de la matrice bloque le passage.
-    */
+    function entierAleatoire(minimum, maximum) {
+      return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+    }
+
+    function positionDepuisCase(colonne, ligne, largeur = 24, hauteur = 24) {
+      return {
+        x: colonne * TAILLE_CASE + (TAILLE_CASE - largeur) / 2,
+        y:
+          HAUTEUR_INTERFACE +
+          ligne * TAILLE_CASE +
+          (TAILLE_CASE - hauteur) / 2
+      };
+    }
+
+    /* =========================================================
+       ÉTAT DU JOUEUR
+       ========================================================= */
+
+    const joueur = {
+      x: 0,
+      y: 0,
+      largeur: 24,
+      hauteur: 24,
+      vitesse: 150,
+      direction: "bas",
+
+      vie: 3,
+      vieMaximum: 3,
+
+      invulnerable: false,
+      tempsInvulnerabilite: 0,
+      dureeInvulnerabilite: 1.2,
+
+      attaqueActive: false,
+      tempsAttaque: 0,
+      dureeAttaque: 0.18,
+
+      rechargeAttaque: 0,
+      dureeRecharge: 0.27,
+
+      ennemisTouchesPendantAttaque: new Set()
+    };
+
+    /* =========================================================
+       ÉTAT DES ENNEMIS
+       ========================================================= */
+
+    let ennemis = [];
+    let compteurIdentifiants = 0;
+
+    function creerEnnemi(colonne, ligne, vie = 2) {
+      const position = positionDepuisCase(colonne, ligne);
+
+      return {
+        identifiant: ++compteurIdentifiants,
+        x: position.x,
+        y: position.y,
+        largeur: 24,
+        hauteur: 24,
+        vitesse: entierAleatoire(50, 82),
+        vie,
+        vieMaximum: vie,
+        directionX: 0,
+        directionY: 0,
+        tempsAvantChangementDirection: 0,
+        tempsRecul: 0,
+        reculX: 0,
+        reculY: 0
+      };
+    }
+
+    function choisirDirectionEnnemi(ennemi) {
+      const directions = [
+        { x: 1, y: 0 },
+        { x: -1, y: 0 },
+        { x: 0, y: 1 },
+        { x: 0, y: -1 },
+        { x: 0, y: 0 }
+      ];
+
+      const direction = directions[entierAleatoire(0, directions.length - 1)];
+
+      ennemi.directionX = direction.x;
+      ennemi.directionY = direction.y;
+      ennemi.tempsAvantChangementDirection = 0.45 + Math.random() * 1.5;
+    }
+
+    /* =========================================================
+       ÉTAT GLOBAL DE L'AVENTURE
+       ========================================================= */
+
+    let indexTableau = 0;
+    let tableauActuel = tableaux[0];
+
+    let sortieOuverte = false;
+    let transitionTableau = false;
+    let jeuTermine = false;
+    let victoireFinale = false;
+
+    let tempsEcoule = 0;
+    let ancienTemps = performance.now();
+
+    let messageTemporaire = "";
+    let tempsMessage = 0;
+
+    const porteSortie = {
+      x: LARGEUR_CANVAS - TAILLE_CASE,
+      y: HAUTEUR_INTERFACE + 5 * TAILLE_CASE,
+      largeur: TAILLE_CASE,
+      hauteur: TAILLE_CASE * 2
+    };
+
+    /* =========================================================
+       CHARGEMENT DES TABLEAUX
+       ========================================================= */
+
+    function chargerTableau(nouvelIndex) {
+      if (nouvelIndex >= tableaux.length) {
+        jeuTermine = true;
+        victoireFinale = true;
+        transitionTableau = false;
+        return;
+      }
+
+      indexTableau = nouvelIndex;
+      tableauActuel = tableaux[indexTableau];
+
+      sortieOuverte = false;
+      transitionTableau = false;
+
+      const depart = positionDepuisCase(
+        tableauActuel.joueur.colonne,
+        tableauActuel.joueur.ligne,
+        joueur.largeur,
+        joueur.hauteur
+      );
+
+      joueur.x = depart.x;
+      joueur.y = depart.y;
+      joueur.direction = "bas";
+      joueur.invulnerable = false;
+      joueur.tempsInvulnerabilite = 0;
+      joueur.attaqueActive = false;
+      joueur.rechargeAttaque = 0;
+      joueur.ennemisTouchesPendantAttaque.clear();
+
+      ennemis = tableauActuel.ennemis.map(function (position, index) {
+        const vie = indexTableau === 2 && index === tableauActuel.ennemis.length - 1
+          ? 4
+          : 2;
+
+        return creerEnnemi(position.colonne, position.ligne, vie);
+      });
+
+      messageTemporaire = tableauActuel.nom;
+      tempsMessage = 2.2;
+
+      ancienTemps = performance.now();
+      canvas.focus();
+    }
+
+    function recommencerAventure() {
+      joueur.vie = joueur.vieMaximum;
+      tempsEcoule = 0;
+      jeuTermine = false;
+      victoireFinale = false;
+      chargerTableau(0);
+    }
+
+    /* =========================================================
+       COLLISIONS AVEC LA CARTE
+       ========================================================= */
+
+    function obtenirCaseDepuisPosition(x, y) {
+      return {
+        colonne: Math.floor(x / TAILLE_CASE),
+        ligne: Math.floor((y - HAUTEUR_INTERFACE) / TAILLE_CASE)
+      };
+    }
+
     function caseEstSolide(colonne, ligne) {
       if (
         colonne < 0 ||
@@ -258,13 +914,21 @@
         return true;
       }
 
-      return carte[ligne][colonne] !== SOL;
+      /*
+        La porte située à droite devient franchissable lorsque tous
+        les ennemis ont été vaincus.
+      */
+      if (
+        sortieOuverte &&
+        colonne === COLONNES - 1 &&
+        (ligne === 5 || ligne === 6)
+      ) {
+        return false;
+      }
+
+      return tableauActuel.carte[ligne][colonne] !== SOL;
     }
 
-    /*
-      Vérifie si un rectangle entre en collision avec un obstacle.
-      Les quatre coins sont testés.
-    */
     function rectangleToucheCarte(x, y, largeur, hauteur) {
       const marge = 2;
 
@@ -286,10 +950,6 @@
       return false;
     }
 
-    /*
-      Déplace une entité séparément sur les axes X et Y.
-      Cette méthode évite qu'une collision bloque les deux axes.
-    */
     function deplacerAvecCollisions(entite, mouvementX, mouvementY) {
       let collisionX = false;
       let collisionY = false;
@@ -327,152 +987,15 @@
       return { collisionX, collisionY };
     }
 
-    /*
-      Limite une valeur entre un minimum et un maximum.
-    */
-    function limiter(valeur, minimum, maximum) {
-      return Math.max(minimum, Math.min(maximum, valeur));
-    }
-
-    /*
-      Produit un nombre entier aléatoire inclusif.
-    */
-    function entierAleatoire(minimum, maximum) {
-      return Math.floor(
-        Math.random() * (maximum - minimum + 1)
-      ) + minimum;
-    }
-
-    /* =========================================================
-       JOUEUR
-       ========================================================= */
-
-    const joueur = {
-      x: 64,
-      y: HAUTEUR_INTERFACE + 64,
-      largeur: 24,
-      hauteur: 24,
-      vitesse: 150,
-      direction: "bas",
-      vie: 3,
-      vieMaximum: 3,
-      invulnerable: false,
-      tempsInvulnerabilite: 0,
-      dureeInvulnerabilite: 1.15,
-      attaqueActive: false,
-      tempsAttaque: 0,
-      dureeAttaque: 0.19,
-      rechargeAttaque: 0,
-      dureeRecharge: 0.24,
-      ennemisTouchesPendantAttaque: new Set()
-    };
-
-    /* =========================================================
-       ENNEMIS
-       ========================================================= */
-
-    let ennemis = [];
-
-    /*
-      Crée un ennemi rouge à une position donnée.
-    */
-    function creerEnnemi(x, y) {
-      return {
-        x,
-        y,
-        largeur: 24,
-        hauteur: 24,
-        vitesse: entierAleatoire(55, 85),
-        vie: 2,
-        vieMaximum: 2,
-        directionX: 0,
-        directionY: 0,
-        tempsAvantChangementDirection: 0,
-        tempsRecul: 0,
-        reculX: 0,
-        reculY: 0,
-        identifiant: crypto.randomUUID
-          ? crypto.randomUUID()
-          : String(Math.random())
-      };
-    }
-
-    /*
-      Installe plusieurs ennemis à des endroits libres.
-    */
-    function creerEnnemisInitiaux() {
-      ennemis = [
-        creerEnnemi(384, HAUTEUR_INTERFACE + 64),
-        creerEnnemi(96, HAUTEUR_INTERFACE + 256),
-        creerEnnemi(384, HAUTEUR_INTERFACE + 256),
-        creerEnnemi(256, HAUTEUR_INTERFACE + 320)
-      ];
-    }
-
-    /*
-      Choisit une direction aléatoire pour un ennemi.
-    */
-    function choisirDirectionEnnemi(ennemi) {
-      const directions = [
-        { x: 1, y: 0 },
-        { x: -1, y: 0 },
-        { x: 0, y: 1 },
-        { x: 0, y: -1 },
-        { x: 0, y: 0 }
-      ];
-
-      const direction = directions[
-        entierAleatoire(0, directions.length - 1)
-      ];
-
-      ennemi.directionX = direction.x;
-      ennemi.directionY = direction.y;
-      ennemi.tempsAvantChangementDirection =
-        0.5 + Math.random() * 1.7;
-    }
-
-    /* =========================================================
-       ÉTAT GLOBAL DU JEU
-       ========================================================= */
-
-    let jeuTermine = false;
-    let victoire = false;
-    let tempsEcoule = 0;
-    let ancienTemps = performance.now();
-
-    /*
-      Remet toutes les valeurs principales à leur état initial.
-    */
-    function recommencerJeu() {
-      joueur.x = 64;
-      joueur.y = HAUTEUR_INTERFACE + 64;
-      joueur.direction = "bas";
-      joueur.vie = joueur.vieMaximum;
-      joueur.invulnerable = false;
-      joueur.tempsInvulnerabilite = 0;
-      joueur.attaqueActive = false;
-      joueur.tempsAttaque = 0;
-      joueur.rechargeAttaque = 0;
-      joueur.ennemisTouchesPendantAttaque.clear();
-
-      creerEnnemisInitiaux();
-
-      jeuTermine = false;
-      victoire = false;
-      tempsEcoule = 0;
-      ancienTemps = performance.now();
-    }
-
     /* =========================================================
        ATTAQUE À L'ÉPÉE
        ========================================================= */
 
-    /*
-      Démarre l'animation d'attaque lorsque l'épée est disponible.
-    */
     function demarrerAttaque() {
       if (
+        jeuEnPause ||
         jeuTermine ||
+        transitionTableau ||
         joueur.attaqueActive ||
         joueur.rechargeAttaque > 0
       ) {
@@ -485,10 +1008,6 @@
       joueur.ennemisTouchesPendantAttaque.clear();
     }
 
-    /*
-      Calcule le rectangle occupé par l'épée selon la direction
-      actuelle du joueur.
-    */
     function obtenirRectangleEpee() {
       const longueur = 30;
       const epaisseur = 10;
@@ -529,10 +1048,6 @@
       }
     }
 
-    /*
-      Inflige des dégâts aux ennemis touchés par l'épée.
-      Un ennemi ne peut être frappé qu'une seule fois par attaque.
-    */
     function verifierCoupsEpee() {
       if (!joueur.attaqueActive) {
         return;
@@ -542,61 +1057,49 @@
 
       for (const ennemi of ennemis) {
         if (
-          joueur.ennemisTouchesPendantAttaque.has(
-            ennemi.identifiant
-          )
+          joueur.ennemisTouchesPendantAttaque.has(ennemi.identifiant)
         ) {
           continue;
         }
 
         if (rectanglesSeTouchent(epee, ennemi)) {
-          joueur.ennemisTouchesPendantAttaque.add(
-            ennemi.identifiant
-          );
+          joueur.ennemisTouchesPendantAttaque.add(ennemi.identifiant);
 
           ennemi.vie -= 1;
           ennemi.tempsRecul = 0.12;
 
-          /*
-            Le recul pousse l'ennemi dans la direction de l'épée.
-          */
           switch (joueur.direction) {
             case "haut":
               ennemi.reculX = 0;
-              ennemi.reculY = -130;
+              ennemi.reculY = -140;
               break;
 
             case "bas":
               ennemi.reculX = 0;
-              ennemi.reculY = 130;
+              ennemi.reculY = 140;
               break;
 
             case "gauche":
-              ennemi.reculX = -130;
+              ennemi.reculX = -140;
               ennemi.reculY = 0;
               break;
 
             case "droite":
-              ennemi.reculX = 130;
+              ennemi.reculX = 140;
               ennemi.reculY = 0;
               break;
           }
         }
       }
 
-      /*
-        Supprime les ennemis dont la vie est tombée à zéro.
-      */
       ennemis = ennemis.filter(function (ennemi) {
         return ennemi.vie > 0;
       });
 
-      /*
-        La partie est gagnée lorsque tous les ennemis sont éliminés.
-      */
-      if (ennemis.length === 0) {
-        victoire = true;
-        jeuTermine = true;
+      if (ennemis.length === 0 && !sortieOuverte) {
+        sortieOuverte = true;
+        messageTemporaire = "LA PORTE EST OUVERTE !";
+        tempsMessage = 2;
       }
     }
 
@@ -608,12 +1111,6 @@
       let directionX = 0;
       let directionY = 0;
 
-      /*
-        Commandes compatibles avec :
-        - Flèches directionnelles
-        - ZQSD
-        - WASD
-      */
       const haut =
         touches.ArrowUp ||
         touches.KeyZ ||
@@ -632,77 +1129,32 @@
         touches.ArrowRight ||
         touches.KeyD;
 
-      if (haut) {
-        directionY -= 1;
-      }
+      if (haut) directionY -= 1;
+      if (bas) directionY += 1;
+      if (gauche) directionX -= 1;
+      if (droite) directionX += 1;
 
-      if (bas) {
-        directionY += 1;
-      }
-
-      if (gauche) {
-        directionX -= 1;
-      }
-
-      if (droite) {
-        directionX += 1;
-      }
-
-      /*
-        Normalise le mouvement diagonal pour éviter qu'il soit
-        plus rapide que le mouvement horizontal ou vertical.
-      */
       if (directionX !== 0 && directionY !== 0) {
-        const facteurDiagonal = Math.SQRT1_2;
-        directionX *= facteurDiagonal;
-        directionY *= facteurDiagonal;
+        directionX *= Math.SQRT1_2;
+        directionY *= Math.SQRT1_2;
       }
 
-      /*
-        Met à jour l'orientation du joueur.
-        La direction dominante devient la direction de l'épée.
-      */
       if (Math.abs(directionX) > Math.abs(directionY)) {
-        if (directionX < 0) {
-          joueur.direction = "gauche";
-        } else if (directionX > 0) {
-          joueur.direction = "droite";
-        }
+        if (directionX < 0) joueur.direction = "gauche";
+        if (directionX > 0) joueur.direction = "droite";
       } else if (directionY !== 0) {
-        if (directionY < 0) {
-          joueur.direction = "haut";
-        } else {
-          joueur.direction = "bas";
-        }
+        if (directionY < 0) joueur.direction = "haut";
+        if (directionY > 0) joueur.direction = "bas";
       }
 
-      /*
-        Le joueur peut se déplacer pendant l'attaque, mais un peu
-        moins rapidement pour donner du poids au coup.
-      */
-      const ralentissement = joueur.attaqueActive ? 0.68 : 1;
-
-      const mouvementX =
-        directionX *
-        joueur.vitesse *
-        ralentissement *
-        deltaTime;
-
-      const mouvementY =
-        directionY *
-        joueur.vitesse *
-        ralentissement *
-        deltaTime;
+      const ralentissement = joueur.attaqueActive ? 0.7 : 1;
 
       deplacerAvecCollisions(
         joueur,
-        mouvementX,
-        mouvementY
+        directionX * joueur.vitesse * ralentissement * deltaTime,
+        directionY * joueur.vitesse * ralentissement * deltaTime
       );
 
-      /*
-        Gestion du temps d'attaque.
-      */
       if (joueur.attaqueActive) {
         joueur.tempsAttaque -= deltaTime;
 
@@ -712,20 +1164,11 @@
         }
       }
 
-      /*
-        Gestion du délai minimal entre deux attaques.
-      */
       if (joueur.rechargeAttaque > 0) {
         joueur.rechargeAttaque -= deltaTime;
-        joueur.rechargeAttaque = Math.max(
-          0,
-          joueur.rechargeAttaque
-        );
+        joueur.rechargeAttaque = Math.max(0, joueur.rechargeAttaque);
       }
 
-      /*
-        Gestion de l'invulnérabilité temporaire.
-      */
       if (joueur.invulnerable) {
         joueur.tempsInvulnerabilite -= deltaTime;
 
@@ -742,9 +1185,6 @@
 
     function mettreAJourEnnemis(deltaTime) {
       for (const ennemi of ennemis) {
-        /*
-          Applique brièvement un recul lorsqu'un ennemi reçoit un coup.
-        */
         if (ennemi.tempsRecul > 0) {
           ennemi.tempsRecul -= deltaTime;
 
@@ -763,26 +1203,12 @@
           choisirDirectionEnnemi(ennemi);
         }
 
-        const mouvementX =
-          ennemi.directionX *
-          ennemi.vitesse *
-          deltaTime;
-
-        const mouvementY =
-          ennemi.directionY *
-          ennemi.vitesse *
-          deltaTime;
-
         const collisions = deplacerAvecCollisions(
           ennemi,
-          mouvementX,
-          mouvementY
+          ennemi.directionX * ennemi.vitesse * deltaTime,
+          ennemi.directionY * ennemi.vitesse * deltaTime
         );
 
-        /*
-          Lorsqu'un ennemi rencontre un obstacle, il choisit
-          immédiatement une autre direction.
-        */
         if (collisions.collisionX || collisions.collisionY) {
           choisirDirectionEnnemi(ennemi);
         }
@@ -790,88 +1216,238 @@
     }
 
     /* =========================================================
-       COLLISIONS ENTRE LE JOUEUR ET LES ENNEMIS
+       DÉGÂTS SUBIS PAR LE JOUEUR
        ========================================================= */
 
     function verifierCollisionsEnnemisJoueur() {
-      if (joueur.invulnerable || jeuTermine) {
+      if (joueur.invulnerable || jeuTermine || transitionTableau) {
         return;
       }
 
       for (const ennemi of ennemis) {
-        if (rectanglesSeTouchent(joueur, ennemi)) {
-          joueur.vie -= 1;
-          joueur.invulnerable = true;
-          joueur.tempsInvulnerabilite =
-            joueur.dureeInvulnerabilite;
-
-          /*
-            Éloigne légèrement le joueur de l'ennemi.
-          */
-          const centreJoueurX =
-            joueur.x + joueur.largeur / 2;
-
-          const centreJoueurY =
-            joueur.y + joueur.hauteur / 2;
-
-          const centreEnnemiX =
-            ennemi.x + ennemi.largeur / 2;
-
-          const centreEnnemiY =
-            ennemi.y + ennemi.hauteur / 2;
-
-          let reculX = centreJoueurX - centreEnnemiX;
-          let reculY = centreJoueurY - centreEnnemiY;
-
-          const longueur =
-            Math.hypot(reculX, reculY) || 1;
-
-          reculX = reculX / longueur * 28;
-          reculY = reculY / longueur * 28;
-
-          deplacerAvecCollisions(
-            joueur,
-            reculX,
-            reculY
-          );
-
-          if (joueur.vie <= 0) {
-            joueur.vie = 0;
-            victoire = false;
-            jeuTermine = true;
-          }
-
-          break;
+        if (!rectanglesSeTouchent(joueur, ennemi)) {
+          continue;
         }
+
+        joueur.vie -= 1;
+        joueur.invulnerable = true;
+        joueur.tempsInvulnerabilite = joueur.dureeInvulnerabilite;
+
+        const centreJoueurX = joueur.x + joueur.largeur / 2;
+        const centreJoueurY = joueur.y + joueur.hauteur / 2;
+        const centreEnnemiX = ennemi.x + ennemi.largeur / 2;
+        const centreEnnemiY = ennemi.y + ennemi.hauteur / 2;
+
+        let reculX = centreJoueurX - centreEnnemiX;
+        let reculY = centreJoueurY - centreEnnemiY;
+
+        const longueur = Math.hypot(reculX, reculY) || 1;
+
+        reculX = reculX / longueur * 28;
+        reculY = reculY / longueur * 28;
+
+        deplacerAvecCollisions(joueur, reculX, reculY);
+
+        if (joueur.vie <= 0) {
+          joueur.vie = 0;
+          jeuTermine = true;
+          victoireFinale = false;
+        }
+
+        break;
       }
     }
 
     /* =========================================================
-       FONCTION DE MISE À JOUR PRINCIPALE
+       PASSAGE VERS LE TABLEAU SUIVANT
+       ========================================================= */
+
+    function verifierSortie() {
+      if (!sortieOuverte || transitionTableau || jeuTermine) {
+        return;
+      }
+
+      if (
+        joueur.x + joueur.largeur >
+        LARGEUR_CANVAS - 5
+      ) {
+        transitionTableau = true;
+      }
+    }
+
+    /* =========================================================
+       MISE À JOUR PRINCIPALE
        ========================================================= */
 
     function update(deltaTime) {
-      if (jeuTermine) {
+      if (jeuEnPause || jeuTermine || transitionTableau) {
         return;
       }
 
       tempsEcoule += deltaTime;
 
+      if (tempsMessage > 0) {
+        tempsMessage -= deltaTime;
+      }
+
       mettreAJourJoueur(deltaTime);
       mettreAJourEnnemis(deltaTime);
       verifierCoupsEpee();
       verifierCollisionsEnnemisJoueur();
+      verifierSortie();
     }
 
     /* =========================================================
-       DESSIN DE L'INTERFACE
+       DESSIN DU SOL ET DES OBSTACLES
+       ========================================================= */
+
+    function dessinerSol(x, y, colonne, ligne) {
+      ctx.fillStyle = tableauActuel.couleurSol;
+      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
+
+      ctx.fillStyle = tableauActuel.couleurDetail;
+
+      const motif = (colonne * 7 + ligne * 11) % 5;
+
+      if (motif === 0) {
+        ctx.fillRect(x + 5, y + 7, 3, 3);
+        ctx.fillRect(x + 22, y + 20, 4, 3);
+      } else if (motif === 1) {
+        ctx.fillRect(x + 16, y + 6, 3, 5);
+      } else if (motif === 2) {
+        ctx.fillRect(x + 8, y + 22, 6, 2);
+      }
+    }
+
+    function dessinerArbre(x, y) {
+      ctx.fillStyle = "#70442a";
+      ctx.fillRect(x + 12, y + 18, 8, 12);
+
+      ctx.fillStyle = "#174f2b";
+      ctx.fillRect(x + 5, y + 4, 22, 18);
+      ctx.fillRect(x + 2, y + 9, 28, 10);
+      ctx.fillRect(x + 8, y + 1, 16, 24);
+
+      ctx.fillStyle = "#347f43";
+      ctx.fillRect(x + 8, y + 5, 6, 5);
+      ctx.fillRect(x + 18, y + 10, 5, 6);
+    }
+
+    function dessinerMur(x, y) {
+      ctx.fillStyle = "#735235";
+      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
+
+      ctx.fillStyle = "#3e2c21";
+      ctx.fillRect(x, y + 14, TAILLE_CASE, 3);
+      ctx.fillRect(x + 14, y, 3, 14);
+      ctx.fillRect(x + 6, y + 17, 3, 15);
+      ctx.fillRect(x + 23, y + 17, 3, 15);
+
+      ctx.fillStyle = "#9b7651";
+      ctx.fillRect(x + 3, y + 3, 9, 3);
+      ctx.fillRect(x + 19, y + 20, 4, 3);
+    }
+
+    function dessinerEau(x, y, colonne, ligne) {
+      ctx.fillStyle = "#286f9d";
+      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
+
+      const decalage =
+        Math.floor(tempsEcoule * 12 + colonne * 3 + ligne * 5) % 16;
+
+      ctx.fillStyle = "#5db5cf";
+      ctx.fillRect(x + decalage, y + 8, 10, 3);
+      ctx.fillRect(x + ((decalage + 11) % 18), y + 22, 9, 3);
+
+      ctx.fillStyle = "#174e78";
+      ctx.fillRect(x + 2, y + 15, 14, 3);
+    }
+
+    function dessinerRoche(x, y) {
+      ctx.fillStyle = "#303638";
+      ctx.fillRect(x + 4, y + 8, 24, 20);
+      ctx.fillRect(x + 8, y + 4, 16, 24);
+
+      ctx.fillStyle = "#5c6669";
+      ctx.fillRect(x + 9, y + 7, 8, 5);
+      ctx.fillRect(x + 6, y + 15, 5, 7);
+
+      ctx.fillStyle = "#1c2021";
+      ctx.fillRect(x + 20, y + 18, 6, 7);
+    }
+
+    function dessinerPorte(x, y, ouverte) {
+      if (ouverte) {
+        ctx.fillStyle = "#111111";
+        ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE * 2);
+
+        ctx.fillStyle = "#ffe46b";
+        ctx.fillRect(x + 6, y + 5, 5, 5);
+        ctx.fillRect(x + 6, y + 49, 5, 5);
+
+        ctx.fillStyle = "#7de0ff";
+        ctx.fillRect(x + 16, y + 12, 8, 40);
+      } else {
+        ctx.fillStyle = "#5e371f";
+        ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE * 2);
+
+        ctx.fillStyle = "#a46935";
+        ctx.fillRect(x + 4, y + 4, 24, 56);
+
+        ctx.fillStyle = "#392014";
+        ctx.fillRect(x + 14, y + 4, 4, 56);
+
+        ctx.fillStyle = "#d9b04c";
+        ctx.fillRect(x + 6, y + 14, 20, 4);
+        ctx.fillRect(x + 6, y + 43, 20, 4);
+      }
+    }
+
+    function dessinerCarte() {
+      for (let ligne = 0; ligne < LIGNES; ligne++) {
+        for (let colonne = 0; colonne < COLONNES; colonne++) {
+          const x = colonne * TAILLE_CASE;
+          const y = HAUTEUR_INTERFACE + ligne * TAILLE_CASE;
+
+          const typeCase = tableauActuel.carte[ligne][colonne];
+
+          dessinerSol(x, y, colonne, ligne);
+
+          const estEmplacementPorte =
+            colonne === COLONNES - 1 &&
+            (ligne === 5 || ligne === 6);
+
+          if (estEmplacementPorte) {
+            continue;
+          }
+
+          if (typeCase === ARBRE) {
+            dessinerArbre(x, y);
+          } else if (typeCase === MUR) {
+            dessinerMur(x, y);
+          } else if (typeCase === EAU) {
+            dessinerEau(x, y, colonne, ligne);
+          } else if (typeCase === ROCHE) {
+            dessinerRoche(x, y);
+          }
+        }
+      }
+
+      dessinerPorte(
+        porteSortie.x,
+        porteSortie.y,
+        sortieOuverte
+      );
+    }
+
+    /* =========================================================
+       DESSIN DES CŒURS
        ========================================================= */
 
     function dessinerCoeur(x, y, rempli) {
       const couleur = rempli ? "#e53b44" : "#4d2729";
-      const contour = "#f7d9a0";
 
-      ctx.fillStyle = contour;
+      ctx.fillStyle = "#f7d9a0";
       ctx.fillRect(x + 4, y, 8, 4);
       ctx.fillRect(x + 16, y, 8, 4);
       ctx.fillRect(x, y + 4, 28, 12);
@@ -886,40 +1462,26 @@
       ctx.fillRect(x + 10, y + 24, 8, 2);
     }
 
+    /* =========================================================
+       DESSIN DE L'INTERFACE DU CANVAS
+       ========================================================= */
+
     function dessinerInterface() {
-      /*
-        Fond sombre de la barre d'interface.
-      */
       ctx.fillStyle = "#171b1b";
-      ctx.fillRect(
-        0,
-        0,
-        LARGEUR_CANVAS,
-        HAUTEUR_INTERFACE
-      );
+      ctx.fillRect(0, 0, LARGEUR_CANVAS, HAUTEUR_INTERFACE);
 
-      /*
-        Bordure inférieure dorée.
-      */
       ctx.fillStyle = "#d7ba62";
-      ctx.fillRect(
-        0,
-        HAUTEUR_INTERFACE - 4,
-        LARGEUR_CANVAS,
-        4
+      ctx.fillRect(0, HAUTEUR_INTERFACE - 4, LARGEUR_CANVAS, 4);
+
+      ctx.fillStyle = "#f4e6a4";
+      ctx.font = "bold 13px monospace";
+      ctx.textAlign = "left";
+      ctx.fillText(
+        "TABLEAU " + (indexTableau + 1) + " / " + tableaux.length,
+        16,
+        18
       );
 
-      /*
-        Titre.
-      */
-      ctx.fillStyle = "#f4e6a4";
-      ctx.font = "bold 15px monospace";
-      ctx.textAlign = "left";
-      ctx.fillText("LA QUÊTE DU HÉROS", 16, 20);
-
-      /*
-        Affichage des cœurs.
-      */
       for (let i = 0; i < joueur.vieMaximum; i++) {
         dessinerCoeur(
           18 + i * 36,
@@ -928,153 +1490,32 @@
         );
       }
 
-      /*
-        Compteur d'ennemis.
-      */
+      ctx.textAlign = "center";
       ctx.fillStyle = "#ffffff";
-      ctx.font = "14px monospace";
+      ctx.font = "bold 12px monospace";
+      ctx.fillText(
+        tableauActuel.nom.replace(/^TABLEAU \d+ — /, ""),
+        LARGEUR_CANVAS / 2,
+        21
+      );
+
       ctx.textAlign = "right";
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "13px monospace";
       ctx.fillText(
         "ENNEMIS : " + ennemis.length,
         LARGEUR_CANVAS - 16,
-        26
+        25
       );
 
-      /*
-        Temps écoulé.
-      */
-      ctx.fillStyle = "#b9d9c0";
+      ctx.fillStyle = sortieOuverte ? "#8bff9e" : "#c5d7c5";
       ctx.fillText(
-        "TEMPS : " + Math.floor(tempsEcoule) + "s",
+        sortieOuverte ? "SORTIE OUVERTE" : "PORTE FERMÉE",
         LARGEUR_CANVAS - 16,
         47
       );
-    }
 
-    /* =========================================================
-       DESSIN DE LA CARTE
-       ========================================================= */
-
-    function dessinerSol(x, y, colonne, ligne) {
-      /*
-        Sol principal.
-      */
-      ctx.fillStyle = "#5fae4d";
-      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
-
-      /*
-        Petits détails géométriques pour casser l'uniformité.
-      */
-      const motif = (colonne * 7 + ligne * 11) % 5;
-
-      ctx.fillStyle = "#4d9844";
-
-      if (motif === 0) {
-        ctx.fillRect(x + 5, y + 7, 3, 3);
-        ctx.fillRect(x + 22, y + 20, 4, 3);
-      } else if (motif === 1) {
-        ctx.fillRect(x + 16, y + 6, 3, 5);
-      } else if (motif === 2) {
-        ctx.fillRect(x + 8, y + 22, 6, 2);
-      }
-    }
-
-    function dessinerArbre(x, y) {
-      /*
-        Ombre sous l'arbre.
-      */
-      ctx.fillStyle = "#284426";
-      ctx.fillRect(x + 4, y + 6, 24, 24);
-
-      /*
-        Tronc.
-      */
-      ctx.fillStyle = "#70442a";
-      ctx.fillRect(x + 12, y + 18, 8, 12);
-
-      /*
-        Feuillage en carrés.
-      */
-      ctx.fillStyle = "#174f2b";
-      ctx.fillRect(x + 5, y + 4, 22, 18);
-      ctx.fillRect(x + 2, y + 9, 28, 10);
-      ctx.fillRect(x + 8, y + 1, 16, 24);
-
-      /*
-        Reflets.
-      */
-      ctx.fillStyle = "#2f7840";
-      ctx.fillRect(x + 8, y + 5, 6, 5);
-      ctx.fillRect(x + 18, y + 10, 5, 6);
-    }
-
-    function dessinerMur(x, y) {
-      /*
-        Bloc principal.
-      */
-      ctx.fillStyle = "#735235";
-      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
-
-      /*
-        Mortier.
-      */
-      ctx.fillStyle = "#3e2c21";
-      ctx.fillRect(x, y + 14, TAILLE_CASE, 3);
-      ctx.fillRect(x + 14, y, 3, 14);
-      ctx.fillRect(x + 6, y + 17, 3, 15);
-      ctx.fillRect(x + 23, y + 17, 3, 15);
-
-      /*
-        Lumière sur la pierre.
-      */
-      ctx.fillStyle = "#9b7651";
-      ctx.fillRect(x + 3, y + 3, 9, 3);
-      ctx.fillRect(x + 19, y + 20, 4, 3);
-    }
-
-    function dessinerEau(x, y, colonne, ligne) {
-      ctx.fillStyle = "#286f9d";
-      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
-
-      /*
-        Ondulations simples animées.
-      */
-      const decalage =
-        Math.floor(tempsEcoule * 12 + colonne * 3 + ligne * 5) % 16;
-
-      ctx.fillStyle = "#5db5cf";
-      ctx.fillRect(x + decalage, y + 8, 10, 3);
-      ctx.fillRect(x + ((decalage + 11) % 18), y + 22, 9, 3);
-
-      ctx.fillStyle = "#174e78";
-      ctx.fillRect(x + 2, y + 15, 14, 3);
-    }
-
-    function dessinerCarte() {
-      for (let ligne = 0; ligne < LIGNES; ligne++) {
-        for (
-          let colonne = 0;
-          colonne < COLONNES;
-          colonne++
-        ) {
-          const x = colonne * TAILLE_CASE;
-          const y =
-            HAUTEUR_INTERFACE +
-            ligne * TAILLE_CASE;
-
-          const typeCase = carte[ligne][colonne];
-
-          dessinerSol(x, y, colonne, ligne);
-
-          if (typeCase === ARBRE) {
-            dessinerArbre(x, y);
-          } else if (typeCase === MUR) {
-            dessinerMur(x, y);
-          } else if (typeCase === EAU) {
-            dessinerEau(x, y, colonne, ligne);
-          }
-        }
-      }
+      ctx.textAlign = "left";
     }
 
     /* =========================================================
@@ -1082,9 +1523,6 @@
        ========================================================= */
 
     function dessinerJoueur() {
-      /*
-        Pendant l'invulnérabilité, le joueur clignote.
-      */
       if (joueur.invulnerable) {
         const visible =
           Math.floor(joueur.tempsInvulnerabilite * 14) % 2 === 0;
@@ -1094,110 +1532,40 @@
         }
       }
 
-      /*
-        Ombre.
-      */
+      const x = Math.round(joueur.x);
+      const y = Math.round(joueur.y);
+
       ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
-      ctx.fillRect(
-        Math.round(joueur.x + 3),
-        Math.round(joueur.y + joueur.hauteur - 1),
-        joueur.largeur,
-        5
-      );
+      ctx.fillRect(x + 3, y + joueur.hauteur - 1, joueur.largeur, 5);
 
-      /*
-        Corps vert principal.
-      */
       ctx.fillStyle = "#2ea043";
-      ctx.fillRect(
-        Math.round(joueur.x),
-        Math.round(joueur.y),
-        joueur.largeur,
-        joueur.hauteur
-      );
+      ctx.fillRect(x, y, joueur.largeur, joueur.hauteur);
 
-      /*
-        Partie sombre du costume.
-      */
       ctx.fillStyle = "#14672c";
-      ctx.fillRect(
-        Math.round(joueur.x),
-        Math.round(joueur.y + joueur.hauteur - 7),
-        joueur.largeur,
-        7
-      );
+      ctx.fillRect(x, y + joueur.hauteur - 7, joueur.largeur, 7);
 
-      /*
-        Visage carré.
-      */
       ctx.fillStyle = "#f0bd7a";
-      ctx.fillRect(
-        Math.round(joueur.x + 5),
-        Math.round(joueur.y + 5),
-        14,
-        10
-      );
+      ctx.fillRect(x + 5, y + 5, 14, 10);
 
-      /*
-        Chapeau vert.
-      */
       ctx.fillStyle = "#17682d";
 
       if (joueur.direction === "gauche") {
-        ctx.fillRect(
-          Math.round(joueur.x - 5),
-          Math.round(joueur.y + 1),
-          14,
-          8
-        );
+        ctx.fillRect(x - 5, y + 1, 14, 8);
       } else if (joueur.direction === "droite") {
-        ctx.fillRect(
-          Math.round(joueur.x + 15),
-          Math.round(joueur.y + 1),
-          14,
-          8
-        );
+        ctx.fillRect(x + 15, y + 1, 14, 8);
       } else {
-        ctx.fillRect(
-          Math.round(joueur.x + 3),
-          Math.round(joueur.y),
-          18,
-          7
-        );
+        ctx.fillRect(x + 3, y, 18, 7);
       }
 
-      /*
-        Yeux orientés selon la direction.
-      */
       ctx.fillStyle = "#171717";
 
       if (joueur.direction === "gauche") {
-        ctx.fillRect(
-          Math.round(joueur.x + 6),
-          Math.round(joueur.y + 8),
-          3,
-          3
-        );
+        ctx.fillRect(x + 6, y + 8, 3, 3);
       } else if (joueur.direction === "droite") {
-        ctx.fillRect(
-          Math.round(joueur.x + 15),
-          Math.round(joueur.y + 8),
-          3,
-          3
-        );
+        ctx.fillRect(x + 15, y + 8, 3, 3);
       } else {
-        ctx.fillRect(
-          Math.round(joueur.x + 8),
-          Math.round(joueur.y + 8),
-          3,
-          3
-        );
-        ctx.fillRect(
-          Math.round(joueur.x + 14),
-          Math.round(joueur.y + 8),
-          3,
-          3
-        );
+        ctx.fillRect(x + 8, y + 8, 3, 3);
+        ctx.fillRect(x + 14, y + 8, 3, 3);
       }
     }
 
@@ -1212,9 +1580,6 @@
 
       const epee = obtenirRectangleEpee();
 
-      /*
-        Lame jaune.
-      */
       ctx.fillStyle = "#ffe45e";
       ctx.fillRect(
         Math.round(epee.x),
@@ -1223,9 +1588,6 @@
         epee.hauteur
       );
 
-      /*
-        Partie lumineuse de la lame.
-      */
       ctx.fillStyle = "#fff6b0";
 
       if (
@@ -1247,18 +1609,10 @@
         );
       }
 
-      /*
-        Garde de l'épée.
-      */
       ctx.fillStyle = "#c68c2d";
 
       if (joueur.direction === "haut") {
-        ctx.fillRect(
-          joueur.x + 5,
-          joueur.y - 4,
-          14,
-          5
-        );
+        ctx.fillRect(joueur.x + 5, joueur.y - 4, 14, 5);
       } else if (joueur.direction === "bas") {
         ctx.fillRect(
           joueur.x + 5,
@@ -1267,12 +1621,7 @@
           5
         );
       } else if (joueur.direction === "gauche") {
-        ctx.fillRect(
-          joueur.x - 4,
-          joueur.y + 5,
-          5,
-          14
-        );
+        ctx.fillRect(joueur.x - 4, joueur.y + 5, 5, 14);
       } else {
         ctx.fillRect(
           joueur.x + joueur.largeur - 1,
@@ -1291,49 +1640,19 @@
       const x = Math.round(ennemi.x);
       const y = Math.round(ennemi.y);
 
-      /*
-        Ombre.
-      */
       ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
-      ctx.fillRect(
-        x + 3,
-        y + ennemi.hauteur - 1,
-        ennemi.largeur,
-        5
-      );
+      ctx.fillRect(x + 3, y + ennemi.hauteur - 1, ennemi.largeur, 5);
 
-      /*
-        Corps rouge.
-      */
-      ctx.fillStyle = "#c9333e";
-      ctx.fillRect(
-        x,
-        y,
-        ennemi.largeur,
-        ennemi.hauteur
-      );
+      ctx.fillStyle = ennemi.vieMaximum >= 4 ? "#8e2029" : "#c9333e";
+      ctx.fillRect(x, y, ennemi.largeur, ennemi.hauteur);
 
-      /*
-        Partie sombre.
-      */
       ctx.fillStyle = "#7c1f28";
-      ctx.fillRect(
-        x,
-        y + ennemi.hauteur - 7,
-        ennemi.largeur,
-        7
-      );
+      ctx.fillRect(x, y + ennemi.hauteur - 7, ennemi.largeur, 7);
 
-      /*
-        Cornes.
-      */
       ctx.fillStyle = "#f0d29b";
       ctx.fillRect(x + 2, y - 4, 5, 6);
       ctx.fillRect(x + 17, y - 4, 5, 6);
 
-      /*
-        Yeux.
-      */
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(x + 5, y + 7, 5, 5);
       ctx.fillRect(x + 14, y + 7, 5, 5);
@@ -1342,21 +1661,16 @@
       ctx.fillRect(x + 7, y + 8, 2, 3);
       ctx.fillRect(x + 15, y + 8, 2, 3);
 
-      /*
-        Petite barre de vie de l'ennemi.
-      */
-      const largeurBarre = ennemi.largeur;
-      const ratioVie =
-        ennemi.vie / ennemi.vieMaximum;
+      const ratioVie = ennemi.vie / ennemi.vieMaximum;
 
       ctx.fillStyle = "#35171a";
-      ctx.fillRect(x, y - 9, largeurBarre, 4);
+      ctx.fillRect(x, y - 9, ennemi.largeur, 4);
 
       ctx.fillStyle = "#ff765d";
       ctx.fillRect(
         x,
         y - 9,
-        Math.floor(largeurBarre * ratioVie),
+        Math.floor(ennemi.largeur * ratioVie),
         4
       );
     }
@@ -1368,6 +1682,94 @@
     }
 
     /* =========================================================
+       MESSAGES TEMPORAIRES
+       ========================================================= */
+
+    function dessinerMessageTemporaire() {
+      if (tempsMessage <= 0 || !messageTemporaire) {
+        return;
+      }
+
+      const largeur = 390;
+      const hauteur = 54;
+      const x = (LARGEUR_CANVAS - largeur) / 2;
+      const y = 80;
+
+      ctx.fillStyle = "rgba(12, 16, 12, 0.90)";
+      ctx.fillRect(x, y, largeur, hauteur);
+
+      ctx.fillStyle = "#dfc96f";
+      ctx.fillRect(x, y, largeur, 4);
+      ctx.fillRect(x, y + hauteur - 4, largeur, 4);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 15px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(
+        messageTemporaire,
+        LARGEUR_CANVAS / 2,
+        y + 33
+      );
+
+      ctx.textAlign = "left";
+    }
+
+    /* =========================================================
+       ÉCRAN ENTRE LES TABLEAUX
+       ========================================================= */
+
+    function dessinerTransitionTableau() {
+      if (!transitionTableau) {
+        return;
+      }
+
+      ctx.fillStyle = "rgba(5, 8, 5, 0.88)";
+      ctx.fillRect(0, 0, LARGEUR_CANVAS, HAUTEUR_CANVAS);
+
+      ctx.fillStyle = "#d8c16b";
+      ctx.fillRect(74, 130, 364, 190);
+
+      ctx.fillStyle = "#151915";
+      ctx.fillRect(81, 137, 350, 176);
+
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "#82f39d";
+      ctx.font = "bold 27px monospace";
+      ctx.fillText(
+        "TABLEAU TERMINÉ",
+        LARGEUR_CANVAS / 2,
+        190
+      );
+
+      ctx.fillStyle = "#f1e5b5";
+      ctx.font = "15px monospace";
+      ctx.fillText(
+        "Le héros poursuit son aventure.",
+        LARGEUR_CANVAS / 2,
+        229
+      );
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 14px monospace";
+      ctx.fillText(
+        "APPUYEZ SUR ENTRÉE",
+        LARGEUR_CANVAS / 2,
+        273
+      );
+
+      ctx.fillStyle = "#bdd0bd";
+      ctx.font = "12px monospace";
+      ctx.fillText(
+        "ou sur le bouton ÉPÉE",
+        LARGEUR_CANVAS / 2,
+        295
+      );
+
+      ctx.textAlign = "left";
+    }
+
+    /* =========================================================
        ÉCRAN DE FIN
        ========================================================= */
 
@@ -1376,131 +1778,84 @@
         return;
       }
 
-      /*
-        Voile sombre semi-transparent.
-      */
-      ctx.fillStyle = "rgba(5, 7, 7, 0.84)";
-      ctx.fillRect(
-        0,
-        0,
-        LARGEUR_CANVAS,
-        HAUTEUR_CANVAS
-      );
+      ctx.fillStyle = "rgba(5, 7, 7, 0.90)";
+      ctx.fillRect(0, 0, LARGEUR_CANVAS, HAUTEUR_CANVAS);
 
-      /*
-        Cadre central.
-      */
-      ctx.fillStyle = victoire
-        ? "#1f6b3a"
-        : "#6b1f28";
-
-      ctx.fillRect(
-        72,
-        126,
-        LARGEUR_CANVAS - 144,
-        194
-      );
+      ctx.fillStyle = victoireFinale ? "#1f6b3a" : "#6b1f28";
+      ctx.fillRect(62, 110, 388, 224);
 
       ctx.fillStyle = "#e9cf76";
-      ctx.fillRect(
-        78,
-        132,
-        LARGEUR_CANVAS - 156,
-        182
-      );
+      ctx.fillRect(68, 116, 376, 212);
 
       ctx.fillStyle = "#151818";
-      ctx.fillRect(
-        84,
-        138,
-        LARGEUR_CANVAS - 168,
-        170
-      );
+      ctx.fillRect(76, 124, 360, 196);
 
-      /*
-        Message principal.
-      */
       ctx.textAlign = "center";
-      ctx.font = "bold 34px monospace";
+      ctx.font = "bold 31px monospace";
 
-      ctx.fillStyle = victoire
-        ? "#7ff09b"
-        : "#ff6571";
-
+      ctx.fillStyle = victoireFinale ? "#7ff09b" : "#ff6571";
       ctx.fillText(
-        victoire ? "VICTOIRE !" : "GAME OVER",
+        victoireFinale ? "AVENTURE TERMINÉE !" : "GAME OVER",
         LARGEUR_CANVAS / 2,
-        192
+        180
       );
 
-      /*
-        Message secondaire.
-      */
       ctx.fillStyle = "#f3e8bb";
-      ctx.font = "16px monospace";
+      ctx.font = "15px monospace";
 
-      if (victoire) {
+      if (victoireFinale) {
         ctx.fillText(
-          "Tous les ennemis sont vaincus.",
+          "Les trois royaumes sont libérés.",
           LARGEUR_CANVAS / 2,
-          228
+          220
+        );
+
+        ctx.fillText(
+          "Temps : " + Math.floor(tempsEcoule) + " secondes",
+          LARGEUR_CANVAS / 2,
+          245
         );
       } else {
         ctx.fillText(
           "Le héros a perdu ses trois cœurs.",
           LARGEUR_CANVAS / 2,
-          228
+          225
         );
       }
 
       ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 15px monospace";
+      ctx.font = "bold 14px monospace";
       ctx.fillText(
         "APPUYEZ SUR UNE TOUCHE",
         LARGEUR_CANVAS / 2,
-        272
+        285
       );
 
       ctx.fillStyle = "#b9d9c0";
-      ctx.font = "13px monospace";
+      ctx.font = "12px monospace";
       ctx.fillText(
-        "pour recommencer",
+        "pour recommencer l'aventure",
         LARGEUR_CANVAS / 2,
-        294
+        307
       );
 
       ctx.textAlign = "left";
     }
 
     /* =========================================================
-       FONCTION DE RENDU PRINCIPALE
+       RENDU PRINCIPAL
        ========================================================= */
 
     function render() {
-      /*
-        Efface entièrement l'image précédente.
-      */
-      ctx.clearRect(
-        0,
-        0,
-        LARGEUR_CANVAS,
-        HAUTEUR_CANVAS
-      );
+      ctx.clearRect(0, 0, LARGEUR_CANVAS, HAUTEUR_CANVAS);
 
-      /*
-        Ordre de dessin :
-        1. carte
-        2. ennemis
-        3. épée
-        4. joueur
-        5. interface
-        6. écran de fin
-      */
       dessinerCarte();
       dessinerEnnemis();
       dessinerEpee();
       dessinerJoueur();
       dessinerInterface();
+      dessinerMessageTemporaire();
+      dessinerTransitionTableau();
       dessinerEcranFin();
     }
 
@@ -1509,18 +1864,9 @@
        ========================================================= */
 
     function boucleJeu(tempsActuel) {
-      /*
-        Conversion des millisecondes en secondes.
-      */
-      let deltaTime =
-        (tempsActuel - ancienTemps) / 1000;
-
+      let deltaTime = (tempsActuel - ancienTemps) / 1000;
       ancienTemps = tempsActuel;
 
-      /*
-        Limite deltaTime pour éviter les grands sauts après une
-        perte de focus ou un ralentissement important.
-      */
       deltaTime = limiter(deltaTime, 0, 0.05);
 
       update(deltaTime);
@@ -1530,10 +1876,10 @@
     }
 
     /* =========================================================
-       DÉMARRAGE INITIAL
+       DÉMARRAGE DE L'AVENTURE
        ========================================================= */
 
-    creerEnnemisInitiaux();
+    recommencerAventure();
     requestAnimationFrame(boucleJeu);
   </script>
 </body>
