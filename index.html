@@ -1,2486 +1,4227 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>La Quête des Cinq Royaumes</title>
+<meta charset="UTF-8">
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"
+>
+<title>La Quête des Cinq Royaumes</title>
 
-  <style>
-    /* =========================================================
-       BASE ET MISE EN PAGE
-       ========================================================= */
-    * { box-sizing: border-box; }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    html, body {
-      width: 100%;
-      min-height: 100%;
-      margin: 0;
-      background: radial-gradient(circle at top, #293829, #101610 58%, #060906);
-      color: #fff;
-      font-family: monospace;
-    }
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  background:
+    radial-gradient(circle at top, #293829, #101610 58%, #060906);
+  color: #ffffff;
+  font-family: monospace;
+}
 
-    body {
-      display: flex;
-      justify-content: center;
-      padding: 14px;
-    }
+body {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+}
 
-    button { font: inherit; }
+button {
+  font: inherit;
+}
 
-    #game-shell {
-      width: 548px;
-      max-width: 100%;
-    }
+.shell {
+  width: 760px;
+  max-width: 100%;
+}
 
-    #top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-      padding: 10px;
-      border: 3px solid #dbc36e;
-      background: #161c16;
-      box-shadow: 0 8px 25px rgba(0,0,0,.5);
-    }
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 3px solid #dbc36e;
+  background: #161c16;
+}
 
-    #game-title {
-      color: #f4df91;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
+.title {
+  color: #f4df91;
+  font-weight: bold;
+}
 
-    #top-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-    }
+.buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
 
-    .ui-button {
-      min-height: 38px;
-      padding: 7px 10px;
-      border: 3px solid #e3ce7c;
-      background: #355c31;
-      color: #fff;
-      cursor: pointer;
-      box-shadow: inset 3px 3px 0 #5f8758, inset -3px -3px 0 #1d341a;
-    }
+.btn {
+  padding: 7px 10px;
+  border: 3px solid #e3ce7c;
+  background: #355c31;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow:
+    inset 3px 3px #5f8758,
+    inset -3px -3px #1d341a;
+}
 
-    .ui-button:hover,
-    .ui-button:focus-visible {
-      background: #4b7b44;
-      outline: 2px solid #fff;
-      outline-offset: 2px;
-    }
+.btn:hover {
+  background: #4b7b44;
+}
 
-    .ui-button:active { transform: translateY(2px); }
+.layout {
+  display: grid;
+  grid-template-columns: 512px 1fr;
+  gap: 12px;
+  align-items: start;
+}
 
-    #canvas-container {
-      width: 512px;
-      max-width: 100%;
-      margin: auto;
-    }
+canvas {
+  display: block;
+  width: 512px;
+  height: 448px;
+  max-width: 100%;
+  border: 6px solid #d8c37a;
+  background: #4d9d47;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  box-shadow:
+    0 0 0 4px #49341d,
+    0 14px 35px rgba(0, 0, 0, 0.6);
+}
 
-    canvas {
-      display: block;
-      width: 512px;
-      height: 448px;
-      max-width: 100%;
-      border: 6px solid #d8c37a;
-      background: #4d9d47;
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-      box-shadow: 0 0 0 4px #49341d, 0 14px 35px rgba(0,0,0,.65);
-    }
+.inventory {
+  display: grid;
+  gap: 8px;
+}
 
-    #status-text {
-      margin-top: 12px;
-      color: #f2e6b8;
-      text-align: center;
-      font-size: 13px;
-      line-height: 1.5;
-    }
+.invbox {
+  padding: 9px;
+  border: 2px solid #75683c;
+  background: #1b211b;
+}
 
-    /* =========================================================
-       ÉCRAN DE SÉLECTION DU PERSONNAGE
-       ========================================================= */
-    #character-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 300;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      overflow-y: auto;
-      background: radial-gradient(circle, rgba(54,75,49,.98), rgba(5,8,5,.99));
-    }
+.invbox h3 {
+  margin: 0 0 7px;
+  color: #f2d978;
+  font-size: 12px;
+}
 
-    #character-screen.hidden { display: none; }
+.line {
+  margin: 4px 0;
+  font-size: 11px;
+  line-height: 1.35;
+}
 
-    #character-panel {
-      width: 790px;
-      max-width: 100%;
-      padding: 24px;
-      border: 5px solid #e0c66e;
-      background: #151a15;
-      box-shadow: 0 0 0 5px #5d4223, 0 20px 70px rgba(0,0,0,.85);
-    }
+.token {
+  display: inline-block;
+  margin: 2px 2px 0 0;
+  padding: 2px 4px;
+  border: 1px solid #a9934f;
+  background: #303830;
+  color: #fff2a4;
+  font-size: 10px;
+}
 
-    #character-panel h1 {
-      margin: 0 0 8px;
-      color: #f3df91;
-      text-align: center;
-      font-size: 25px;
-    }
+.muted {
+  color: #7f8d7f;
+}
 
-    #character-panel > p {
-      margin: 0 0 20px;
-      color: #cad8ca;
-      text-align: center;
-      line-height: 1.5;
-    }
+.status {
+  margin-top: 10px;
+  color: #f2e6b8;
+  text-align: center;
+  font-size: 12px;
+}
 
-    #character-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-    }
+.overlay,
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.87);
+}
 
-    .character-card {
-      padding: 14px;
-      border: 3px solid #6a603e;
-      background: #222922;
-      color: #fff;
-      cursor: pointer;
-      text-align: center;
-    }
+.overlay.hidden,
+.modal {
+  display: none;
+}
 
-    .character-card:hover,
-    .character-card:focus-visible {
-      border-color: #ffe47c;
-      background: #303a30;
-      outline: none;
-      transform: translateY(-3px);
-    }
+.modal.show {
+  display: flex;
+}
 
-    .character-preview {
-      position: relative;
-      width: 92px;
-      height: 92px;
-      margin: 0 auto 12px;
-      border: 3px solid #d8c37a;
-      background: #101510;
-    }
+.panel {
+  width: 760px;
+  max-width: 100%;
+  max-height: 92vh;
+  overflow: auto;
+  padding: 20px;
+  border: 5px solid #dfc76e;
+  background: #151a15;
+  box-shadow:
+    0 0 0 5px #5d4223,
+    0 20px 70px rgba(0, 0, 0, 0.85);
+}
 
-    .character-card h2 {
-      margin: 0 0 7px;
-      color: #ffe279;
-      font-size: 18px;
-    }
+.panel h1,
+.panel h2 {
+  color: #f3df91;
+  text-align: center;
+}
 
-    .character-card p {
-      min-height: 50px;
-      color: #adbdad;
-      font-size: 12px;
-      line-height: 1.45;
-    }
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
 
-    .character-card ul {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      color: #d9e2d9;
-      font-size: 13px;
-      line-height: 1.75;
-    }
+.card {
+  padding: 12px;
+  border: 3px solid #6a603e;
+  background: #222922;
+  color: #ffffff;
+  cursor: pointer;
+  text-align: center;
+}
 
-    /* =========================================================
-       MODALES
-       ========================================================= */
-    .modal {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(0,0,0,.82);
-    }
+.card:hover {
+  border-color: #ffe47c;
+  background: #303a30;
+}
 
-    .modal.visible { display: flex; }
+.preview {
+  position: relative;
+  width: 86px;
+  height: 86px;
+  margin: 0 auto 10px;
+  border: 3px solid #d8c37a;
+  background: #101510;
+}
 
-    .modal-panel {
-      width: 500px;
-      max-width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 22px;
-      border: 5px solid #dfc76e;
-      background: #151a15;
-      box-shadow: 0 0 0 5px #5d4223, 0 20px 60px rgba(0,0,0,.8);
-    }
+.card h3 {
+  color: #ffe279;
+}
 
-    .modal-panel h2 {
-      margin: 0 0 18px;
-      color: #f3df91;
-      text-align: center;
-    }
+.card ul {
+  padding: 0;
+  list-style: none;
+  line-height: 1.6;
+  font-size: 12px;
+}
 
-    .info-row {
-      display: grid;
-      grid-template-columns: 145px 1fr;
-      gap: 12px;
-      align-items: center;
-      padding: 11px 0;
-      border-bottom: 1px solid #394139;
-    }
+.row {
+  padding: 9px 0;
+  border-bottom: 1px solid #394139;
+}
 
-    .key {
-      display: inline-block;
-      padding: 7px 8px;
-      border: 2px solid #cfbb70;
-      background: #303830;
-      text-align: center;
-    }
+.item {
+  padding: 10px;
+  margin: 8px 0;
+  border: 2px solid #685d38;
+  background: #232923;
+}
 
-    .collection-card {
-      margin-bottom: 10px;
-      padding: 12px;
-      border: 2px solid #685d38;
-      background: #232923;
-    }
+.locked {
+  opacity: 0.45;
+}
 
-    .collection-card.locked { opacity: .43; }
+.upgrade {
+  margin-top: 7px;
+  padding: 5px 7px;
+  border: 2px solid #dac36e;
+  background: #704b25;
+  color: #ffffff;
+  cursor: pointer;
+}
 
-    .collection-card h3 {
-      margin: 0 0 6px;
-      color: #ffe879;
-    }
+.upgrade:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 
-    .collection-card p {
-      margin: 4px 0;
-      line-height: 1.45;
-    }
+.touch {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 14px;
+  user-select: none;
+}
 
-    .modal-close {
-      width: 100%;
-      margin-top: 18px;
-    }
+.pad {
+  display: grid;
+  grid-template-columns: repeat(3, 48px);
+  grid-template-rows: repeat(3, 48px);
+  justify-content: center;
+  gap: 4px;
+}
 
+.tbtn {
+  border: 3px solid #d9c477;
+  background: #293329;
+  color: #ffffff;
+  font-size: 20px;
+  touch-action: none;
+}
 
-    /* =========================================================
-       INVENTAIRE STRUCTURÉ TOUJOURS VISIBLE
-       ========================================================= */
-    #inventory-bar {
-      display: grid;
-      grid-template-columns: 1fr 1.25fr 1.4fr;
-      gap: 8px;
-      width: 512px;
-      max-width: 100%;
-      margin: 0 auto 12px;
-    }
+.up {
+  grid-column: 2;
+}
 
-    .inventory-section {
-      min-height: 78px;
-      padding: 9px;
-      border: 2px solid #75683c;
-      background: #1b211b;
-      box-shadow: inset 0 0 0 2px #101410;
-    }
+.left {
+  grid-column: 1;
+  grid-row: 2;
+}
 
-    .inventory-section h3 {
-      margin: 0 0 7px;
-      color: #f2d978;
-      font-size: 11px;
-      letter-spacing: .5px;
-    }
+.down {
+  grid-column: 2;
+  grid-row: 2;
+}
 
-    .inventory-line {
-      margin: 3px 0;
-      color: #dce7dc;
-      font-size: 11px;
-      line-height: 1.35;
-    }
+.right {
+  grid-column: 3;
+  grid-row: 2;
+}
 
-    .inventory-empty { color: #7f8d7f; }
+.attack {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: #9b312f;
+}
 
-    .inventory-token {
-      display: inline-block;
-      margin: 2px 2px 0 0;
-      padding: 2px 4px;
-      border: 1px solid #a9934f;
-      background: #303830;
-      color: #fff2a4;
-      font-size: 10px;
-    }
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    .craft-button {
-      margin-top: 7px;
-      padding: 5px 7px;
-      border: 2px solid #dac36e;
-      background: #704b25;
-      color: #fff;
-      cursor: pointer;
-      font-size: 11px;
-    }
+@media (max-width: 760px), (pointer: coarse) {
+  body {
+    padding: 6px;
+  }
 
-    .craft-button:disabled {
-      cursor: not-allowed;
-      opacity: .45;
-    }
+  .layout {
+    grid-template-columns: 1fr;
+  }
 
-    .lock-requirement {
-      color: #ffcf76;
-      font-size: 11px;
-    }
+  .inventory {
+    grid-template-columns: repeat(3, 1fr);
+  }
 
-    @media (max-width: 560px) {
-      #inventory-bar {
-        grid-template-columns: 1fr;
-      }
+  .touch {
+    display: grid;
+  }
 
-      .inventory-section {
-        min-height: auto;
-      }
-    }
+  .top {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-    /* =========================================================
-       COMMANDES TACTILES
-       ========================================================= */
-    #mobile-controls {
-      display: none;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 16px;
-      user-select: none;
-      touch-action: none;
-    }
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
 
-    #direction-pad {
-      display: grid;
-      grid-template-columns: repeat(3, 52px);
-      grid-template-rows: repeat(3, 52px);
-      justify-content: center;
-      gap: 4px;
-    }
+  .cards {
+    grid-template-columns: 1fr;
+  }
 
-    .touch-button {
-      border: 3px solid #d9c477;
-      background: #293329;
-      color: #fff;
-      font-size: 21px;
-      font-weight: 700;
-      touch-action: none;
-      box-shadow: inset 3px 3px 0 #526252, inset -3px -3px 0 #131813;
-    }
+  canvas {
+    height: auto;
+  }
+}
 
-    .touch-button.active,
-    .touch-button:active {
-      background: #4b6745;
-      transform: translateY(2px);
-    }
+@media (max-width: 520px) {
+  .inventory {
+    grid-template-columns: 1fr;
+  }
 
-    #touch-up { grid-column: 2; grid-row: 1; }
-    #touch-left { grid-column: 1; grid-row: 2; }
-    #touch-down { grid-column: 2; grid-row: 2; }
-    #touch-right { grid-column: 3; grid-row: 2; }
-
-    #action-pad {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #touch-attack {
-      width: 92px;
-      height: 92px;
-      border-radius: 50%;
-      background: #9b312f;
-      font-size: 15px;
-    }
-
-    @media (max-width: 760px), (pointer: coarse) {
-      body { padding: 7px; }
-      canvas { height: auto; }
-      #mobile-controls { display: grid; }
-      #top-bar { align-items: stretch; flex-direction: column; }
-      #top-buttons { display: grid; grid-template-columns: repeat(3, 1fr); }
-      #character-grid { grid-template-columns: 1fr; }
-      .character-card {
-        display: grid;
-        grid-template-columns: 105px 1fr;
-        gap: 12px;
-        align-items: center;
-        text-align: left;
-      }
-      .character-preview { margin: 0; }
-    }
-
-    @media (max-width: 440px) {
-      #top-buttons { grid-template-columns: 1fr; }
-      #direction-pad {
-        grid-template-columns: repeat(3, 46px);
-        grid-template-rows: repeat(3, 46px);
-      }
-      #touch-attack { width: 80px; height: 80px; }
-      .info-row { grid-template-columns: 1fr; text-align: center; }
-    }
-  </style>
+  .buttons {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
 </head>
 
 <body>
-  <!-- =======================================================
-       SÉLECTION DU PERSONNAGE
-       ======================================================= -->
-  <section id="character-screen">
-    <div id="character-panel">
-      <h1>CHOISIS TON PERSONNAGE</h1>
-      <p>Le choix modifie réellement la vie, la vitesse, les dégâts, la portée et certains bonus de départ.</p>
 
-      <div id="character-grid">
-        <button class="character-card" data-character="renard" type="button">
-          <div class="character-preview" aria-hidden="true">
-            <span style="position:absolute;left:27px;top:39px;width:38px;height:34px;background:#f28c28"></span>
-            <span style="position:absolute;left:31px;top:19px;width:30px;height:29px;background:#ff9c35"></span>
-            <span style="position:absolute;left:27px;top:10px;width:11px;height:16px;background:#c9651d"></span>
-            <span style="position:absolute;left:54px;top:10px;width:11px;height:16px;background:#c9651d"></span>
-            <span style="position:absolute;left:37px;top:36px;width:18px;height:8px;background:#fff0c8"></span>
-            <span style="position:absolute;left:35px;top:29px;width:4px;height:4px;background:#161616"></span>
-            <span style="position:absolute;left:53px;top:29px;width:4px;height:4px;background:#161616"></span>
-          </div>
-          <div>
-            <h2>RENARD ORANGE</h2>
-            <p>Explorateur agile, rapide et spécialisé dans la collecte des richesses.</p>
-            <ul>
-              <li>Vie : 3 cœurs</li>
-              <li>Vitesse : très élevée</li>
-              <li>Attaque : 1</li>
-              <li>Or gagné : +15 %</li>
-            </ul>
-          </div>
-        </button>
+<!-- =========================================================
+     ÉCRAN DE SÉLECTION DU PERSONNAGE
+     ========================================================= -->
 
-        <button class="character-card" data-character="guerrier" type="button">
-          <div class="character-preview" aria-hidden="true">
-            <span style="position:absolute;left:27px;top:38px;width:38px;height:35px;background:#3175d6"></span>
-            <span style="position:absolute;left:31px;top:20px;width:30px;height:25px;background:#d7a46d"></span>
-            <span style="position:absolute;left:27px;top:12px;width:38px;height:12px;background:#858e99"></span>
-            <span style="position:absolute;left:66px;top:39px;width:7px;height:31px;background:#ffe36d"></span>
-          </div>
-          <div>
-            <h2>GUERRIER</h2>
-            <p>Combattant robuste avec davantage de vie, de dégâts et une défense naturelle.</p>
-            <ul>
-              <li>Vie : 5 cœurs</li>
-              <li>Vitesse : moyenne</li>
-              <li>Attaque : 2</li>
-              <li>Défense de départ : 1</li>
-            </ul>
-          </div>
-        </button>
+<section id="select" class="overlay">
+  <div class="panel">
+    <h1>CHOISIS TON HÉROS</h1>
 
-        <button class="character-card" data-character="mage" type="button">
-          <div class="character-preview" aria-hidden="true">
-            <span style="position:absolute;left:27px;top:38px;width:38px;height:35px;background:#7e46c4"></span>
-            <span style="position:absolute;left:31px;top:20px;width:30px;height:25px;background:#d9ac79"></span>
-            <span style="position:absolute;left:28px;top:6px;width:36px;height:20px;background:#552a8d"></span>
-            <span style="position:absolute;left:70px;top:28px;width:5px;height:44px;background:#b77b3c"></span>
-            <span style="position:absolute;left:65px;top:22px;width:15px;height:15px;background:#65dfff"></span>
-          </div>
-          <div>
-            <h2>MAGE</h2>
-            <p>Personnage technique avec une attaque plus longue et une récupération plus rapide.</p>
-            <ul>
-              <li>Vie : 3 cœurs</li>
-              <li>Vitesse : élevée</li>
-              <li>Portée : supérieure</li>
-              <li>Recharge : rapide</li>
-            </ul>
-          </div>
-        </button>
+    <div class="cards">
+
+      <button class="card" data-char="fox" type="button">
+        <div class="preview">
+          <i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#f28c28"></i>
+          <i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#ff9c35"></i>
+          <i style="position:absolute;left:24px;top:8px;width:11px;height:16px;background:#c9651d"></i>
+          <i style="position:absolute;left:51px;top:8px;width:11px;height:16px;background:#c9651d"></i>
+        </div>
+
+        <h3>🦊 RENARD ORANGE</h3>
+
+        <ul>
+          <li>Vie : 3 cœurs</li>
+          <li>Vitesse très élevée</li>
+          <li>Attaque : 1</li>
+          <li>Or gagné : +15 %</li>
+        </ul>
+      </button>
+
+      <button class="card" data-char="warrior" type="button">
+        <div class="preview">
+          <i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#3175d6"></i>
+          <i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#d7a46d"></i>
+          <i style="position:absolute;left:24px;top:9px;width:38px;height:12px;background:#858e99"></i>
+        </div>
+
+        <h3>🥷 GUERRIER</h3>
+
+        <ul>
+          <li>Vie : 5 cœurs</li>
+          <li>Attaque : 2</li>
+          <li>Défense : 1</li>
+          <li>Vitesse moyenne</li>
+        </ul>
+      </button>
+
+      <button class="card" data-char="mage" type="button">
+        <div class="preview">
+          <i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#7e46c4"></i>
+          <i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#d9ac79"></i>
+          <i style="position:absolute;left:25px;top:4px;width:36px;height:20px;background:#552a8d"></i>
+        </div>
+
+        <h3>🧙 MAGE</h3>
+
+        <ul>
+          <li>Vie : 3 cœurs</li>
+          <li>Portée accrue</li>
+          <li>Recharge rapide</li>
+          <li>Vitesse élevée</li>
+        </ul>
+      </button>
+
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     INTERFACE PRINCIPALE
+     ========================================================= -->
+
+<main class="shell">
+
+  <header class="top">
+    <div class="title">
+      LA QUÊTE DES CINQ ROYAUMES
+    </div>
+
+    <div class="buttons">
+      <button id="controlsBtn" class="btn" type="button">
+        COMMANDES
+      </button>
+
+      <button id="inventoryBtn" class="btn" type="button">
+        INVENTAIRE
+      </button>
+
+      <button id="changeBtn" class="btn" type="button">
+        PERSONNAGE
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <div>
+      <canvas
+        id="game"
+        width="512"
+        height="448"
+        tabindex="0"
+        aria-label="Jeu d'aventure rétro"
+      ></canvas>
+
+      <div class="touch">
+
+        <div class="pad">
+          <button class="tbtn up" data-key="ArrowUp" type="button">
+            ▲
+          </button>
+
+          <button class="tbtn left" data-key="ArrowLeft" type="button">
+            ◀
+          </button>
+
+          <button class="tbtn down" data-key="ArrowDown" type="button">
+            ▼
+          </button>
+
+          <button class="tbtn right" data-key="ArrowRight" type="button">
+            ▶
+          </button>
+        </div>
+
+        <div class="action">
+          <button id="touchAttack" class="tbtn attack" type="button">
+            ÉPÉE
+          </button>
+        </div>
+
       </div>
     </div>
-  </section>
 
-  <!-- =======================================================
-       JEU
-       ======================================================= -->
-  <main id="game-shell">
-    <header id="top-bar">
-      <div id="game-title">LA QUÊTE DES CINQ ROYAUMES</div>
-      <div id="top-buttons">
-        <button id="show-controls" class="ui-button" type="button">COMMANDES</button>
-        <button id="show-artifacts" class="ui-button" type="button">ARTÉFACTS</button>
-        <button id="show-equipment" class="ui-button" type="button">ÉQUIPEMENT</button>
-        <button id="show-inventory" class="ui-button" type="button">INVENTAIRE</button>
-      </div>
-    </header>
+    <aside class="inventory">
 
-    <section id="inventory-bar" aria-label="Inventaire du joueur">
-      <div class="inventory-section">
+      <section class="invbox">
         <h3>RESSOURCES</h3>
-        <div id="inventory-resources"></div>
-      </div>
+        <div id="res"></div>
+      </section>
 
-      <div class="inventory-section">
+      <section class="invbox">
         <h3>ÉQUIPEMENT</h3>
-        <div id="inventory-equipment"></div>
-      </div>
+        <div id="gear"></div>
+      </section>
 
-      <div class="inventory-section">
+      <section class="invbox">
         <h3>ARTÉFACTS-CLÉS</h3>
-        <div id="inventory-artifacts"></div>
-      </div>
-    </section>
+        <div id="keys"></div>
+      </section>
 
-    <div id="canvas-container">
-      <canvas id="game" width="512" height="448" tabindex="0" aria-label="Jeu d'aventure rétro"></canvas>
-    </div>
-
-    <section id="mobile-controls" aria-label="Commandes tactiles">
-      <div id="direction-pad">
-        <button id="touch-up" class="touch-button" type="button">▲</button>
-        <button id="touch-left" class="touch-button" type="button">◀</button>
-        <button id="touch-down" class="touch-button" type="button">▼</button>
-        <button id="touch-right" class="touch-button" type="button">▶</button>
-      </div>
-      <div id="action-pad">
-        <button id="touch-attack" class="touch-button" type="button">ÉPÉE</button>
-      </div>
-    </section>
-
-    <div id="status-text">
-      Élimine les ennemis et accomplis l’objectif du niveau pour ouvrir la porte.
-    </div>
-  </main>
-
-  <!-- =======================================================
-       MODALES
-       ======================================================= -->
-  <div id="controls-modal" class="modal" role="dialog" aria-modal="true">
-    <div class="modal-panel">
-      <h2>COMMANDES</h2>
-      <div class="info-row"><span class="key">↑ ↓ ← →</span><span>Déplacement</span></div>
-      <div class="info-row"><span class="key">Z Q S D</span><span>Déplacement alternatif</span></div>
-      <div class="info-row"><span class="key">ESPACE</span><span>Attaque à l’épée</span></div>
-      <div class="info-row"><span class="key">ENTRÉE</span><span>Continuer après un niveau</span></div>
-      <div class="info-row"><span class="key">R</span><span>Recommencer avec le même personnage</span></div>
-      <div class="info-row"><span class="key">C</span><span>Retour au choix du personnage</span></div>
-      <button class="ui-button modal-close" data-close-modal type="button">RETOUR AU JEU</button>
-    </div>
+    </aside>
   </div>
 
-  <div id="artifacts-modal" class="modal" role="dialog" aria-modal="true">
-    <div class="modal-panel">
-      <h2>ARTÉFACTS</h2>
-      <div id="artifact-list"></div>
-      <button class="ui-button modal-close" data-close-modal type="button">RETOUR AU JEU</button>
-    </div>
+  <div class="status">
+    Porte droite : niveau suivant · Porte gauche : niveau précédent · ESPACE : épée
   </div>
+</main>
 
-  <div id="equipment-modal" class="modal" role="dialog" aria-modal="true">
-    <div class="modal-panel">
-      <h2>ÉQUIPEMENT ET AMÉLIORATIONS</h2>
-      <div id="equipment-list"></div>
-      <button class="ui-button modal-close" data-close-modal type="button">RETOUR AU JEU</button>
+<!-- =========================================================
+     FENÊTRES
+     ========================================================= -->
+
+<div id="controls" class="modal">
+  <div class="panel">
+    <h2>COMMANDES</h2>
+
+    <div class="row">
+      Flèches ou ZQSD : déplacement
     </div>
-  </div>
 
-  <div id="inventory-modal" class="modal" role="dialog" aria-modal="true">
-    <div class="modal-panel">
-      <h2>INVENTAIRE COMPLET</h2>
-      <div id="inventory-full"></div>
-      <button class="ui-button modal-close" data-close-modal type="button">RETOUR AU JEU</button>
+    <div class="row">
+      ESPACE : attaque, coupe les arbres et les hautes herbes
     </div>
+
+    <div class="row">
+      Porte droite : avancer · Porte gauche : revenir
+    </div>
+
+    <div class="row">
+      R : recommencer · C : changer de héros
+    </div>
+
+    <button class="btn close" type="button">
+      RETOUR
+    </button>
   </div>
+</div>
 
-  <script>
-    "use strict";
+<div id="inventoryModal" class="modal">
+  <div class="panel">
+    <h2>INVENTAIRE COMPLET</h2>
 
-    /* =========================================================
-       CANVAS ET CONSTANTES
-       ========================================================= */
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
-    ctx.imageSmoothingEnabled = false;
+    <div id="fullInventory"></div>
 
-    const W = 512;
-    const H = 448;
-    const HUD = 96;
-    const TILE = 32;
-    const COLS = 16;
-    const ROWS = 11;
+    <button class="btn close" type="button">
+      RETOUR
+    </button>
+  </div>
+</div>
 
-    const SOL = 0;
-    const ARBRE = 1;
-    const MUR = 2;
-    const EAU = 3;
-    const ROCHE = 4;
-    const LAVE = 5;
-    const GLACE = 6;
-    const CRISTAL = 7;
+<script>
+"use strict";
 
-    /* =========================================================
-       OUTILS
-       ========================================================= */
-    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-    const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+/* =========================================================
+   CANVAS ET CONSTANTES
+   ========================================================= */
 
-    function collisionRect(a, b) {
-      return a.x < b.x + b.w &&
-             a.x + a.w > b.x &&
-             a.y < b.y + b.h &&
-             a.y + a.h > b.y;
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+ctx.imageSmoothingEnabled = false;
+
+const W = 512;
+const H = 448;
+const HUD = 72;
+const T = 32;
+const COLS = 16;
+const ROWS = 11;
+
+const GROUND = 0;
+const TREE = 1;
+const WALL = 2;
+const WATER = 3;
+const ROCK = 4;
+const LAVA = 5;
+const ICE = 6;
+const CRYSTAL = 7;
+
+/* =========================================================
+   OUTILS
+   ========================================================= */
+
+const clamp = (value, min, max) =>
+  Math.max(min, Math.min(max, value));
+
+const hit = (a, b) =>
+  a.x < b.x + b.w &&
+  a.x + a.w > b.x &&
+  a.y < b.y + b.h &&
+  a.y + a.h > b.y;
+
+const pos = (column, row, width = 24, height = 24) => ({
+  x: column * T + (T - width) / 2,
+  y: HUD + row * T + (T - height) / 2
+});
+
+const map = rows =>
+  rows.map(row =>
+    [...row].map(Number)
+  );
+
+/* =========================================================
+   PERSONNAGES
+   ========================================================= */
+
+const HEROES = {
+  fox: {
+    name: "Renard Orange",
+    type: "fox",
+    c1: "#f28c28",
+    c2: "#c9651d",
+    face: "#fff0c8",
+    hp: 3,
+    speed: 184,
+    atk: 1,
+    def: 0,
+    range: 33,
+    cool: 0.22,
+    gold: 1.15
+  },
+
+  warrior: {
+    name: "Guerrier",
+    type: "human",
+    c1: "#3175d6",
+    c2: "#1d4a90",
+    face: "#d7a46d",
+    hp: 5,
+    speed: 145,
+    atk: 2,
+    def: 1,
+    range: 30,
+    cool: 0.30,
+    gold: 1
+  },
+
+  mage: {
+    name: "Mage",
+    type: "human",
+    c1: "#7e46c4",
+    c2: "#552a8d",
+    face: "#d9ac79",
+    hp: 3,
+    speed: 158,
+    atk: 1,
+    def: 0,
+    range: 43,
+    cool: 0.17,
+    gold: 1
+  }
+};
+
+/* =========================================================
+   ARTÉFACTS-CLÉS
+   ========================================================= */
+
+const ART = {
+  heart: {
+    name: "Cœur Ancien",
+    sym: "C",
+    desc: "+1 cœur. Sert de clé vivante."
+  },
+
+  boots: {
+    name: "Bottes du Vent",
+    sym: "B",
+    desc: "+20 % de vitesse. Active les mécanismes du vent."
+  },
+
+  emblem: {
+    name: "Emblème du Guerrier",
+    sym: "E",
+    desc: "+1 attaque. Ouvre les anciens sceaux guerriers."
+  }
+};
+
+/* =========================================================
+   ÉQUIPEMENT
+   ========================================================= */
+
+const GEAR = {
+  helmet: {
+    name: "Casque de Fer",
+    slot: "casque",
+    desc: "+1 défense",
+    def: 1
+  },
+
+  armor: {
+    name: "Armure Ancienne",
+    slot: "armure",
+    desc: "+1 cœur et +1 défense",
+    def: 1,
+    hp: 1
+  },
+
+  shield: {
+    name: "Bouclier Royal",
+    slot: "bouclier",
+    desc: "+2 défense et chance de blocage",
+    def: 2,
+    block: 0.25
+  }
+};
+
+/* =========================================================
+   DÉFINITION DES CINQ NIVEAUX
+   ========================================================= */
+
+const LEVELS = [
+  {
+    name: "FORÊT DES RICHESSES",
+    floor: "#5baa4b",
+    detail: "#4b9340",
+
+    objective: [
+      "Ramasser 3 trésors",
+      "treasures",
+      3
+    ],
+
+    req: [],
+
+    map: map([
+      "1111111111111111",
+      "1000000000000001",
+      "1011000110001101",
+      "1000033333000001",
+      "1010033333010101",
+      "1010000000010001",
+      "1000002200000201",
+      "1020102001100201",
+      "1020100000001101",
+      "1000001022000001",
+      "1111111111111111"
+    ]),
+
+    start: [1, 1],
+
+    enemies: [
+      [12, 1, 2],
+      [3, 8, 2],
+      [13, 8, 2]
+    ],
+
+    loot: [
+      ["coin", 4, 1, 10],
+      ["coin", 10, 2, 10],
+      ["chest", 3, 5, 40],
+      ["coin", 13, 5, 10]
+    ],
+
+    arts: [
+      ["heart", 10, 8]
+    ],
+
+    gear: [],
+
+    grass: [
+      ["g1", 3, 2],
+      ["g2", 9, 1],
+      ["g3", 12, 5]
+    ],
+
+    hidden: [
+      ["h1", "tree", "2,2", "coin", 30],
+      ["h2", "grass", "g2", "chest", 55]
+    ],
+
+    locked: [
+      ["m1", 13, 2, ["heart"], 60, 1]
+    ]
+  },
+
+  {
+    name: "RUINES DU VENT",
+    floor: "#88774f",
+    detail: "#75613e",
+
+    objective: [
+      "Trouver les Bottes du Vent",
+      "artifact",
+      "boots"
+    ],
+
+    req: [
+      "heart"
+    ],
+
+    map: map([
+      "2222222222222222",
+      "2000000200000002",
+      "2022040202220402",
+      "2002040002000402",
+      "2402000222040002",
+      "2000020000040202",
+      "2022022204000202",
+      "2002000004220002",
+      "2402220400020402",
+      "2000000422020002",
+      "2222222222222222"
+    ]),
+
+    start: [1, 1],
+
+    enemies: [
+      [13, 1, 2],
+      [5, 5, 2],
+      [9, 7, 3]
+    ],
+
+    loot: [
+      ["coin", 4, 3, 15],
+      ["chest", 10, 3, 50]
+    ],
+
+    arts: [
+      ["boots", 8, 5]
+    ],
+
+    gear: [],
+
+    grass: [
+      ["g1", 4, 1],
+      ["g2", 8, 3],
+      ["g3", 12, 4]
+    ],
+
+    hidden: [
+      ["h1", "grass", "g1", "coin", 35],
+      ["h2", "grass", "g3", "chest", 65]
+    ],
+
+    locked: [
+      ["m1", 12, 8, ["heart", "boots"], 90, 1]
+    ]
+  },
+
+  {
+    name: "FORTERESSE DU GUERRIER",
+    floor: "#684949",
+    detail: "#553939",
+
+    objective: [
+      "Trouver le Casque de Fer",
+      "gear",
+      "helmet"
+    ],
+
+    req: [
+      "heart",
+      "boots"
+    ],
+
+    map: map([
+      "2222222222222222",
+      "2000002000200002",
+      "2022202040202202",
+      "2020000040000202",
+      "2020222022220202",
+      "2000200000020002",
+      "2220204224020222",
+      "2000004004000002",
+      "2022202022222202",
+      "2000200000000002",
+      "2222222222222222"
+    ]),
+
+    start: [1, 1],
+
+    enemies: [
+      [13, 1, 3],
+      [7, 3, 3],
+      [5, 7, 3],
+      [8, 9, 5]
+    ],
+
+    loot: [
+      ["coin", 3, 3, 20],
+      ["chest", 10, 5, 75]
+    ],
+
+    arts: [
+      ["emblem", 8, 7]
+    ],
+
+    gear: [
+      ["helmet", 13, 9]
+    ],
+
+    grass: [
+      ["g1", 5, 3],
+      ["g2", 10, 3],
+      ["g3", 7, 9]
+    ],
+
+    hidden: [
+      ["h1", "grass", "g2", "coin", 45],
+      ["h2", "grass", "g3", "chest", 80]
+    ],
+
+    locked: [
+      ["m1", 3, 9, ["boots", "emblem"], 120, 1]
+    ]
+  },
+
+  {
+    name: "CAVERNE DE GLACE",
+    floor: "#8bc5d6",
+    detail: "#6dacbf",
+
+    objective: [
+      "Trouver l’Armure Ancienne",
+      "gear",
+      "armor"
+    ],
+
+    req: [
+      "heart",
+      "boots",
+      "emblem"
+    ],
+
+    map: map([
+      "6666666666666666",
+      "6000006000000006",
+      "6066006066606606",
+      "6006070000600606",
+      "6606076600660606",
+      "6000000607000006",
+      "6066600607066606",
+      "6000600000060006",
+      "6660660666060606",
+      "6000000000000606",
+      "6666666666666666"
+    ]),
+
+    start: [1, 1],
+
+    enemies: [
+      [13, 1, 3],
+      [4, 5, 3],
+      [10, 7, 4]
+    ],
+
+    loot: [
+      ["coin", 3, 3, 25],
+      ["chest", 12, 5, 85]
+    ],
+
+    arts: [],
+
+    gear: [
+      ["armor", 8, 9]
+    ],
+
+    grass: [
+      ["g1", 4, 2],
+      ["g2", 8, 5],
+      ["g3", 12, 7]
+    ],
+
+    hidden: [
+      ["h1", "grass", "g1", "coin", 55],
+      ["h2", "grass", "g3", "chest", 95]
+    ],
+
+    locked: [
+      [
+        "m1",
+        12,
+        7,
+        ["heart", "boots", "emblem"],
+        150,
+        2
+      ]
+    ]
+  },
+
+  {
+    name: "VOLCAN DU ROI SOMBRE",
+    floor: "#6a302b",
+    detail: "#4d211f",
+
+    objective: [
+      "Trouver le Bouclier Royal",
+      "gear",
+      "shield"
+    ],
+
+    req: [
+      "heart",
+      "boots",
+      "emblem"
+    ],
+
+    map: map([
+      "5555555555555555",
+      "5000050000050005",
+      "5055050555050505",
+      "5005000005000505",
+      "5505550505550505",
+      "5000000500000005",
+      "5055505555055505",
+      "5000500000050005",
+      "5550550555050505",
+      "5000000000000505",
+      "5555555555555555"
+    ]),
+
+    start: [1, 1],
+
+    enemies: [
+      [13, 1, 4],
+      [6, 3, 4],
+      [3, 7, 4],
+      [9, 7, 5],
+      [13, 9, 7]
+    ],
+
+    loot: [
+      ["chest", 3, 5, 100],
+      ["chest", 10, 9, 120]
+    ],
+
+    arts: [],
+
+    gear: [
+      ["shield", 12, 7]
+    ],
+
+    grass: [
+      ["g1", 3, 1],
+      ["g2", 8, 3],
+      ["g3", 12, 5]
+    ],
+
+    hidden: [
+      ["h1", "grass", "g1", "coin", 70],
+      ["h2", "grass", "g3", "chest", 120]
+    ],
+
+    locked: [
+      [
+        "m1",
+        8,
+        5,
+        ["heart", "boots", "emblem"],
+        220,
+        2
+      ]
+    ]
+  }
+];
+
+/* =========================================================
+   ÉTAT GLOBAL
+   ========================================================= */
+
+let selected = null;
+let levelIndex = 0;
+let level = LEVELS[0];
+
+let paused = true;
+let gameOver = false;
+let victory = false;
+
+let last = performance.now();
+let time = 0;
+
+const keys = {};
+
+const arts = new Set();
+const ownedGear = new Set();
+
+const gearLevels = {
+  helmet: 0,
+  armor: 0,
+  shield: 0
+};
+
+const stats = {
+  gold: 0,
+  score: 0,
+  treasures: 0,
+  fragments: 0,
+  kills: 0
+};
+
+let states = createStates();
+
+let enemies = [];
+let loot = [];
+let artItems = [];
+let gearItems = [];
+let grass = [];
+let hidden = [];
+let lockedChests = [];
+
+const msg = {
+  text: "",
+  time: 0
+};
+
+const player = {
+  x: 0,
+  y: 0,
+  w: 24,
+  h: 24,
+
+  dir: "down",
+
+  hp: 3,
+  maxHp: 3,
+
+  attack: false,
+  attackTime: 0,
+  cool: 0,
+  inv: 0,
+
+  hitSet: new Set(),
+
+  gear: {
+    casque: null,
+    armure: null,
+    bouclier: null
+  }
+};
+
+/* =========================================================
+   SAUVEGARDE EN MÉMOIRE DES NIVEAUX
+   ========================================================= */
+
+function createStates() {
+  return LEVELS.map(() => ({
+    trees: new Set(),
+    grass: new Set(),
+    loot: new Set(),
+    hiddenShown: new Set(),
+    hiddenTaken: new Set(),
+    dead: new Set(),
+    locked: new Set()
+  }));
+}
+
+function state() {
+  return states[levelIndex];
+}
+
+/* =========================================================
+   MESSAGES
+   ========================================================= */
+
+function message(text, duration = 1.8) {
+  msg.text = text;
+  msg.time = duration;
+}
+
+/* =========================================================
+   ARTÉFACTS ET CLÉS
+   ========================================================= */
+
+function hasAll(required = []) {
+  return required.every(id =>
+    arts.has(id)
+  );
+}
+
+function missing(required = []) {
+  return required.filter(id =>
+    !arts.has(id)
+  );
+}
+
+function artNames(ids) {
+  return ids
+    .map(id => ART[id]?.name || id)
+    .join(" + ");
+}
+
+/* =========================================================
+   PERSONNAGE
+   ========================================================= */
+
+function chooseHero(id) {
+  const hero = HEROES[id];
+
+  selected = id;
+
+  Object.assign(player, {
+    name: hero.name,
+    type: hero.type,
+    c1: hero.c1,
+    c2: hero.c2,
+    face: hero.face,
+
+    baseHp: hero.hp,
+    baseSpeed: hero.speed,
+    baseAtk: hero.atk,
+    baseDef: hero.def,
+
+    range: hero.range,
+    maxCool: hero.cool,
+    goldMult: hero.gold
+  });
+
+  player.gear = {
+    casque: null,
+    armure: null,
+    bouclier: null
+  };
+
+  player.artHp = 0;
+  player.artAtk = 0;
+  player.artSpeed = 0;
+
+  recalc(true);
+}
+
+/* =========================================================
+   STATISTIQUES ET ÉQUIPEMENT
+   ========================================================= */
+
+function gearBonus(key) {
+  let result = 0;
+
+  Object.values(player.gear).forEach(id => {
+    if (!id) {
+      return;
     }
 
-    function positionCase(col, row, w = 24, h = 24) {
-      return {
-        x: col * TILE + (TILE - w) / 2,
-        y: HUD + row * TILE + (TILE - h) / 2
+    const gear = GEAR[id];
+    const levelValue = gearLevels[id] || 0;
+
+    if (key === "def") {
+      result += (gear.def || 0) + levelValue;
+    }
+
+    if (key === "hp") {
+      result +=
+        (gear.hp || 0) +
+        Math.floor(levelValue / 2);
+    }
+
+    if (key === "block") {
+      result +=
+        (gear.block || 0) +
+        levelValue * 0.05;
+    }
+  });
+
+  return result;
+}
+
+function recalc(heal = false) {
+  player.maxHp =
+    player.baseHp +
+    (player.artHp || 0) +
+    gearBonus("hp");
+
+  player.hp = heal
+    ? player.maxHp
+    : clamp(player.hp, 0, player.maxHp);
+}
+
+function atk() {
+  return (
+    player.baseAtk +
+    (player.artAtk || 0)
+  );
+}
+
+function def() {
+  return (
+    player.baseDef +
+    gearBonus("def")
+  );
+}
+
+function speed() {
+  return (
+    player.baseSpeed *
+    (1 + (player.artSpeed || 0))
+  );
+}
+
+function blockChance() {
+  return clamp(
+    def() * 0.1 +
+    gearBonus("block"),
+    0,
+    0.75
+  );
+}
+
+/* =========================================================
+   RAMASSAGE DES ARTÉFACTS
+   ========================================================= */
+
+function getArtifact(id) {
+  if (arts.has(id)) {
+    return;
+  }
+
+  arts.add(id);
+
+  if (id === "heart") {
+    player.artHp += 1;
+  }
+
+  if (id === "boots") {
+    player.artSpeed += 0.2;
+  }
+
+  if (id === "emblem") {
+    player.artAtk += 1;
+  }
+
+  recalc(true);
+
+  stats.score += 500;
+
+  message(
+    "ARTÉFACT : " + ART[id].name,
+    2.2
+  );
+
+  updateInventory();
+}
+
+/* =========================================================
+   RAMASSAGE DE L'ÉQUIPEMENT
+   ========================================================= */
+
+function getGear(id) {
+  if (ownedGear.has(id)) {
+    return;
+  }
+
+  ownedGear.add(id);
+
+  const gear = GEAR[id];
+
+  player.gear[gear.slot] = id;
+
+  recalc(true);
+
+  stats.score += 350;
+
+  message(
+    gear.name.toUpperCase() + " ÉQUIPÉ !",
+    2
+  );
+
+  updateInventory();
+}
+
+/* =========================================================
+   AMÉLIORATION DE L'ÉQUIPEMENT
+   ========================================================= */
+
+function upgradeCost(id) {
+  const currentLevel =
+    gearLevels[id] || 0;
+
+  return {
+    gold: 75 + currentLevel * 75,
+    frag: 1 + currentLevel
+  };
+}
+
+function upgrade(id) {
+  if (!ownedGear.has(id)) {
+    message("ÉQUIPEMENT NON OBTENU");
+    return;
+  }
+
+  if (gearLevels[id] >= 2) {
+    message("NIVEAU MAXIMUM");
+    return;
+  }
+
+  const cost = upgradeCost(id);
+
+  if (
+    stats.gold < cost.gold ||
+    stats.fragments < cost.frag
+  ) {
+    message(
+      "IL FAUT " +
+      cost.gold +
+      " OR ET " +
+      cost.frag +
+      " FRAGMENT(S)",
+      2
+    );
+
+    return;
+  }
+
+  stats.gold -= cost.gold;
+  stats.fragments -= cost.frag;
+
+  gearLevels[id] += 1;
+
+  recalc(true);
+
+  message(
+    GEAR[id].name +
+    " AMÉLIORÉ NIV. " +
+    gearLevels[id],
+    2
+  );
+
+  updateInventory();
+}
+
+/* =========================================================
+   OBJECTIFS ET PORTES
+   ========================================================= */
+
+function objectiveDone() {
+  const objective = level.objective;
+
+  if (objective[1] === "treasures") {
+    return (
+      state().loot.size +
+      state().hiddenTaken.size >=
+      objective[2]
+    );
+  }
+
+  if (objective[1] === "artifact") {
+    return arts.has(objective[2]);
+  }
+
+  if (objective[1] === "gear") {
+    return ownedGear.has(objective[2]);
+  }
+
+  return true;
+}
+
+function exitOpen() {
+  return (
+    enemies.length === 0 &&
+    objectiveDone() &&
+    hasAll(level.req)
+  );
+}
+
+/* =========================================================
+   POSITION D'ENTRÉE
+   ========================================================= */
+
+function spawn(side) {
+  if (side === "start") {
+    return pos(
+      level.start[0],
+      level.start[1],
+      player.w,
+      player.h
+    );
+  }
+
+  const column =
+    side === "right"
+      ? 14
+      : 1;
+
+  const candidateRows = [
+    5,
+    4,
+    6,
+    3,
+    7,
+    2,
+    8,
+    1,
+    9
+  ];
+
+  for (const row of candidateRows) {
+    const tile = level.map[row][column];
+
+    if (
+      tile === GROUND ||
+      (
+        tile === TREE &&
+        state().trees.has(
+          column + "," + row
+        )
+      )
+    ) {
+      return pos(
+        column,
+        row,
+        player.w,
+        player.h
+      );
+    }
+  }
+
+  return pos(
+    level.start[0],
+    level.start[1],
+    player.w,
+    player.h
+  );
+}
+
+/* =========================================================
+   CHARGEMENT D'UN NIVEAU
+   ========================================================= */
+
+function loadLevel(index, side = "start") {
+  if (index < 0) {
+    return;
+  }
+
+  if (index >= LEVELS.length) {
+    victory = true;
+    gameOver = true;
+    return;
+  }
+
+  levelIndex = index;
+  level = LEVELS[index];
+
+  const playerPosition =
+    spawn(side);
+
+  player.x = playerPosition.x;
+  player.y = playerPosition.y;
+
+  player.dir =
+    side === "right"
+      ? "left"
+      : "right";
+
+  player.attack = false;
+  player.cool = 0;
+  player.inv = 0;
+
+  enemies = level.enemies
+    .map(createEnemy)
+    .filter(enemy =>
+      !state().dead.has(enemy.id)
+    );
+
+  loot = level.loot.map(createLoot);
+  artItems = level.arts.map(createArt);
+  gearItems = level.gear.map(createGear);
+  grass = level.grass.map(createGrass);
+  hidden = level.hidden.map(createHidden);
+  lockedChests =
+    level.locked.map(createLocked);
+
+  message(
+    "NIVEAU " +
+    (index + 1) +
+    " : " +
+    level.name,
+    2
+  );
+
+  updateInventory();
+}
+
+/* =========================================================
+   RECOMMENCER
+   ========================================================= */
+
+function restart() {
+  stats.gold = 0;
+  stats.score = 0;
+  stats.treasures = 0;
+  stats.fragments = 0;
+  stats.kills = 0;
+
+  arts.clear();
+  ownedGear.clear();
+
+  Object.keys(gearLevels)
+    .forEach(id => {
+      gearLevels[id] = 0;
+    });
+
+  states = createStates();
+
+  chooseHero(selected);
+
+  gameOver = false;
+  victory = false;
+  time = 0;
+
+  loadLevel(0, "start");
+}
+
+/* =========================================================
+   CRÉATION DES OBJETS DU NIVEAU
+   ========================================================= */
+
+function createEnemy(definition, index) {
+  const [column, row, hp] =
+    definition;
+
+  const position =
+    pos(column, row);
+
+  return {
+    id: "e" + index,
+
+    x: position.x,
+    y: position.y,
+
+    w: 24,
+    h: 24,
+
+    hp,
+    max: hp,
+
+    dx: 0,
+    dy: 0,
+
+    next: 0,
+    recoil: 0,
+    rx: 0,
+    ry: 0,
+
+    speed:
+      48 + Math.random() * 35
+  };
+}
+
+function createLoot(definition, index) {
+  const [
+    type,
+    column,
+    row,
+    value
+  ] = definition;
+
+  const size =
+    type === "chest"
+      ? 24
+      : 16;
+
+  const position =
+    pos(
+      column,
+      row,
+      size,
+      size
+    );
+
+  const id =
+    "l" + index;
+
+  return {
+    id,
+    type,
+    value,
+
+    x: position.x,
+    y: position.y,
+
+    w: size,
+    h: size,
+
+    taken:
+      state().loot.has(id)
+  };
+}
+
+function createArt(definition) {
+  const [
+    id,
+    column,
+    row
+  ] = definition;
+
+  const position =
+    pos(column, row, 22, 22);
+
+  return {
+    id,
+
+    x: position.x,
+    y: position.y,
+
+    w: 22,
+    h: 22,
+
+    taken:
+      arts.has(id)
+  };
+}
+
+function createGear(definition) {
+  const [
+    id,
+    column,
+    row
+  ] = definition;
+
+  const position =
+    pos(column, row);
+
+  return {
+    id,
+
+    x: position.x,
+    y: position.y,
+
+    w: 24,
+    h: 24,
+
+    taken:
+      ownedGear.has(id)
+  };
+}
+
+function createGrass(definition) {
+  const [
+    id,
+    column,
+    row
+  ] = definition;
+
+  const position =
+    pos(column, row, 26, 26);
+
+  return {
+    id,
+    column,
+    row,
+
+    x: position.x,
+    y: position.y,
+
+    w: 26,
+    h: 26,
+
+    cut:
+      state().grass.has(id)
+  };
+}
+
+function createHidden(definition) {
+  const [
+    id,
+    source,
+    sourceId,
+    type,
+    value
+  ] = definition;
+
+  let column = 0;
+  let row = 0;
+
+  if (source === "tree") {
+    [
+      column,
+      row
+    ] = sourceId
+      .split(",")
+      .map(Number);
+  } else {
+    const grassDefinition =
+      level.grass.find(
+        item =>
+          item[0] === sourceId
+      );
+
+    column =
+      grassDefinition[1];
+
+    row =
+      grassDefinition[2];
+  }
+
+  const size =
+    type === "chest"
+      ? 24
+      : 16;
+
+  const position =
+    pos(
+      column,
+      row,
+      size,
+      size
+    );
+
+  return {
+    id,
+    source,
+    sourceId,
+    type,
+    value,
+
+    x: position.x,
+    y: position.y,
+
+    w: size,
+    h: size,
+
+    shown:
+      state().hiddenShown.has(id),
+
+    taken:
+      state().hiddenTaken.has(id)
+  };
+}
+
+function createLocked(definition) {
+  const [
+    id,
+    column,
+    row,
+    required,
+    gold,
+    fragments
+  ] = definition;
+
+  const position =
+    pos(column, row, 28, 24);
+
+  return {
+    id,
+    required,
+    gold,
+    fragments,
+
+    x: position.x,
+    y: position.y,
+
+    w: 28,
+    h: 24,
+
+    opened:
+      state().locked.has(id),
+
+    wait: 0
+  };
+}
+
+/* =========================================================
+   COLLISIONS AVEC LA CARTE
+   ========================================================= */
+
+function tileAt(x, y) {
+  return {
+    column:
+      Math.floor(x / T),
+
+    row:
+      Math.floor(
+        (y - HUD) / T
+      )
+  };
+}
+
+function solid(column, row) {
+  if (
+    column < 0 ||
+    column >= COLS ||
+    row < 0 ||
+    row >= ROWS
+  ) {
+    return true;
+  }
+
+  if (
+    levelIndex > 0 &&
+    column === 0 &&
+    (
+      row === 4 ||
+      row === 5
+    )
+  ) {
+    return false;
+  }
+
+  if (
+    exitOpen() &&
+    column === 15 &&
+    (
+      row === 4 ||
+      row === 5
+    )
+  ) {
+    return false;
+  }
+
+  const tile =
+    level.map[row][column];
+
+  if (
+    tile === TREE &&
+    state().trees.has(
+      column + "," + row
+    )
+  ) {
+    return false;
+  }
+
+  return tile !== GROUND;
+}
+
+function hitsMap(
+  x,
+  y,
+  width,
+  height
+) {
+  const margin = 2;
+
+  const points = [
+    [
+      x + margin,
+      y + margin
+    ],
+
+    [
+      x + width - margin,
+      y + margin
+    ],
+
+    [
+      x + margin,
+      y + height - margin
+    ],
+
+    [
+      x + width - margin,
+      y + height - margin
+    ]
+  ];
+
+  return points.some(
+    ([pointX, pointY]) => {
+      const tile =
+        tileAt(pointX, pointY);
+
+      return solid(
+        tile.column,
+        tile.row
+      );
+    }
+  );
+}
+
+function move(
+  object,
+  moveX,
+  moveY
+) {
+  if (
+    !hitsMap(
+      object.x + moveX,
+      object.y,
+      object.w,
+      object.h
+    )
+  ) {
+    object.x += moveX;
+  }
+
+  if (
+    !hitsMap(
+      object.x,
+      object.y + moveY,
+      object.w,
+      object.h
+    )
+  ) {
+    object.y += moveY;
+  }
+}
+
+/* =========================================================
+   ÉPÉE
+   ========================================================= */
+
+function sword() {
+  const length =
+    player.range;
+
+  const thickness = 10;
+
+  if (player.dir === "up") {
+    return {
+      x: player.x + 7,
+      y: player.y - length,
+      w: thickness,
+      h: length
+    };
+  }
+
+  if (player.dir === "down") {
+    return {
+      x: player.x + 7,
+      y: player.y + player.h,
+      w: thickness,
+      h: length
+    };
+  }
+
+  if (player.dir === "left") {
+    return {
+      x: player.x - length,
+      y: player.y + 7,
+      w: length,
+      h: thickness
+    };
+  }
+
+  return {
+    x: player.x + player.w,
+    y: player.y + 7,
+    w: length,
+    h: thickness
+  };
+}
+
+/* =========================================================
+   RÉVÉLATION DES TRÉSORS CACHÉS
+   ========================================================= */
+
+function reveal(source, sourceId) {
+  hidden.forEach(hiddenItem => {
+    if (
+      hiddenItem.source === source &&
+      hiddenItem.sourceId === sourceId &&
+      !hiddenItem.shown
+    ) {
+      hiddenItem.shown = true;
+
+      state().hiddenShown.add(
+        hiddenItem.id
+      );
+
+      message(
+        "TRÉSOR CACHÉ RÉVÉLÉ !"
+      );
+    }
+  });
+}
+
+/* =========================================================
+   DÉMARRAGE DE L'ATTAQUE
+   ========================================================= */
+
+function attack() {
+  if (
+    paused ||
+    gameOver ||
+    player.attack ||
+    player.cool > 0
+  ) {
+    return;
+  }
+
+  player.attack = true;
+  player.attackTime = 0.18;
+  player.cool = player.maxCool;
+
+  player.hitSet.clear();
+}
+
+/* =========================================================
+   COLLISIONS DE L'ÉPÉE
+   ========================================================= */
+
+function attackHits() {
+  if (!player.attack) {
+    return;
+  }
+
+  const swordRectangle =
+    sword();
+
+  /*
+    Destruction des arbres.
+  */
+  for (
+    let row = 0;
+    row < ROWS;
+    row++
+  ) {
+    for (
+      let column = 0;
+      column < COLS;
+      column++
+    ) {
+      if (
+        level.map[row][column] !== TREE
+      ) {
+        continue;
+      }
+
+      const key =
+        column + "," + row;
+
+      if (
+        state().trees.has(key)
+      ) {
+        continue;
+      }
+
+      const treeRectangle = {
+        x: column * T,
+        y: HUD + row * T,
+        w: T,
+        h: T
       };
+
+      if (
+        hit(
+          swordRectangle,
+          treeRectangle
+        )
+      ) {
+        state().trees.add(key);
+
+        reveal(
+          "tree",
+          key
+        );
+
+        stats.score += 20;
+
+        message(
+          "ARBRE COUPÉ !",
+          0.8
+        );
+      }
+    }
+  }
+
+  /*
+    Destruction des hautes herbes.
+  */
+  grass.forEach(grassItem => {
+    if (
+      grassItem.cut ||
+      !hit(
+        swordRectangle,
+        grassItem
+      )
+    ) {
+      return;
     }
 
-    function afficherMessage(texte, duree = 1.8) {
-      message.texte = texte;
-      message.temps = duree;
+    grassItem.cut = true;
+
+    state().grass.add(
+      grassItem.id
+    );
+
+    reveal(
+      "grass",
+      grassItem.id
+    );
+
+    stats.score += 10;
+
+    message(
+      "HAUTE HERBE COUPÉE !",
+      0.8
+    );
+  });
+
+  /*
+    Dégâts infligés aux ennemis.
+  */
+  enemies.forEach(enemy => {
+    if (
+      player.hitSet.has(enemy.id) ||
+      !hit(
+        swordRectangle,
+        enemy
+      )
+    ) {
+      return;
     }
 
-    /* =========================================================
-       PERSONNAGES
-       ========================================================= */
-    const personnages = {
-      renard: {
-        id: "renard",
-        nom: "Renard Orange",
-        type: "renard",
-        principale: "#f28c28",
-        secondaire: "#c9651d",
-        visage: "#fff0c8",
-        vie: 3,
-        vitesse: 182,
-        attaque: 1,
-        defense: 0,
-        recharge: .23,
-        portee: 32,
-        or: 1.15
-      },
-      guerrier: {
-        id: "guerrier",
-        nom: "Guerrier",
-        type: "humain",
-        principale: "#3175d6",
-        secondaire: "#1d4a90",
-        visage: "#d7a46d",
-        vie: 5,
-        vitesse: 145,
-        attaque: 2,
-        defense: 1,
-        recharge: .30,
-        portee: 30,
-        or: 1
-      },
-      mage: {
-        id: "mage",
-        nom: "Mage",
-        type: "humain",
-        principale: "#7e46c4",
-        secondaire: "#552a8d",
-        visage: "#d9ac79",
-        vie: 3,
-        vitesse: 158,
-        attaque: 1,
-        defense: 0,
-        recharge: .17,
-        portee: 42,
-        or: 1
-      }
-    };
+    player.hitSet.add(
+      enemy.id
+    );
 
-    let personnageSelectionne = null;
+    enemy.hp -= atk();
+    enemy.recoil = 0.12;
 
-    const joueur = {
-      x: 0, y: 0, w: 24, h: 24,
-      nom: "", type: "humain",
-      principale: "#2ea043",
-      secondaire: "#14672c",
-      visage: "#f0bd7a",
-      direction: "bas",
+    enemy.rx =
+      player.dir === "left"
+        ? -145
+        : player.dir === "right"
+          ? 145
+          : 0;
 
-      vie: 3,
-      vieBase: 3,
-      vieMax: 3,
+    enemy.ry =
+      player.dir === "up"
+        ? -145
+        : player.dir === "down"
+          ? 145
+          : 0;
+  });
 
-      vitesseBase: 150,
-      attaqueBase: 1,
-      defenseBase: 0,
-      portee: 30,
-      multiplicateurOr: 1,
+  enemies.forEach(enemy => {
+    if (enemy.hp <= 0) {
+      state().dead.add(
+        enemy.id
+      );
+    }
+  });
 
-      bonusVieArtefact: 0,
-      bonusAttaqueArtefact: 0,
-      bonusVitesseArtefact: 0,
+  const enemyCountBefore =
+    enemies.length;
 
-      attaqueActive: false,
-      tempsAttaque: 0,
-      dureeAttaque: .18,
-      recharge: 0,
-      rechargeMax: .26,
-      touchesAttaque: new Set(),
+  enemies =
+    enemies.filter(
+      enemy =>
+        enemy.hp > 0
+    );
 
-      invulnerable: false,
-      tempsInvulnerable: 0,
-      dureeInvulnerable: 1.15,
+  if (
+    enemyCountBefore !==
+    enemies.length
+  ) {
+    const defeated =
+      enemyCountBefore -
+      enemies.length;
 
-      equipement: {
-        casque: null,
-        armure: null,
-        bouclier: null
-      }
-    };
+    stats.kills += defeated;
+    stats.score += defeated * 100;
+  }
+}
 
-    function appliquerPersonnage(id) {
-      const p = personnages[id];
-      personnageSelectionne = id;
+/* =========================================================
+   COLLECTE DES OBJETS
+   ========================================================= */
 
-      joueur.nom = p.nom;
-      joueur.type = p.type;
-      joueur.principale = p.principale;
-      joueur.secondaire = p.secondaire;
-      joueur.visage = p.visage;
-
-      joueur.vieBase = p.vie;
-      joueur.vitesseBase = p.vitesse;
-      joueur.attaqueBase = p.attaque;
-      joueur.defenseBase = p.defense;
-      joueur.rechargeMax = p.recharge;
-      joueur.portee = p.portee;
-      joueur.multiplicateurOr = p.or;
-
-      joueur.bonusVieArtefact = 0;
-      joueur.bonusAttaqueArtefact = 0;
-      joueur.bonusVitesseArtefact = 0;
-      joueur.equipement = { casque: null, armure: null, bouclier: null };
-
-      recalculerStatistiques(true);
+function collect() {
+  /*
+    Pièces et coffres normaux.
+  */
+  loot.forEach(object => {
+    if (
+      object.taken ||
+      !hit(player, object)
+    ) {
+      return;
     }
 
-    /* =========================================================
-       ARTÉFACTS
-       ========================================================= */
-    const artefacts = {
-      coeurAncien: {
-        id: "coeurAncien",
-        nom: "Cœur Ancien",
-        symbole: "C",
-        description: "Ajoute un cœur maximum. Sert aussi de clé vivante pour certaines portes."
-      },
-      bottesDuVent: {
-        id: "bottesDuVent",
-        nom: "Bottes du Vent",
-        symbole: "B",
-        description: "Augmente la vitesse de 20 %. Active les mécanismes liés au vent."
-      },
-      emblemeGuerrier: {
-        id: "emblemeGuerrier",
-        nom: "Emblème du Guerrier",
-        symbole: "E",
-        description: "Ajoute 1 dégât. Déverrouille les sceaux guerriers anciens."
-      }
-    };
+    object.taken = true;
 
-    const artefactsObtenus = new Set();
+    state().loot.add(
+      object.id
+    );
 
-    function obtenirArtefact(id) {
-      if (artefactsObtenus.has(id) || !artefacts[id]) return;
+    const value =
+      Math.round(
+        object.value *
+        player.goldMult
+      );
 
-      artefactsObtenus.add(id);
+    stats.gold += value;
+    stats.treasures += 1;
 
-      if (id === "coeurAncien") joueur.bonusVieArtefact += 1;
-      if (id === "bottesDuVent") joueur.bonusVitesseArtefact += .20;
-      if (id === "emblemeGuerrier") joueur.bonusAttaqueArtefact += 1;
+    stats.score +=
+      value *
+      (
+        object.type === "chest"
+          ? 10
+          : 5
+      );
 
-      recalculerStatistiques(true);
-      stats.score += 500;
-      afficherMessage("ARTÉFACT OBTENU : " + artefacts[id].nom, 2.4);
-      remplirCollection();
-      mettreAJourInventaire();
-      verifierObjectif();
+    message(
+      "+" + value + " OR"
+    );
+  });
+
+  /*
+    Artéfacts.
+  */
+  artItems.forEach(object => {
+    if (
+      !object.taken &&
+      hit(player, object)
+    ) {
+      object.taken = true;
+
+      getArtifact(
+        object.id
+      );
+    }
+  });
+
+  /*
+    Équipement.
+  */
+  gearItems.forEach(object => {
+    if (
+      !object.taken &&
+      hit(player, object)
+    ) {
+      object.taken = true;
+
+      getGear(
+        object.id
+      );
+    }
+  });
+
+  /*
+    Trésors révélés sous un arbre ou une herbe.
+  */
+  hidden.forEach(object => {
+    if (
+      !object.shown ||
+      object.taken ||
+      !hit(player, object)
+    ) {
+      return;
     }
 
-    /* =========================================================
-       ÉQUIPEMENT
-       ========================================================= */
-    const equipements = {
-      casqueFer: {
-        id: "casqueFer",
-        slot: "casque",
-        nom: "Casque de Fer",
-        symbole: "H",
-        description: "+1 défense.",
-        bonus: { defense: 1 }
-      },
-      armureAncienne: {
-        id: "armureAncienne",
-        slot: "armure",
-        nom: "Armure Ancienne",
-        symbole: "A",
-        description: "+1 cœur maximum et +1 défense.",
-        bonus: { vie: 1, defense: 1 }
-      },
-      bouclierRoyal: {
-        id: "bouclierRoyal",
-        slot: "bouclier",
-        nom: "Bouclier Royal",
-        symbole: "S",
-        description: "+2 défense et 25 % de chance supplémentaire de bloquer.",
-        bonus: { defense: 2, blocage: .25 }
-      }
-    };
+    object.taken = true;
 
-    const equipementsObtenus = new Set();
+    state().hiddenTaken.add(
+      object.id
+    );
 
-    /*
-      Niveau 0 : objet normal.
-      Niveau 1 et 2 : améliorations fabriquées avec de l'or et des fragments.
-    */
-    const niveauxEquipement = {
-      casqueFer: 0,
-      armureAncienne: 0,
-      bouclierRoyal: 0
-    };
+    const value =
+      Math.round(
+        object.value *
+        player.goldMult
+      );
 
-    function obtenirEquipement(id) {
-      const item = equipements[id];
-      if (!item || equipementsObtenus.has(id)) return;
+    stats.gold += value;
+    stats.treasures += 1;
 
-      equipementsObtenus.add(id);
-      joueur.equipement[item.slot] = id;
-      recalculerStatistiques(true);
-      stats.score += 350;
+    stats.score +=
+      value *
+      (
+        object.type === "chest"
+          ? 12
+          : 6
+      );
 
-      afficherMessage(item.nom.toUpperCase() + " ÉQUIPÉ !", 2.3);
-      remplirCollection();
-      mettreAJourInventaire();
-      verifierObjectif();
+    message(
+      "TRÉSOR CACHÉ : +" +
+      value +
+      " OR",
+      1.6
+    );
+  });
+
+  /*
+    Coffres nécessitant une combinaison d'artéfacts.
+  */
+  lockedChests.forEach(object => {
+    object.wait =
+      Math.max(
+        0,
+        object.wait - 0.016
+      );
+
+    if (
+      object.opened ||
+      !hit(player, object)
+    ) {
+      return;
     }
 
-    function coutAmelioration(id) {
-      const niveauActuel = niveauxEquipement[id] || 0;
-      return {
-        or: 75 + niveauActuel * 75,
-        fragments: 1 + niveauActuel
-      };
-    }
+    const missingArtifacts =
+      missing(
+        object.required
+      );
 
-    function ameliorerEquipement(id) {
-      if (!equipementsObtenus.has(id)) {
-        afficherMessage("ÉQUIPEMENT NON OBTENU", 1.4);
-        return;
-      }
-
-      const niveauActuel = niveauxEquipement[id] || 0;
-
-      if (niveauActuel >= 2) {
-        afficherMessage("AMÉLIORATION MAXIMALE ATTEINTE", 1.5);
-        return;
-      }
-
-      const cout = coutAmelioration(id);
-
-      if (stats.or < cout.or || stats.fragments < cout.fragments) {
-        afficherMessage(
-          "IL FAUT " + cout.or + " OR ET " + cout.fragments + " FRAGMENT(S)",
+    if (
+      missingArtifacts.length
+    ) {
+      if (!object.wait) {
+        message(
+          "IL VOUS MANQUE : " +
+          artNames(
+            missingArtifacts
+          ),
           2
         );
-        return;
+
+        object.wait = 1.2;
       }
 
-      stats.or -= cout.or;
-      stats.fragments -= cout.fragments;
-      niveauxEquipement[id] = niveauActuel + 1;
+      return;
+    }
 
-      recalculerStatistiques(true);
-      stats.score += 250 * niveauxEquipement[id];
+    object.opened = true;
 
-      afficherMessage(
-        equipements[id].nom.toUpperCase() + " AMÉLIORÉ NIV. " + niveauxEquipement[id],
-        2.2
+    state().locked.add(
+      object.id
+    );
+
+    stats.gold +=
+      Math.round(
+        object.gold *
+        player.goldMult
       );
 
-      remplirCollection();
-      mettreAJourInventaire();
+    stats.fragments +=
+      object.fragments;
+
+    stats.score += 800;
+
+    message(
+      "COFFRE MYSTIQUE OUVERT !",
+      2
+    );
+  });
+
+  updateInventory();
+}
+
+/* =========================================================
+   DÉGÂTS SUBIS
+   ========================================================= */
+
+function damage() {
+  if (player.inv > 0) {
+    return;
+  }
+
+  for (const enemy of enemies) {
+    if (!hit(player, enemy)) {
+      continue;
     }
 
-    function bonusEquipement(cle) {
-      let total = 0;
-
-      Object.values(joueur.equipement).forEach(id => {
-        if (!id || !equipements[id]) return;
-
-        const base = equipements[id].bonus[cle] || 0;
-        const niveau = niveauxEquipement[id] || 0;
-
-        if (cle === "defense") total += base + niveau;
-        else if (cle === "vie") total += base + Math.floor(niveau / 2);
-        else if (cle === "blocage") total += base + niveau * .05;
-        else total += base;
-      });
-
-      return total;
+    if (
+      Math.random() <
+      blockChance()
+    ) {
+      message(
+        "ATTAQUE BLOQUÉE !",
+        0.7
+      );
+    } else {
+      player.hp -= 1;
     }
 
-    function recalculerStatistiques(soigner = false) {
-      const ancienneVieMax = joueur.vieMax || joueur.vieBase;
+    player.inv = 1.1;
 
-      joueur.vieMax =
-        joueur.vieBase +
-        joueur.bonusVieArtefact +
-        bonusEquipement("vie");
-
-      if (soigner) {
-        joueur.vie = joueur.vieMax;
-      } else if (joueur.vieMax > ancienneVieMax) {
-        joueur.vie += joueur.vieMax - ancienneVieMax;
-      }
-
-      joueur.vie = clamp(joueur.vie, 0, joueur.vieMax);
+    if (player.hp <= 0) {
+      player.hp = 0;
+      gameOver = true;
     }
 
-    function attaqueJoueur() {
-      return joueur.attaqueBase +
-             joueur.bonusAttaqueArtefact +
-             bonusEquipement("attaque");
+    break;
+  }
+}
+
+/* =========================================================
+   MISE À JOUR DU JOUEUR
+   ========================================================= */
+
+function updatePlayer(deltaTime) {
+  let directionX = 0;
+  let directionY = 0;
+
+  if (
+    keys.ArrowUp ||
+    keys.KeyZ ||
+    keys.KeyW
+  ) {
+    directionY -= 1;
+  }
+
+  if (
+    keys.ArrowDown ||
+    keys.KeyS
+  ) {
+    directionY += 1;
+  }
+
+  if (
+    keys.ArrowLeft ||
+    keys.KeyQ ||
+    keys.KeyA
+  ) {
+    directionX -= 1;
+  }
+
+  if (
+    keys.ArrowRight ||
+    keys.KeyD
+  ) {
+    directionX += 1;
+  }
+
+  if (
+    directionX &&
+    directionY
+  ) {
+    directionX *= Math.SQRT1_2;
+    directionY *= Math.SQRT1_2;
+  }
+
+  if (
+    Math.abs(directionX) >
+    Math.abs(directionY)
+  ) {
+    if (directionX < 0) {
+      player.dir = "left";
     }
 
-    function defenseJoueur() {
-      return joueur.defenseBase + bonusEquipement("defense");
+    if (directionX > 0) {
+      player.dir = "right";
+    }
+  } else if (directionY) {
+    player.dir =
+      directionY < 0
+        ? "up"
+        : "down";
+  }
+
+  move(
+    player,
+    directionX *
+    speed() *
+    deltaTime,
+
+    directionY *
+    speed() *
+    deltaTime
+  );
+
+  if (player.attack) {
+    player.attackTime -=
+      deltaTime;
+
+    if (
+      player.attackTime <= 0
+    ) {
+      player.attack = false;
+    }
+  }
+
+  player.cool =
+    Math.max(
+      0,
+      player.cool - deltaTime
+    );
+
+  player.inv =
+    Math.max(
+      0,
+      player.inv - deltaTime
+    );
+}
+
+/* =========================================================
+   MISE À JOUR DES ENNEMIS
+   ========================================================= */
+
+function updateEnemies(deltaTime) {
+  enemies.forEach(enemy => {
+    if (enemy.recoil > 0) {
+      enemy.recoil -= deltaTime;
+
+      move(
+        enemy,
+        enemy.rx * deltaTime,
+        enemy.ry * deltaTime
+      );
+
+      return;
     }
 
-    function vitesseJoueur() {
-      return joueur.vitesseBase * (1 + joueur.bonusVitesseArtefact + bonusEquipement("vitesse"));
-    }
+    enemy.next -= deltaTime;
 
-    function chanceBlocage() {
-      return clamp(defenseJoueur() * .12 + bonusEquipement("blocage"), 0, .78);
-    }
-
-    /* =========================================================
-       NIVEAUX
-       Pour ajouter un niveau 6, copier un objet du tableau
-       NIVEAUX et modifier carte, couleurs et contenu.
-       ========================================================= */
-    const NIVEAUX = [
-      {
-        nom: "FORÊT DES RICHESSES",
-        sol: "#5baa4b",
-        detail: "#4b9340",
-        objectif: {
-          texte: "Ramasser 3 trésors",
-          progression: () => stats.tresorsNiveau,
-          cible: 3
-        },
-        carte: [
-          [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-          [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-          [1,0,1,1,0,0,0,1,1,0,0,0,1,1,0,1],
-          [1,0,0,0,0,3,3,3,3,3,0,0,0,0,0,1],
-          [1,0,1,0,0,3,3,3,3,3,0,1,0,1,0,1],
-          [1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1],
-          [1,0,0,0,0,0,2,2,0,0,0,0,0,2,0,1],
-          [1,0,2,0,1,0,2,0,0,1,1,0,0,2,0,1],
-          [1,0,2,0,1,0,0,0,0,0,0,0,1,1,0,1],
-          [1,0,0,0,0,0,1,0,2,2,0,0,0,0,0,1],
-          [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-        ],
-        depart: [1,1],
-        ennemis: [[12,1,2],[3,8,2],[13,8,2]],
-        tresors: [
-          ["or",4,1,10],["or",10,2,10],["coffre",3,5,40],["or",13,5,10]
-        ],
-        artefacts: [["coeurAncien",10,8]],
-        equipements: [],
-        porteRequise: [],
-        coffresSpeciaux: [
-          ["coffreSylvestre",13,2,["coeurAncien"],60,1]
-        ]
-      },
-      {
-        nom: "RUINES DU VENT",
-        sol: "#88774f",
-        detail: "#75613e",
-        objectif: {
-          texte: "Trouver les Bottes du Vent",
-          progression: () => artefactsObtenus.has("bottesDuVent") ? 1 : 0,
-          cible: 1
-        },
-        carte: [
-          [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
-          [2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,2],
-          [2,0,2,2,0,4,0,2,0,2,2,2,0,4,0,2],
-          [2,0,0,2,0,4,0,0,0,2,0,0,0,4,0,2],
-          [2,4,0,2,0,0,0,2,2,2,0,4,0,0,0,2],
-          [2,0,0,0,0,2,0,0,0,0,0,4,0,2,0,2],
-          [2,0,2,2,0,2,2,2,0,4,0,0,0,2,0,2],
-          [2,0,0,2,0,0,0,0,0,4,2,2,0,0,0,2],
-          [2,4,0,2,2,2,0,4,0,0,0,2,0,4,0,2],
-          [2,0,0,0,0,0,0,4,2,2,0,2,0,0,0,2],
-          [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
-        ],
-        depart: [1,1],
-        ennemis: [[13,1,2],[5,5,2],[9,7,3],[13,8,2]],
-        tresors: [["or",4,3,15],["coffre",10,3,50],["or",2,7,15]],
-        artefacts: [["bottesDuVent",8,5]],
-        equipements: [],
-        porteRequise: ["coeurAncien"],
-        coffresSpeciaux: [
-          ["coffreDuVent",12,8,["coeurAncien","bottesDuVent"],90,1]
-        ]
-      },
-      {
-        nom: "FORTERESSE DU GUERRIER",
-        sol: "#684949",
-        detail: "#553939",
-        objectif: {
-          texte: "Trouver et équiper le Casque de Fer",
-          progression: () => joueur.equipement.casque ? 1 : 0,
-          cible: 1
-        },
-        carte: [
-          [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
-          [2,0,0,0,0,0,2,0,0,0,2,0,0,0,0,2],
-          [2,0,2,2,2,0,2,0,4,0,2,0,2,2,0,2],
-          [2,0,2,0,0,0,0,0,4,0,0,0,0,2,0,2],
-          [2,0,2,0,2,2,2,0,2,2,2,2,0,2,0,2],
-          [2,0,0,0,2,0,0,0,0,0,0,2,0,0,0,2],
-          [2,2,2,0,2,0,4,2,2,4,0,2,0,2,2,2],
-          [2,0,0,0,0,0,4,0,0,4,0,0,0,0,0,2],
-          [2,0,2,2,2,0,2,0,2,2,2,2,2,2,0,2],
-          [2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,2],
-          [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
-        ],
-        depart: [1,1],
-        ennemis: [[13,1,3],[7,3,3],[5,7,3],[13,7,3],[8,9,5]],
-        tresors: [["or",3,3,20],["coffre",10,5,75]],
-        artefacts: [["emblemeGuerrier",8,7]],
-        equipements: [["casqueFer",13,9]],
-        porteRequise: ["coeurAncien","bottesDuVent"],
-        coffresSpeciaux: [
-          ["coffreDuSceau",3,9,["bottesDuVent","emblemeGuerrier"],120,1]
-        ]
-      },
-      {
-        nom: "CAVERNE DE GLACE",
-        sol: "#8bc5d6",
-        detail: "#6dacbf",
-        objectif: {
-          texte: "Trouver et équiper l’Armure Ancienne",
-          progression: () => joueur.equipement.armure ? 1 : 0,
-          cible: 1
-        },
-        carte: [
-          [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6],
-          [6,0,0,0,0,0,6,0,0,0,0,0,0,0,0,6],
-          [6,0,6,6,0,0,6,0,6,6,6,0,6,6,0,6],
-          [6,0,0,6,0,7,0,0,0,0,6,0,0,6,0,6],
-          [6,6,0,6,0,7,6,6,0,0,6,6,0,6,0,6],
-          [6,0,0,0,0,0,0,6,0,7,0,0,0,0,0,6],
-          [6,0,6,6,6,0,0,6,0,7,0,6,6,6,0,6],
-          [6,0,0,0,6,0,0,0,0,0,0,6,0,0,0,6],
-          [6,6,6,0,6,6,0,6,6,6,0,6,0,6,0,6],
-          [6,0,0,0,0,0,0,0,0,0,0,0,0,6,0,6],
-          [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]
-        ],
-        depart: [1,1],
-        ennemis: [[13,1,3],[4,5,3],[10,7,4],[13,9,4]],
-        tresors: [["or",3,3,25],["coffre",12,5,85]],
-        artefacts: [],
-        equipements: [["armureAncienne",8,9]],
-        porteRequise: ["coeurAncien","bottesDuVent","emblemeGuerrier"],
-        coffresSpeciaux: [
-          ["coffreDeGlace",12,7,["coeurAncien","bottesDuVent","emblemeGuerrier"],150,2]
-        ]
-      },
-      {
-        nom: "VOLCAN DU ROI SOMBRE",
-        sol: "#6a302b",
-        detail: "#4d211f",
-        objectif: {
-          texte: "Trouver le Bouclier Royal",
-          progression: () => joueur.equipement.bouclier ? 1 : 0,
-          cible: 1
-        },
-        carte: [
-          [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
-          [5,0,0,0,0,5,0,0,0,0,0,5,0,0,0,5],
-          [5,0,5,5,0,5,0,5,5,5,0,5,0,5,0,5],
-          [5,0,0,5,0,0,0,0,0,5,0,0,0,5,0,5],
-          [5,5,0,5,5,5,0,5,0,5,5,5,0,5,0,5],
-          [5,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5],
-          [5,0,5,5,5,0,5,5,5,5,0,5,5,5,0,5],
-          [5,0,0,0,5,0,0,0,0,0,0,5,0,0,0,5],
-          [5,5,5,0,5,5,0,5,5,5,0,5,0,5,0,5],
-          [5,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5],
-          [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]
-        ],
-        depart: [1,1],
-        ennemis: [[13,1,4],[6,3,4],[3,7,4],[9,7,5],[13,9,7]],
-        tresors: [["coffre",3,5,100],["coffre",10,9,120]],
-        artefacts: [],
-        equipements: [["bouclierRoyal",12,7]],
-        porteRequise: ["coeurAncien","bottesDuVent","emblemeGuerrier"],
-        coffresSpeciaux: [
-          ["tresorRoyal",8,5,["coeurAncien","bottesDuVent","emblemeGuerrier"],220,2]
-        ]
-      }
-    ];
-
-    /* =========================================================
-       ÉTAT GLOBAL
-       ========================================================= */
-    const stats = {
-      score: 0,
-      or: 0,
-      tresors: 0,
-      tresorsNiveau: 0,
-      ennemis: 0,
-      fragments: 0,
-      coffresMystiques: 0
-    };
-
-    const message = { texte: "", temps: 0 };
-
-    let niveauIndex = 0;
-    let niveau = NIVEAUX[0];
-    let ennemisActifs = [];
-    let tresorsActifs = [];
-    let artefactsActifs = [];
-    let equipementsActifs = [];
-    let coffresSpeciauxActifs = [];
-    let prochainEnnemiId = 1;
-    let porteMessageCooldown = 0;
-
-    let sortieOuverte = false;
-    let transition = false;
-    let jeuTermine = false;
-    let victoire = false;
-    let pause = true;
-    let tempsJeu = 0;
-    let ancienTemps = performance.now();
-
-    const porte = {
-      x: W - TILE,
-      y: HUD + 4 * TILE,
-      w: TILE,
-      h: TILE * 2
-    };
-
-    /* =========================================================
-       CRÉATION ET CHARGEMENT
-       ========================================================= */
-    function creerEnnemi([col, row, vie]) {
-      const p = positionCase(col, row);
-      return {
-        id: prochainEnnemiId++,
-        x: p.x, y: p.y, w: 24, h: 24,
-        vie, vieMax: vie,
-        vitesse: randInt(48, 82),
-        dx: 0, dy: 0,
-        prochainChoix: 0,
-        recul: 0,
-        reculX: 0,
-        reculY: 0
-      };
-    }
-
-    function creerTresor([type, col, row, valeur], index) {
-      const taille = type === "coffre" ? 24 : 16;
-      const p = positionCase(col, row, taille, taille);
-      return { id: index, type, valeur, x: p.x, y: p.y, w: taille, h: taille, pris: false };
-    }
-
-    function creerArtefact([id, col, row]) {
-      const p = positionCase(col, row, 22, 22);
-      return { id, x: p.x, y: p.y, w: 22, h: 22, pris: artefactsObtenus.has(id) };
-    }
-
-    function creerEquipement([id, col, row]) {
-      const p = positionCase(col, row, 24, 24);
-      return { id, x: p.x, y: p.y, w: 24, h: 24, pris: equipementsObtenus.has(id) };
-    }
-
-    function creerCoffreSpecial([id, col, row, requis, or, fragments]) {
-      const p = positionCase(col, row, 28, 24);
-
-      return {
-        id,
-        x: p.x,
-        y: p.y,
-        w: 28,
-        h: 24,
-        requis,
-        or,
-        fragments,
-        ouvert: false,
-        messageCooldown: 0
-      };
-    }
-
-    function nomsArtefacts(ids) {
-      return ids.map(id => artefacts[id] ? artefacts[id].nom : id).join(" + ");
-    }
-
-    function artefactsPossedes(ids = []) {
-      return ids.every(id => artefactsObtenus.has(id));
-    }
-
-    function artefactsManquants(ids = []) {
-      return ids.filter(id => !artefactsObtenus.has(id));
-    }
-
-    function chargerNiveau(index) {
-      if (index >= NIVEAUX.length) {
-        transition = false;
-        jeuTermine = true;
-        victoire = true;
-        return;
-      }
-
-      niveauIndex = index;
-      niveau = NIVEAUX[index];
-      sortieOuverte = false;
-      transition = false;
-      stats.tresorsNiveau = 0;
-
-      const depart = positionCase(niveau.depart[0], niveau.depart[1], joueur.w, joueur.h);
-      joueur.x = depart.x;
-      joueur.y = depart.y;
-      joueur.direction = "bas";
-      joueur.invulnerable = false;
-      joueur.tempsInvulnerable = 0;
-      joueur.attaqueActive = false;
-      joueur.recharge = 0;
-      joueur.touchesAttaque.clear();
-
-      ennemisActifs = niveau.ennemis.map(creerEnnemi);
-      tresorsActifs = niveau.tresors.map(creerTresor);
-      artefactsActifs = niveau.artefacts.map(creerArtefact);
-      equipementsActifs = niveau.equipements.map(creerEquipement);
-      coffresSpeciauxActifs = (niveau.coffresSpeciaux || []).map(creerCoffreSpecial);
-      porteMessageCooldown = 0;
-
-      mettreAJourInventaire();
-      afficherMessage("NIVEAU " + (niveauIndex + 1) + " : " + niveau.nom, 2.4);
-      ancienTemps = performance.now();
-      canvas.focus();
-    }
-
-    function recommencerAventure() {
-      if (!personnageSelectionne) return;
-
-      stats.score = 0;
-      stats.or = 0;
-      stats.tresors = 0;
-      stats.tresorsNiveau = 0;
-      stats.ennemis = 0;
-      stats.fragments = 0;
-      stats.coffresMystiques = 0;
-
-      artefactsObtenus.clear();
-      equipementsObtenus.clear();
-      Object.keys(niveauxEquipement).forEach(id => niveauxEquipement[id] = 0);
-
-      appliquerPersonnage(personnageSelectionne);
-
-      tempsJeu = 0;
-      jeuTermine = false;
-      victoire = false;
-      transition = false;
-
-      remplirCollection();
-      chargerNiveau(0);
-    }
-
-    function verifierObjectif() {
-      const objectifAtteint = niveau.objectif.progression() >= niveau.objectif.cible;
-      const clesValides = artefactsPossedes(niveau.porteRequise || []);
-
-      if (ennemisActifs.length === 0 && objectifAtteint && clesValides && !sortieOuverte) {
-        sortieOuverte = true;
-        afficherMessage("SERRURE ACTIVÉE — SORTIE OUVERTE !", 2.2);
-      }
-    }
-
-    function verifierPorteVerrouillee(dt) {
-      porteMessageCooldown = Math.max(0, porteMessageCooldown - dt);
-
-      if (sortieOuverte || transition || jeuTermine) return;
-
-      const zonePorte = {
-        x: porte.x - 42,
-        y: porte.y - 10,
-        w: porte.w + 50,
-        h: porte.h + 20
-      };
-
-      if (!collisionRect(joueur, zonePorte) || porteMessageCooldown > 0) return;
-
-      const objectifAtteint = niveau.objectif.progression() >= niveau.objectif.cible;
-      const manquants = artefactsManquants(niveau.porteRequise || []);
-
-      if (ennemisActifs.length > 0) {
-        afficherMessage("ÉLIMINE D’ABORD LES ENNEMIS", 1.6);
-      } else if (!objectifAtteint) {
-        afficherMessage("OBJECTIF INCOMPLET : " + niveau.objectif.texte, 2);
-      } else if (manquants.length) {
-        afficherMessage("IL VOUS MANQUE : " + nomsArtefacts(manquants), 2.2);
-      }
-
-      porteMessageCooldown = 1.4;
-    }
-
-    /* =========================================================
-       COLLISIONS AVEC LA CARTE
-       ========================================================= */
-    function caseDepuisPosition(x, y) {
-      return {
-        col: Math.floor(x / TILE),
-        row: Math.floor((y - HUD) / TILE)
-      };
-    }
-
-    function caseSolide(col, row) {
-      if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return true;
-
-      if (sortieOuverte && col === COLS - 1 && (row === 4 || row === 5)) {
-        return false;
-      }
-
-      return niveau.carte[row][col] !== SOL;
-    }
-
-    function toucheCarte(x, y, w, h) {
-      const m = 2;
-      const points = [
-        [x + m, y + m],
-        [x + w - m, y + m],
-        [x + m, y + h - m],
-        [x + w - m, y + h - m]
+    if (enemy.next <= 0) {
+      const directions = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+        [0, 0]
       ];
 
-      return points.some(([px, py]) => {
-        const c = caseDepuisPosition(px, py);
-        return caseSolide(c.col, c.row);
-      });
+      const direction =
+        directions[
+          Math.floor(
+            Math.random() *
+            directions.length
+          )
+        ];
+
+      enemy.dx = direction[0];
+      enemy.dy = direction[1];
+
+      enemy.next =
+        0.5 +
+        Math.random() * 1.4;
     }
 
-    function deplacerAvecCollision(entite, mx, my) {
-      let collisionX = false;
-      let collisionY = false;
+    move(
+      enemy,
 
-      if (!toucheCarte(entite.x + mx, entite.y, entite.w, entite.h)) {
-        entite.x += mx;
-      } else {
-        collisionX = true;
+      enemy.dx *
+      enemy.speed *
+      deltaTime,
+
+      enemy.dy *
+      enemy.speed *
+      deltaTime
+    );
+  });
+}
+
+/* =========================================================
+   VOYAGE ALLER-RETOUR
+   ========================================================= */
+
+function doors() {
+  /*
+    Retour vers le niveau précédent.
+  */
+  if (
+    levelIndex > 0 &&
+    player.x < 4
+  ) {
+    loadLevel(
+      levelIndex - 1,
+      "right"
+    );
+
+    message(
+      "RETOUR AU NIVEAU PRÉCÉDENT"
+    );
+
+    return;
+  }
+
+  /*
+    Passage vers le niveau suivant.
+  */
+  if (
+    exitOpen() &&
+    player.x + player.w > W - 4
+  ) {
+    if (
+      levelIndex ===
+      LEVELS.length - 1
+    ) {
+      victory = true;
+      gameOver = true;
+    } else {
+      loadLevel(
+        levelIndex + 1,
+        "left"
+      );
+
+      message(
+        "NIVEAU SUIVANT"
+      );
+    }
+  }
+}
+
+/* =========================================================
+   MESSAGE DE PORTE VERROUILLÉE
+   ========================================================= */
+
+function lockedDoorMessage() {
+  if (exitOpen()) {
+    return;
+  }
+
+  const doorZone = {
+    x: W - 70,
+    y: HUD + 4 * T - 8,
+    w: 70,
+    h: 80
+  };
+
+  if (
+    !hit(player, doorZone) ||
+    msg.time > 0.2
+  ) {
+    return;
+  }
+
+  if (enemies.length) {
+    message(
+      "ÉLIMINE LES ENNEMIS",
+      1.4
+    );
+
+    return;
+  }
+
+  if (!objectiveDone()) {
+    message(
+      "OBJECTIF : " +
+      level.objective[0],
+      1.8
+    );
+
+    return;
+  }
+
+  const missingArtifacts =
+    missing(level.req);
+
+  if (
+    missingArtifacts.length
+  ) {
+    message(
+      "IL VOUS MANQUE : " +
+      artNames(
+        missingArtifacts
+      ),
+      2
+    );
+  }
+}
+
+/* =========================================================
+   BOUCLE DE MISE À JOUR
+   ========================================================= */
+
+function update(deltaTime) {
+  if (
+    paused ||
+    gameOver
+  ) {
+    return;
+  }
+
+  time += deltaTime;
+
+  msg.time =
+    Math.max(
+      0,
+      msg.time - deltaTime
+    );
+
+  updatePlayer(deltaTime);
+  updateEnemies(deltaTime);
+
+  attackHits();
+  damage();
+  collect();
+
+  lockedDoorMessage();
+  doors();
+}
+
+/* =========================================================
+   DESSIN DES TUILES
+   ========================================================= */
+
+function drawTile(
+  type,
+  x,
+  y,
+  column,
+  row
+) {
+  ctx.fillStyle =
+    level.floor;
+
+  ctx.fillRect(
+    x,
+    y,
+    T,
+    T
+  );
+
+  ctx.fillStyle =
+    level.detail;
+
+  if (
+    (
+      column * 7 +
+      row * 11
+    ) % 5 === 0
+  ) {
+    ctx.fillRect(
+      x + 6,
+      y + 8,
+      4,
+      4
+    );
+  }
+
+  if (type === TREE) {
+    ctx.fillStyle = "#70442a";
+
+    ctx.fillRect(
+      x + 12,
+      y + 18,
+      8,
+      12
+    );
+
+    ctx.fillStyle = "#174f2b";
+
+    ctx.fillRect(
+      x + 3,
+      y + 5,
+      26,
+      18
+    );
+
+    ctx.fillRect(
+      x + 8,
+      y + 1,
+      16,
+      25
+    );
+  }
+
+  if (type === WALL) {
+    ctx.fillStyle = "#735235";
+
+    ctx.fillRect(
+      x,
+      y,
+      T,
+      T
+    );
+
+    ctx.fillStyle = "#3e2c21";
+
+    ctx.fillRect(
+      x,
+      y + 14,
+      T,
+      3
+    );
+
+    ctx.fillRect(
+      x + 14,
+      y,
+      3,
+      14
+    );
+  }
+
+  if (type === WATER) {
+    ctx.fillStyle = "#286f9d";
+
+    ctx.fillRect(
+      x,
+      y,
+      T,
+      T
+    );
+
+    ctx.fillStyle = "#5db5cf";
+
+    ctx.fillRect(
+      x +
+      (
+        (
+          time * 12 +
+          column * 3
+        ) % 16
+      ),
+      y + 8,
+      10,
+      3
+    );
+  }
+
+  if (type === ROCK) {
+    ctx.fillStyle = "#303638";
+
+    ctx.fillRect(
+      x + 4,
+      y + 8,
+      24,
+      20
+    );
+
+    ctx.fillStyle = "#626c70";
+
+    ctx.fillRect(
+      x + 9,
+      y + 7,
+      8,
+      5
+    );
+  }
+
+  if (type === LAVA) {
+    ctx.fillStyle = "#7d241f";
+
+    ctx.fillRect(
+      x,
+      y,
+      T,
+      T
+    );
+
+    ctx.fillStyle = "#ff6b22";
+
+    ctx.fillRect(
+      x +
+      (
+        (
+          time * 14 +
+          column * 4
+        ) % 16
+      ),
+      y + 8,
+      12,
+      4
+    );
+  }
+
+  if (type === ICE) {
+    ctx.fillStyle = "#8ed4e5";
+
+    ctx.fillRect(
+      x,
+      y,
+      T,
+      T
+    );
+
+    ctx.fillStyle = "#d8f7ff";
+
+    ctx.fillRect(
+      x + 4,
+      y + 4,
+      14,
+      3
+    );
+  }
+
+  if (type === CRYSTAL) {
+    ctx.fillStyle = "#2d6e83";
+
+    ctx.fillRect(
+      x + 10,
+      y + 4,
+      12,
+      24
+    );
+
+    ctx.fillStyle = "#8ff0ff";
+
+    ctx.fillRect(
+      x + 13,
+      y + 2,
+      6,
+      26
+    );
+  }
+}
+
+/* =========================================================
+   DESSIN DES PORTES
+   ========================================================= */
+
+function drawDoor(
+  x,
+  open,
+  back = false
+) {
+  const y =
+    HUD + 4 * T;
+
+  ctx.fillStyle =
+    open
+      ? "#101010"
+      : "#5e371f";
+
+  ctx.fillRect(
+    x,
+    y,
+    32,
+    64
+  );
+
+  if (open) {
+    ctx.fillStyle =
+      back
+        ? "#75c8ff"
+        : "#7de0ff";
+
+    ctx.fillRect(
+      x + 9,
+      y + 8,
+      14,
+      48
+    );
+  } else {
+    ctx.fillStyle = "#a46935";
+
+    ctx.fillRect(
+      x + 4,
+      y + 4,
+      24,
+      56
+    );
+
+    ctx.fillStyle = "#8f4fb3";
+
+    ctx.fillRect(
+      x + 8,
+      y + 24,
+      16,
+      17
+    );
+  }
+}
+
+/* =========================================================
+   DESSIN DE LA CARTE
+   ========================================================= */
+
+function drawMap() {
+  for (
+    let row = 0;
+    row < ROWS;
+    row++
+  ) {
+    for (
+      let column = 0;
+      column < COLS;
+      column++
+    ) {
+      const x =
+        column * T;
+
+      const y =
+        HUD + row * T;
+
+      const tile =
+        level.map[row][column];
+
+      ctx.fillStyle =
+        level.floor;
+
+      ctx.fillRect(
+        x,
+        y,
+        T,
+        T
+      );
+
+      if (
+        (
+          column === 0 ||
+          column === 15
+        ) &&
+        (
+          row === 4 ||
+          row === 5
+        )
+      ) {
+        continue;
       }
 
-      if (!toucheCarte(entite.x, entite.y + my, entite.w, entite.h)) {
-        entite.y += my;
-      } else {
-        collisionY = true;
+      if (
+        tile === TREE &&
+        state().trees.has(
+          column + "," + row
+        )
+      ) {
+        continue;
       }
 
-      return { collisionX, collisionY };
+      drawTile(
+        tile,
+        x,
+        y,
+        column,
+        row
+      );
+    }
+  }
+
+  drawDoor(
+    0,
+    levelIndex > 0,
+    true
+  );
+
+  drawDoor(
+    W - T,
+    exitOpen()
+  );
+}
+
+/* =========================================================
+   DESSIN DES HAUTES HERBES
+   ========================================================= */
+
+function drawGrass() {
+  grass.forEach(grassItem => {
+    if (grassItem.cut) {
+      return;
     }
 
-    /* =========================================================
-       CLAVIER ET COMMANDES
-       ========================================================= */
-    const touches = Object.create(null);
-    const touchesBloquees = new Set(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"]);
+    ctx.fillStyle = "#1d6b31";
 
-    window.addEventListener("keydown", event => {
-      if (touchesBloquees.has(event.code)) event.preventDefault();
+    for (
+      const offset of [
+        2,
+        8,
+        14,
+        20
+      ]
+    ) {
+      ctx.fillRect(
+        grassItem.x + offset,
+        grassItem.y +
+        (
+          offset % 7
+        ),
+        4,
+        20
+      );
+    }
+  });
+}
 
-      if (pause) {
-        if (event.code === "Escape") fermerModales();
-        return;
-      }
+/* =========================================================
+   DESSIN DES TRÉSORS
+   ========================================================= */
 
-      touches[event.code] = true;
+function drawLoot(object) {
+  const x =
+    Math.round(object.x);
 
-      if (event.code === "Space" && !event.repeat) {
-        if (transition) chargerNiveau(niveauIndex + 1);
-        else if (jeuTermine) recommencerAventure();
-        else demarrerAttaque();
-      }
+  const y =
+    Math.round(object.y);
 
-      if (event.code === "Enter" && transition && !event.repeat) {
-        chargerNiveau(niveauIndex + 1);
-      }
+  if (
+    object.type === "chest"
+  ) {
+    ctx.fillStyle = "#56311d";
 
-      if (event.code === "KeyR" && !event.repeat) recommencerAventure();
-      if (event.code === "KeyC" && !event.repeat) afficherSelectionPersonnage();
+    ctx.fillRect(
+      x,
+      y,
+      object.w,
+      object.h
+    );
 
-      if (jeuTermine && !event.repeat && !["KeyR","KeyC","Space"].includes(event.code)) {
-        recommencerAventure();
-      }
-    });
+    ctx.fillStyle = "#a7672d";
 
-    window.addEventListener("keyup", event => {
-      touches[event.code] = false;
-    });
+    ctx.fillRect(
+      x + 2,
+      y + 3,
+      object.w - 4,
+      8
+    );
 
-    window.addEventListener("blur", () => {
-      Object.keys(touches).forEach(code => touches[code] = false);
-    });
+    ctx.fillStyle = "#e7c34f";
 
-    function connecterDirection(id, code) {
-      const bouton = document.getElementById(id);
+    ctx.fillRect(
+      x + 10,
+      y + 8,
+      5,
+      10
+    );
+  } else {
+    ctx.fillStyle = "#fff17a";
 
-      const activer = event => {
-        event.preventDefault();
-        touches[code] = true;
-        bouton.classList.add("active");
-        canvas.focus();
-      };
+    ctx.fillRect(
+      x + 3,
+      y,
+      object.w - 6,
+      object.h
+    );
 
-      const desactiver = event => {
-        event.preventDefault();
-        touches[code] = false;
-        bouton.classList.remove("active");
-      };
+    ctx.fillRect(
+      x,
+      y + 3,
+      object.w,
+      object.h - 6
+    );
+  }
+}
 
-      bouton.addEventListener("pointerdown", activer);
-      bouton.addEventListener("pointerup", desactiver);
-      bouton.addEventListener("pointercancel", desactiver);
-      bouton.addEventListener("pointerleave", desactiver);
+/* =========================================================
+   DESSIN DES OBJETS
+   ========================================================= */
+
+function drawObjects() {
+  loot.forEach(object => {
+    if (!object.taken) {
+      drawLoot(object);
+    }
+  });
+
+  hidden.forEach(object => {
+    if (
+      object.shown &&
+      !object.taken
+    ) {
+      drawLoot(object);
+    }
+  });
+
+  artItems.forEach(object => {
+    if (object.taken) {
+      return;
     }
 
-    connecterDirection("touch-up", "ArrowUp");
-    connecterDirection("touch-down", "ArrowDown");
-    connecterDirection("touch-left", "ArrowLeft");
-    connecterDirection("touch-right", "ArrowRight");
+    ctx.fillStyle = "#fff19a";
 
-    const boutonAttaque = document.getElementById("touch-attack");
+    ctx.fillRect(
+      object.x - 3,
+      object.y - 3,
+      28,
+      28
+    );
 
-    boutonAttaque.addEventListener("pointerdown", event => {
+    ctx.fillStyle = "#713e91";
+
+    ctx.fillRect(
+      object.x,
+      object.y,
+      22,
+      22
+    );
+
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "center";
+    ctx.font = "bold 14px monospace";
+
+    ctx.fillText(
+      ART[object.id].sym,
+      object.x + 11,
+      object.y + 16
+    );
+
+    ctx.textAlign = "left";
+  });
+
+  gearItems.forEach(object => {
+    if (object.taken) {
+      return;
+    }
+
+    ctx.fillStyle = "#ffe882";
+
+    ctx.fillRect(
+      object.x - 3,
+      object.y - 3,
+      30,
+      30
+    );
+
+    if (object.id === "helmet") {
+      ctx.fillStyle = "#8a939e";
+
+      ctx.fillRect(
+        object.x + 3,
+        object.y + 4,
+        18,
+        15
+      );
+    }
+
+    if (object.id === "armor") {
+      ctx.fillStyle = "#b08b4e";
+
+      ctx.fillRect(
+        object.x + 3,
+        object.y + 3,
+        18,
+        18
+      );
+    }
+
+    if (object.id === "shield") {
+      ctx.fillStyle = "#376eae";
+
+      ctx.fillRect(
+        object.x + 3,
+        object.y + 2,
+        18,
+        19
+      );
+
+      ctx.fillStyle = "#f1d45a";
+
+      ctx.fillRect(
+        object.x + 10,
+        object.y + 5,
+        4,
+        13
+      );
+    }
+  });
+
+  lockedChests.forEach(object => {
+    if (object.opened) {
+      return;
+    }
+
+    ctx.fillStyle =
+      hasAll(object.required)
+        ? "#fff19a"
+        : "#b56bff";
+
+    ctx.fillRect(
+      object.x - 3,
+      object.y - 3,
+      34,
+      30
+    );
+
+    ctx.fillStyle = "#3e204f";
+
+    ctx.fillRect(
+      object.x,
+      object.y,
+      object.w,
+      object.h
+    );
+
+    ctx.fillStyle = "#8d4eb0";
+
+    ctx.fillRect(
+      object.x + 2,
+      object.y + 3,
+      object.w - 4,
+      8
+    );
+  });
+}
+
+/* =========================================================
+   DESSIN DES ENNEMIS
+   ========================================================= */
+
+function drawEnemies() {
+  enemies.forEach(enemy => {
+    ctx.fillStyle = "#c9333e";
+
+    ctx.fillRect(
+      enemy.x,
+      enemy.y,
+      enemy.w,
+      enemy.h
+    );
+
+    ctx.fillStyle = "#ffffff";
+
+    ctx.fillRect(
+      enemy.x + 5,
+      enemy.y + 7,
+      5,
+      5
+    );
+
+    ctx.fillRect(
+      enemy.x + 14,
+      enemy.y + 7,
+      5,
+      5
+    );
+
+    ctx.fillStyle = "#35171a";
+
+    ctx.fillRect(
+      enemy.x,
+      enemy.y - 7,
+      enemy.w,
+      4
+    );
+
+    ctx.fillStyle = "#ff765d";
+
+    ctx.fillRect(
+      enemy.x,
+      enemy.y - 7,
+      enemy.w *
+      enemy.hp /
+      enemy.max,
+      4
+    );
+  });
+}
+
+/* =========================================================
+   DESSIN DU JOUEUR
+   ========================================================= */
+
+function drawPlayer() {
+  if (
+    player.inv &&
+    Math.floor(
+      player.inv * 14
+    ) % 2
+  ) {
+    return;
+  }
+
+  const x =
+    Math.round(player.x);
+
+  const y =
+    Math.round(player.y);
+
+  ctx.fillStyle =
+    player.c1;
+
+  ctx.fillRect(
+    x,
+    y + 4,
+    24,
+    20
+  );
+
+  if (player.type === "fox") {
+    ctx.fillRect(
+      x + 3,
+      y,
+      18,
+      14
+    );
+
+    ctx.fillStyle =
+      player.c2;
+
+    ctx.fillRect(
+      x + 2,
+      y - 5,
+      7,
+      8
+    );
+
+    ctx.fillRect(
+      x + 15,
+      y - 5,
+      7,
+      8
+    );
+
+    ctx.fillRect(
+      player.dir === "left"
+        ? x + 24
+        : x - 9,
+      y + 11,
+      9,
+      7
+    );
+  } else {
+    ctx.fillStyle =
+      player.face;
+
+    ctx.fillRect(
+      x + 5,
+      y + 5,
+      14,
+      10
+    );
+
+    ctx.fillStyle =
+      player.c2;
+
+    ctx.fillRect(
+      x + 3,
+      y,
+      18,
+      7
+    );
+  }
+
+  if (player.gear.casque) {
+    ctx.fillStyle = "#949da8";
+
+    ctx.fillRect(
+      x + 2,
+      y - 3,
+      20,
+      5
+    );
+  }
+
+  if (player.gear.armure) {
+    ctx.fillStyle = "#b08b4e";
+
+    ctx.fillRect(
+      x + 3,
+      y + 13,
+      18,
+      8
+    );
+  }
+
+  if (player.gear.bouclier) {
+    ctx.fillStyle = "#376eae";
+
+    ctx.fillRect(
+      player.dir === "left"
+        ? x + 17
+        : x - 5,
+      y + 8,
+      8,
+      13
+    );
+  }
+}
+
+/* =========================================================
+   DESSIN DE L'ÉPÉE
+   ========================================================= */
+
+function drawSword() {
+  if (!player.attack) {
+    return;
+  }
+
+  const swordRectangle =
+    sword();
+
+  ctx.fillStyle = "#ffe45e";
+
+  ctx.fillRect(
+    swordRectangle.x,
+    swordRectangle.y,
+    swordRectangle.w,
+    swordRectangle.h
+  );
+}
+
+/* =========================================================
+   CŒURS
+   ========================================================= */
+
+function heart(
+  x,
+  y,
+  active
+) {
+  ctx.fillStyle =
+    active
+      ? "#e53b44"
+      : "#4d2729";
+
+  ctx.fillRect(
+    x + 4,
+    y,
+    8,
+    4
+  );
+
+  ctx.fillRect(
+    x + 16,
+    y,
+    8,
+    4
+  );
+
+  ctx.fillRect(
+    x,
+    y + 4,
+    28,
+    10
+  );
+
+  ctx.fillRect(
+    x + 4,
+    y + 14,
+    20,
+    7
+  );
+}
+
+/* =========================================================
+   INTERFACE DU CANVAS
+   ========================================================= */
+
+function hud() {
+  ctx.fillStyle = "#171b1b";
+
+  ctx.fillRect(
+    0,
+    0,
+    W,
+    HUD
+  );
+
+  ctx.fillStyle = "#d7ba62";
+
+  ctx.fillRect(
+    0,
+    HUD - 4,
+    W,
+    4
+  );
+
+  ctx.fillStyle = "#f4e6a4";
+  ctx.font = "bold 11px monospace";
+
+  ctx.fillText(
+    player.name +
+    " · NIV " +
+    (levelIndex + 1) +
+    "/5",
+    12,
+    15
+  );
+
+  for (
+    let index = 0;
+    index < player.maxHp;
+    index++
+  ) {
+    heart(
+      12 + index * 30,
+      25,
+      index < player.hp
+    );
+  }
+
+  ctx.textAlign = "right";
+  ctx.fillStyle = "#ffffff";
+
+  ctx.fillText(
+    "OR " +
+    stats.gold +
+    " · SCORE " +
+    stats.score,
+    W - 12,
+    16
+  );
+
+  ctx.fillText(
+    "ATQ " +
+    atk() +
+    " · DEF " +
+    def() +
+    " · ENNEMIS " +
+    enemies.length,
+    W - 12,
+    34
+  );
+
+  ctx.fillStyle =
+    exitOpen()
+      ? "#7fff9b"
+      : "#e0a4ff";
+
+  ctx.fillText(
+    exitOpen()
+      ? "SORTIE OUVERTE"
+      : "OBJECTIF/CLÉS REQUIS",
+    W - 12,
+    52
+  );
+
+  ctx.textAlign = "left";
+}
+
+/* =========================================================
+   MESSAGES ET ÉCRAN DE FIN
+   ========================================================= */
+
+function overlays() {
+  if (msg.time > 0) {
+    ctx.fillStyle =
+      "rgba(10,14,10,0.93)";
+
+    ctx.fillRect(
+      45,
+      90,
+      422,
+      48
+    );
+
+    ctx.fillStyle = "#dfc96f";
+
+    ctx.fillRect(
+      45,
+      90,
+      422,
+      4
+    );
+
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "center";
+    ctx.font = "bold 13px monospace";
+
+    ctx.fillText(
+      msg.text,
+      W / 2,
+      120
+    );
+
+    ctx.textAlign = "left";
+  }
+
+  if (gameOver) {
+    ctx.fillStyle =
+      "rgba(5,7,7,0.94)";
+
+    ctx.fillRect(
+      0,
+      0,
+      W,
+      H
+    );
+
+    ctx.textAlign = "center";
+
+    ctx.fillStyle =
+      victory
+        ? "#7ff09b"
+        : "#ff6571";
+
+    ctx.font =
+      "bold 25px monospace";
+
+    ctx.fillText(
+      victory
+        ? "LES CINQ ROYAUMES SONT LIBRES !"
+        : "GAME OVER",
+      W / 2,
+      180
+    );
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "14px monospace";
+
+    ctx.fillText(
+      "Appuie sur R pour recommencer",
+      W / 2,
+      225
+    );
+
+    ctx.textAlign = "left";
+  }
+}
+
+/* =========================================================
+   RENDU
+   ========================================================= */
+
+function render() {
+  ctx.clearRect(
+    0,
+    0,
+    W,
+    H
+  );
+
+  if (!selected) {
+    return;
+  }
+
+  drawMap();
+  drawGrass();
+  drawObjects();
+  drawEnemies();
+  drawSword();
+  drawPlayer();
+  hud();
+  overlays();
+}
+
+/* =========================================================
+   INVENTAIRE HTML
+   ========================================================= */
+
+function updateInventory() {
+  const resourcesElement =
+    document.getElementById("res");
+
+  const gearElement =
+    document.getElementById("gear");
+
+  const keysElement =
+    document.getElementById("keys");
+
+  resourcesElement.innerHTML =
+    `
+      <div class="line">
+        Or : <b>${stats.gold}</b>
+      </div>
+
+      <div class="line">
+        Trésors : <b>${stats.treasures}</b>
+      </div>
+
+      <div class="line">
+        Fragments : <b>${stats.fragments}</b>
+      </div>
+
+      <div class="line">
+        Arbres coupés ici :
+        <b>${state().trees.size}</b>
+      </div>
+
+      <div class="line">
+        Herbes coupées ici :
+        <b>${state().grass.size}</b>
+      </div>
+    `;
+
+  gearElement.innerHTML =
+    Object.entries(
+      player.gear
+    )
+      .map(
+        ([slot, id]) =>
+          `
+            <div class="line ${id ? "" : "muted"}">
+              ${slot} :
+              ${
+                id
+                  ? GEAR[id].name +
+                    " niv. " +
+                    gearLevels[id]
+                  : "vide"
+              }
+            </div>
+          `
+      )
+      .join("") +
+    `
+      <div class="line">
+        ATQ ${atk()} ·
+        DEF ${def()} ·
+        Blocage ${Math.round(blockChance() * 100)} %
+      </div>
+    `;
+
+  keysElement.innerHTML =
+    Object.entries(ART)
+      .map(
+        ([id, artifact]) =>
+          `
+            <span class="token">
+              ${
+                arts.has(id)
+                  ? "✓ " + artifact.name
+                  : "🔒 ???"
+              }
+            </span>
+          `
+      )
+      .join("") +
+    `
+      <div class="line">
+        Porte :
+        ${
+          level.req.length
+            ? artNames(level.req)
+            : "aucune clé"
+        }
+      </div>
+    `;
+
+  const gearHtml =
+    Object.entries(GEAR)
+      .map(([id, gear]) => {
+        const owned =
+          ownedGear.has(id);
+
+        const cost =
+          upgradeCost(id);
+
+        return `
+          <div class="item ${owned ? "" : "locked"}">
+            <b>
+              ${
+                owned
+                  ? gear.name
+                  : "Équipement inconnu"
+              }
+            </b>
+
+            <div>
+              ${
+                owned
+                  ? gear.desc
+                  : "À découvrir"
+              }
+            </div>
+
+            ${
+              owned
+                ? `
+                  <button
+                    class="upgrade"
+                    data-up="${id}"
+                    ${
+                      gearLevels[id] >= 2
+                        ? "disabled"
+                        : ""
+                    }
+                  >
+                    ${
+                      gearLevels[id] >= 2
+                        ? "NIVEAU MAXIMUM"
+                        : "AMÉLIORER " +
+                          cost.gold +
+                          " OR + " +
+                          cost.frag +
+                          " FRAGMENT(S)"
+                    }
+                  </button>
+                `
+                : ""
+            }
+          </div>
+        `;
+      })
+      .join("");
+
+  const artifactsHtml =
+    Object.entries(ART)
+      .map(([id, artifact]) => {
+        const owned =
+          arts.has(id);
+
+        return `
+          <div class="item ${owned ? "" : "locked"}">
+            <b>
+              ${
+                owned
+                  ? artifact.name
+                  : "Artéfact inconnu"
+              }
+            </b>
+
+            <div>
+              ${
+                owned
+                  ? artifact.desc
+                  : "À découvrir"
+              }
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+
+  document.getElementById(
+    "fullInventory"
+  ).innerHTML =
+    `
+      <h3>RESSOURCES</h3>
+      ${resourcesElement.innerHTML}
+
+      <h3>ÉQUIPEMENT</h3>
+      ${gearHtml}
+
+      <h3>ARTÉFACTS-CLÉS</h3>
+      ${artifactsHtml}
+    `;
+}
+
+/* =========================================================
+   CLAVIER
+   ========================================================= */
+
+window.addEventListener(
+  "keydown",
+  event => {
+    if (
+      [
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight",
+        "Space"
+      ].includes(event.code)
+    ) {
+      event.preventDefault();
+    }
+
+    if (paused) {
+      return;
+    }
+
+    keys[event.code] = true;
+
+    if (
+      event.code === "Space" &&
+      !event.repeat
+    ) {
+      attack();
+    }
+
+    if (
+      event.code === "KeyR" &&
+      !event.repeat
+    ) {
+      restart();
+    }
+
+    if (
+      event.code === "KeyC" &&
+      !event.repeat
+    ) {
+      paused = true;
+
+      document
+        .getElementById("select")
+        .classList.remove("hidden");
+    }
+  }
+);
+
+window.addEventListener(
+  "keyup",
+  event => {
+    keys[event.code] = false;
+  }
+);
+
+/* =========================================================
+   CHOIX DU PERSONNAGE
+   ========================================================= */
+
+document
+  .querySelectorAll("[data-char]")
+  .forEach(button => {
+    button.addEventListener(
+      "click",
+      () => {
+        chooseHero(
+          button.dataset.char
+        );
+
+        document
+          .getElementById("select")
+          .classList.add("hidden");
+
+        paused = false;
+
+        restart();
+      }
+    );
+  });
+
+/* =========================================================
+   COMMANDES TACTILES
+   ========================================================= */
+
+document
+  .querySelectorAll("[data-key]")
+  .forEach(button => {
+    const activate = event => {
       event.preventDefault();
 
-      if (jeuTermine) recommencerAventure();
-      else if (transition) chargerNiveau(niveauIndex + 1);
-      else demarrerAttaque();
+      keys[
+        button.dataset.key
+      ] = true;
+    };
 
-      boutonAttaque.classList.add("active");
-      canvas.focus();
+    const deactivate = event => {
+      event.preventDefault();
+
+      keys[
+        button.dataset.key
+      ] = false;
+    };
+
+    button.addEventListener(
+      "pointerdown",
+      activate
+    );
+
+    button.addEventListener(
+      "pointerup",
+      deactivate
+    );
+
+    button.addEventListener(
+      "pointercancel",
+      deactivate
+    );
+
+    button.addEventListener(
+      "pointerleave",
+      deactivate
+    );
+  });
+
+document
+  .getElementById("touchAttack")
+  .addEventListener(
+    "pointerdown",
+    event => {
+      event.preventDefault();
+      attack();
+    }
+  );
+
+/* =========================================================
+   FENÊTRES HTML
+   ========================================================= */
+
+function openModal(id) {
+  paused = true;
+
+  document
+    .getElementById(id)
+    .classList.add("show");
+}
+
+function closeModal() {
+  document
+    .querySelectorAll(".modal")
+    .forEach(modal => {
+      modal.classList.remove("show");
     });
 
-    ["pointerup","pointercancel","pointerleave"].forEach(type => {
-      boutonAttaque.addEventListener(type, () => boutonAttaque.classList.remove("active"));
-    });
+  if (
+    document
+      .getElementById("select")
+      .classList.contains("hidden")
+  ) {
+    paused = false;
+  }
+}
 
-    /* =========================================================
-       COMBAT
-       ========================================================= */
-    function demarrerAttaque() {
-      if (pause || jeuTermine || transition || joueur.attaqueActive || joueur.recharge > 0) return;
-
-      joueur.attaqueActive = true;
-      joueur.tempsAttaque = joueur.dureeAttaque;
-      joueur.recharge = joueur.rechargeMax;
-      joueur.touchesAttaque.clear();
+document
+  .getElementById("controlsBtn")
+  .addEventListener(
+    "click",
+    () => {
+      openModal("controls");
     }
+  );
 
-    function rectangleEpee() {
-      const longueur = joueur.portee;
-      const epaisseur = 10;
-
-      if (joueur.direction === "haut") {
-        return {
-          x: joueur.x + joueur.w / 2 - epaisseur / 2,
-          y: joueur.y - longueur,
-          w: epaisseur,
-          h: longueur
-        };
-      }
-
-      if (joueur.direction === "bas") {
-        return {
-          x: joueur.x + joueur.w / 2 - epaisseur / 2,
-          y: joueur.y + joueur.h,
-          w: epaisseur,
-          h: longueur
-        };
-      }
-
-      if (joueur.direction === "gauche") {
-        return {
-          x: joueur.x - longueur,
-          y: joueur.y + joueur.h / 2 - epaisseur / 2,
-          w: longueur,
-          h: epaisseur
-        };
-      }
-
-      return {
-        x: joueur.x + joueur.w,
-        y: joueur.y + joueur.h / 2 - epaisseur / 2,
-        w: longueur,
-        h: epaisseur
-      };
+document
+  .getElementById("inventoryBtn")
+  .addEventListener(
+    "click",
+    () => {
+      updateInventory();
+      openModal("inventoryModal");
     }
+  );
 
-    function verifierCoups() {
-      if (!joueur.attaqueActive) return;
+document
+  .getElementById("changeBtn")
+  .addEventListener(
+    "click",
+    () => {
+      paused = true;
 
-      const epee = rectangleEpee();
-
-      ennemisActifs.forEach(ennemi => {
-        if (joueur.touchesAttaque.has(ennemi.id) || !collisionRect(epee, ennemi)) return;
-
-        joueur.touchesAttaque.add(ennemi.id);
-        ennemi.vie -= attaqueJoueur();
-        ennemi.recul = .12;
-
-        if (joueur.direction === "haut")  { ennemi.reculX = 0; ennemi.reculY = -145; }
-        if (joueur.direction === "bas")   { ennemi.reculX = 0; ennemi.reculY = 145; }
-        if (joueur.direction === "gauche"){ ennemi.reculX = -145; ennemi.reculY = 0; }
-        if (joueur.direction === "droite"){ ennemi.reculX = 145; ennemi.reculY = 0; }
-      });
-
-      const avant = ennemisActifs.length;
-      ennemisActifs = ennemisActifs.filter(e => e.vie > 0);
-      const tues = avant - ennemisActifs.length;
-
-      if (tues > 0) {
-        stats.ennemis += tues;
-        stats.score += tues * 100;
-        mettreAJourInventaire();
-        verifierObjectif();
-      }
+      document
+        .getElementById("select")
+        .classList.remove("hidden");
     }
+  );
 
-    function verifierDegats() {
-      if (joueur.invulnerable || transition || jeuTermine) return;
+document
+  .querySelectorAll(".close")
+  .forEach(button => {
+    button.addEventListener(
+      "click",
+      closeModal
+    );
+  });
 
-      for (const ennemi of ennemisActifs) {
-        if (!collisionRect(joueur, ennemi)) continue;
-
-        if (Math.random() < chanceBlocage()) {
-          afficherMessage("ATTAQUE BLOQUÉE !", .8);
-        } else {
-          joueur.vie -= 1;
-        }
-
-        joueur.invulnerable = true;
-        joueur.tempsInvulnerable = joueur.dureeInvulnerable;
-
-        const jx = joueur.x + joueur.w / 2;
-        const jy = joueur.y + joueur.h / 2;
-        const ex = ennemi.x + ennemi.w / 2;
-        const ey = ennemi.y + ennemi.h / 2;
-        const longueur = Math.hypot(jx - ex, jy - ey) || 1;
-
-        deplacerAvecCollision(
-          joueur,
-          ((jx - ex) / longueur) * 25,
-          ((jy - ey) / longueur) * 25
+document
+  .getElementById("fullInventory")
+  .addEventListener(
+    "click",
+    event => {
+      const button =
+        event.target.closest(
+          "[data-up]"
         );
 
-        if (joueur.vie <= 0) {
-          joueur.vie = 0;
-          jeuTermine = true;
-          victoire = false;
-        }
-        break;
-      }
-    }
-
-    /* =========================================================
-       COLLECTE
-       ========================================================= */
-    function verifierCollectes() {
-      tresorsActifs.forEach(tresor => {
-        if (tresor.pris || !collisionRect(joueur, tresor)) return;
-
-        tresor.pris = true;
-        stats.tresors += 1;
-        stats.tresorsNiveau += 1;
-
-        const valeur = Math.round(tresor.valeur * joueur.multiplicateurOr);
-        stats.or += valeur;
-        stats.score += tresor.type === "coffre" ? valeur * 10 : valeur * 5;
-
-        afficherMessage(
-          tresor.type === "coffre" ? "COFFRE OUVERT : +" + valeur + " OR" : "+" + valeur + " OR",
-          1.4
+      if (button) {
+        upgrade(
+          button.dataset.up
         );
-
-        verifierObjectif();
-      });
-
-      artefactsActifs.forEach(objet => {
-        if (objet.pris || !collisionRect(joueur, objet)) return;
-        objet.pris = true;
-        obtenirArtefact(objet.id);
-      });
-
-      equipementsActifs.forEach(objet => {
-        if (objet.pris || !collisionRect(joueur, objet)) return;
-        objet.pris = true;
-        obtenirEquipement(objet.id);
-      });
-
-      coffresSpeciauxActifs.forEach(coffre => {
-        coffre.messageCooldown = Math.max(0, coffre.messageCooldown - .016);
-
-        if (coffre.ouvert || !collisionRect(joueur, coffre)) return;
-
-        const manquants = artefactsManquants(coffre.requis);
-
-        if (manquants.length) {
-          if (coffre.messageCooldown <= 0) {
-            afficherMessage(
-              "COFFRE SCELLÉ — IL MANQUE : " + nomsArtefacts(manquants),
-              2.2
-            );
-            coffre.messageCooldown = 1.4;
-          }
-          return;
-        }
-
-        coffre.ouvert = true;
-        stats.or += Math.round(coffre.or * joueur.multiplicateurOr);
-        stats.fragments += coffre.fragments;
-        stats.coffresMystiques += 1;
-        stats.score += 800 + coffre.fragments * 250;
-
-        afficherMessage(
-          "COFFRE MYSTIQUE : +" + coffre.or + " OR, +" + coffre.fragments + " FRAGMENT(S)",
-          2.4
-        );
-
-        mettreAJourInventaire();
-      });
-
-      mettreAJourInventaire();
-    }
-
-    /* =========================================================
-       MISE À JOUR
-       ========================================================= */
-    function choisirDirection(ennemi) {
-      const directions = [[1,0],[-1,0],[0,1],[0,-1],[0,0]];
-      const choix = directions[randInt(0, directions.length - 1)];
-      ennemi.dx = choix[0];
-      ennemi.dy = choix[1];
-      ennemi.prochainChoix = .45 + Math.random() * 1.55;
-    }
-
-    function mettreAJourJoueur(dt) {
-      let dx = 0;
-      let dy = 0;
-
-      if (touches.ArrowUp || touches.KeyZ || touches.KeyW) dy -= 1;
-      if (touches.ArrowDown || touches.KeyS) dy += 1;
-      if (touches.ArrowLeft || touches.KeyQ || touches.KeyA) dx -= 1;
-      if (touches.ArrowRight || touches.KeyD) dx += 1;
-
-      if (dx && dy) {
-        dx *= Math.SQRT1_2;
-        dy *= Math.SQRT1_2;
-      }
-
-      if (Math.abs(dx) > Math.abs(dy)) {
-        if (dx < 0) joueur.direction = "gauche";
-        if (dx > 0) joueur.direction = "droite";
-      } else if (dy) {
-        joueur.direction = dy < 0 ? "haut" : "bas";
-      }
-
-      const vitesse = vitesseJoueur() * (joueur.attaqueActive ? .72 : 1);
-      deplacerAvecCollision(joueur, dx * vitesse * dt, dy * vitesse * dt);
-
-      if (joueur.attaqueActive) {
-        joueur.tempsAttaque -= dt;
-        if (joueur.tempsAttaque <= 0) joueur.attaqueActive = false;
-      }
-
-      joueur.recharge = Math.max(0, joueur.recharge - dt);
-
-      if (joueur.invulnerable) {
-        joueur.tempsInvulnerable -= dt;
-        if (joueur.tempsInvulnerable <= 0) joueur.invulnerable = false;
       }
     }
-
-    function mettreAJourEnnemis(dt) {
-      ennemisActifs.forEach(ennemi => {
-        if (ennemi.recul > 0) {
-          ennemi.recul -= dt;
-          deplacerAvecCollision(ennemi, ennemi.reculX * dt, ennemi.reculY * dt);
-          return;
-        }
-
-        ennemi.prochainChoix -= dt;
-        if (ennemi.prochainChoix <= 0) choisirDirection(ennemi);
-
-        const collisions = deplacerAvecCollision(
-          ennemi,
-          ennemi.dx * ennemi.vitesse * dt,
-          ennemi.dy * ennemi.vitesse * dt
-        );
-
-        if (collisions.collisionX || collisions.collisionY) choisirDirection(ennemi);
-      });
-    }
-
-    function verifierSortie() {
-      if (!sortieOuverte || transition || jeuTermine) return;
-
-      if (joueur.x + joueur.w > W - 4) {
-        transition = true;
-      }
-    }
-
-    function update(dt) {
-      if (pause || jeuTermine || transition || !personnageSelectionne) return;
-
-      tempsJeu += dt;
-      message.temps = Math.max(0, message.temps - dt);
-
-      mettreAJourJoueur(dt);
-      mettreAJourEnnemis(dt);
-      verifierCoups();
-      verifierDegats();
-      verifierCollectes();
-      verifierObjectif();
-      verifierPorteVerrouillee(dt);
-      verifierSortie();
-    }
-
-    /* =========================================================
-       DESSIN DU TERRAIN
-       ========================================================= */
-    function dessinerSol(x, y, col, row) {
-      ctx.fillStyle = niveau.sol;
-      ctx.fillRect(x, y, TILE, TILE);
-
-      ctx.fillStyle = niveau.detail;
-      const motif = (col * 7 + row * 11) % 5;
-      if (motif === 0) {
-        ctx.fillRect(x + 5, y + 7, 3, 3);
-        ctx.fillRect(x + 22, y + 20, 4, 3);
-      } else if (motif === 1) {
-        ctx.fillRect(x + 16, y + 6, 3, 5);
-      } else if (motif === 2) {
-        ctx.fillRect(x + 8, y + 22, 6, 2);
-      }
-    }
-
-    function dessinerObstacle(type, x, y, col, row) {
-      if (type === ARBRE) {
-        ctx.fillStyle = "#70442a";
-        ctx.fillRect(x + 12, y + 18, 8, 12);
-        ctx.fillStyle = "#174f2b";
-        ctx.fillRect(x + 5, y + 4, 22, 18);
-        ctx.fillRect(x + 2, y + 9, 28, 10);
-        ctx.fillRect(x + 8, y + 1, 16, 24);
-        ctx.fillStyle = "#347f43";
-        ctx.fillRect(x + 8, y + 5, 6, 5);
-      }
-
-      if (type === MUR) {
-        ctx.fillStyle = "#735235";
-        ctx.fillRect(x, y, 32, 32);
-        ctx.fillStyle = "#3e2c21";
-        ctx.fillRect(x, y + 14, 32, 3);
-        ctx.fillRect(x + 14, y, 3, 14);
-        ctx.fillRect(x + 6, y + 17, 3, 15);
-        ctx.fillRect(x + 23, y + 17, 3, 15);
-      }
-
-      if (type === EAU) {
-        ctx.fillStyle = "#286f9d";
-        ctx.fillRect(x, y, 32, 32);
-        const d = Math.floor(tempsJeu * 12 + col * 3 + row * 5) % 16;
-        ctx.fillStyle = "#5db5cf";
-        ctx.fillRect(x + d, y + 8, 10, 3);
-        ctx.fillRect(x + 5, y + 22, 10, 3);
-      }
-
-      if (type === ROCHE) {
-        ctx.fillStyle = "#303638";
-        ctx.fillRect(x + 4, y + 8, 24, 20);
-        ctx.fillRect(x + 8, y + 4, 16, 24);
-        ctx.fillStyle = "#626c70";
-        ctx.fillRect(x + 9, y + 7, 8, 5);
-      }
-
-      if (type === LAVE) {
-        ctx.fillStyle = "#7d241f";
-        ctx.fillRect(x, y, 32, 32);
-        const d = Math.floor(tempsJeu * 14 + col * 5 + row * 3) % 16;
-        ctx.fillStyle = "#ff6b22";
-        ctx.fillRect(x + d, y + 8, 12, 4);
-        ctx.fillStyle = "#ffd04a";
-        ctx.fillRect(x + 5, y + 22, 10, 3);
-      }
-
-      if (type === GLACE) {
-        ctx.fillStyle = "#8ed4e5";
-        ctx.fillRect(x, y, 32, 32);
-        ctx.fillStyle = "#d8f7ff";
-        ctx.fillRect(x + 4, y + 4, 14, 3);
-        ctx.fillRect(x + 7, y + 8, 3, 10);
-        ctx.fillStyle = "#5aa7bd";
-        ctx.fillRect(x + 20, y + 18, 8, 3);
-      }
-
-      if (type === CRISTAL) {
-        ctx.fillStyle = "#2d6e83";
-        ctx.fillRect(x + 10, y + 4, 12, 24);
-        ctx.fillStyle = "#8ff0ff";
-        ctx.fillRect(x + 13, y + 2, 6, 26);
-        ctx.fillStyle = "#d8fbff";
-        ctx.fillRect(x + 15, y + 4, 3, 12);
-      }
-    }
-
-    function dessinerPorte() {
-      const x = porte.x;
-      const y = porte.y;
-
-      if (sortieOuverte) {
-        ctx.fillStyle = "#101010";
-        ctx.fillRect(x, y, 32, 64);
-        ctx.fillStyle = "#7de0ff";
-        ctx.fillRect(x + 15, y + 8, 8, 48);
-        ctx.fillStyle = "#fff178";
-        ctx.fillRect(x + 6, y + 9, 5, 5);
-        ctx.fillRect(x + 6, y + 49, 5, 5);
-      } else {
-        ctx.fillStyle = "#5e371f";
-        ctx.fillRect(x, y, 32, 64);
-        ctx.fillStyle = "#a46935";
-        ctx.fillRect(x + 4, y + 4, 24, 56);
-        ctx.fillStyle = "#372015";
-        ctx.fillRect(x + 14, y + 4, 4, 56);
-        ctx.fillStyle = "#d9b04c";
-        ctx.fillRect(x + 6, y + 15, 20, 4);
-        ctx.fillRect(x + 6, y + 44, 20, 4);
-
-        const requis = niveau.porteRequise || [];
-        if (requis.length) {
-          ctx.fillStyle = "#8f4fb3";
-          ctx.fillRect(x + 8, y + 24, 16, 17);
-          ctx.fillStyle = "#f2d77d";
-          ctx.font = "bold 9px monospace";
-          ctx.textAlign = "center";
-          ctx.fillText(requis.length + " CLÉ", x + 16, y + 35);
-          ctx.textAlign = "left";
-        }
-      }
-    }
-
-    function dessinerCarte() {
-      for (let row = 0; row < ROWS; row++) {
-        for (let col = 0; col < COLS; col++) {
-          const x = col * TILE;
-          const y = HUD + row * TILE;
-          const type = niveau.carte[row][col];
-
-          dessinerSol(x, y, col, row);
-
-          if (col === COLS - 1 && (row === 4 || row === 5)) continue;
-          if (type !== SOL) dessinerObstacle(type, x, y, col, row);
-        }
-      }
-
-      dessinerPorte();
-    }
-
-    /* =========================================================
-       DESSIN DES OBJETS
-       ========================================================= */
-    function dessinerTresors() {
-      tresorsActifs.forEach(t => {
-        if (t.pris) return;
-        const x = Math.round(t.x);
-        const y = Math.round(t.y);
-
-        if (t.type === "or") {
-          ctx.fillStyle = "#fff17a";
-          ctx.fillRect(x + 3, y, t.w - 6, t.h);
-          ctx.fillRect(x, y + 3, t.w, t.h - 6);
-          ctx.fillStyle = "#c68d24";
-          ctx.fillRect(x + 6, y + 4, 4, 8);
-        } else {
-          ctx.fillStyle = "#56311d";
-          ctx.fillRect(x, y, t.w, t.h);
-          ctx.fillStyle = "#a7672d";
-          ctx.fillRect(x + 2, y + 3, t.w - 4, 8);
-          ctx.fillStyle = "#e7c34f";
-          ctx.fillRect(x + 10, y + 8, 5, 10);
-          ctx.fillRect(x, y + 11, t.w, 3);
-        }
-      });
-    }
-
-
-    function dessinerCoffresSpeciaux() {
-      coffresSpeciauxActifs.forEach(coffre => {
-        if (coffre.ouvert) return;
-
-        const x = Math.round(coffre.x);
-        const y = Math.round(coffre.y);
-        const deverrouille = artefactsPossedes(coffre.requis);
-
-        ctx.fillStyle = deverrouille ? "#fff19a" : "#b56bff";
-        ctx.fillRect(x - 3, y - 3, coffre.w + 6, coffre.h + 6);
-
-        ctx.fillStyle = "#3e204f";
-        ctx.fillRect(x, y, coffre.w, coffre.h);
-
-        ctx.fillStyle = "#8d4eb0";
-        ctx.fillRect(x + 2, y + 3, coffre.w - 4, 8);
-
-        ctx.fillStyle = deverrouille ? "#ffe66d" : "#d8b0ff";
-        ctx.fillRect(x + 12, y + 8, 5, 11);
-        ctx.fillRect(x, y + 11, coffre.w, 3);
-
-        ctx.fillStyle = "#151515";
-        ctx.fillRect(x + 13, y + 10, 3, 5);
-      });
-    }
-
-    function dessinerArtefacts() {
-      artefactsActifs.forEach(a => {
-        if (a.pris) return;
-        const def = artefacts[a.id];
-        const x = Math.round(a.x);
-        const y = Math.round(a.y);
-
-        ctx.fillStyle = Math.floor(tempsJeu * 8) % 2 ? "#ffbc45" : "#fff19a";
-        ctx.fillRect(x - 3, y - 3, a.w + 6, a.h + 6);
-        ctx.fillStyle = "#713e91";
-        ctx.fillRect(x, y, a.w, a.h);
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 14px monospace";
-        ctx.textAlign = "center";
-        ctx.fillText(def.symbole, x + a.w / 2, y + 16);
-        ctx.textAlign = "left";
-      });
-    }
-
-    function dessinerEquipements() {
-      equipementsActifs.forEach(objet => {
-        if (objet.pris) return;
-
-        const def = equipements[objet.id];
-        const x = Math.round(objet.x);
-        const y = Math.round(objet.y);
-
-        ctx.fillStyle = Math.floor(tempsJeu * 7) % 2 ? "#ffe882" : "#fff6b9";
-        ctx.fillRect(x - 3, y - 3, 30, 30);
-
-        if (def.slot === "casque") {
-          ctx.fillStyle = "#8a939e";
-          ctx.fillRect(x + 4, y + 3, 16, 7);
-          ctx.fillRect(x + 2, y + 9, 20, 8);
-          ctx.fillStyle = "#4f5964";
-          ctx.fillRect(x + 5, y + 16, 4, 6);
-          ctx.fillRect(x + 15, y + 16, 4, 6);
-        }
-
-        if (def.slot === "armure") {
-          ctx.fillStyle = "#8f754a";
-          ctx.fillRect(x + 4, y + 3, 16, 18);
-          ctx.fillStyle = "#d7bd78";
-          ctx.fillRect(x + 8, y + 5, 8, 14);
-        }
-
-        if (def.slot === "bouclier") {
-          ctx.fillStyle = "#4672b6";
-          ctx.fillRect(x + 3, y + 2, 18, 18);
-          ctx.fillStyle = "#f0cf58";
-          ctx.fillRect(x + 10, y + 4, 4, 14);
-          ctx.fillRect(x + 6, y + 9, 12, 4);
-        }
-      });
-    }
-
-    /* =========================================================
-       DESSIN DES PERSONNAGES
-       ========================================================= */
-    function dessinerEnnemis() {
-      ennemisActifs.forEach(e => {
-        const x = Math.round(e.x);
-        const y = Math.round(e.y);
-
-        ctx.fillStyle = "rgba(0,0,0,.25)";
-        ctx.fillRect(x + 3, y + e.h - 1, e.w, 5);
-
-        ctx.fillStyle = e.vieMax >= 6 ? "#7f1625" : "#c9333e";
-        ctx.fillRect(x, y, e.w, e.h);
-        ctx.fillStyle = "#7c1f28";
-        ctx.fillRect(x, y + e.h - 7, e.w, 7);
-
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(x + 5, y + 7, 5, 5);
-        ctx.fillRect(x + 14, y + 7, 5, 5);
-        ctx.fillStyle = "#111";
-        ctx.fillRect(x + 7, y + 8, 2, 3);
-        ctx.fillRect(x + 15, y + 8, 2, 3);
-
-        ctx.fillStyle = "#35171a";
-        ctx.fillRect(x, y - 8, e.w, 4);
-        ctx.fillStyle = "#ff765d";
-        ctx.fillRect(x, y - 8, Math.floor(e.w * e.vie / e.vieMax), 4);
-      });
-    }
-
-    function dessinerEquipementJoueur(x, y) {
-      if (joueur.equipement.casque) {
-        ctx.fillStyle = "#949da8";
-        ctx.fillRect(x + 3, y - 3, 18, 5);
-        ctx.fillRect(x + 1, y + 1, 22, 4);
-      }
-
-      if (joueur.equipement.armure) {
-        ctx.fillStyle = "#b08b4e";
-        ctx.fillRect(x + 3, y + 13, 18, 8);
-      }
-
-      if (joueur.equipement.bouclier) {
-        const bx = joueur.direction === "gauche" ? x + 17 : x - 5;
-        ctx.fillStyle = "#376eae";
-        ctx.fillRect(bx, y + 8, 8, 13);
-        ctx.fillStyle = "#f1d45a";
-        ctx.fillRect(bx + 3, y + 10, 2, 9);
-      }
-    }
-
-    function dessinerJoueur() {
-      if (joueur.invulnerable && Math.floor(joueur.tempsInvulnerable * 14) % 2) return;
-
-      const x = Math.round(joueur.x);
-      const y = Math.round(joueur.y);
-
-      ctx.fillStyle = "rgba(0,0,0,.28)";
-      ctx.fillRect(x + 3, y + joueur.h - 1, joueur.w, 5);
-
-      if (joueur.type === "renard") {
-        ctx.fillStyle = joueur.principale;
-        ctx.fillRect(x, y + 5, joueur.w, joueur.h - 5);
-        ctx.fillRect(x + 3, y, 18, 14);
-
-        ctx.fillStyle = joueur.secondaire;
-        ctx.fillRect(x + 2, y - 5, 7, 8);
-        ctx.fillRect(x + 15, y - 5, 7, 8);
-
-        ctx.fillStyle = joueur.visage;
-        ctx.fillRect(x + 6, y + 7, 12, 6);
-
-        ctx.fillStyle = "#161616";
-        ctx.fillRect(x + 6, y + 5, 3, 3);
-        ctx.fillRect(x + 15, y + 5, 3, 3);
-
-        ctx.fillStyle = joueur.secondaire;
-        const queueX = joueur.direction === "gauche" ? x + joueur.w : x - 10;
-        ctx.fillRect(queueX, y + 11, 10, 7);
-      } else {
-        ctx.fillStyle = joueur.principale;
-        ctx.fillRect(x, y, joueur.w, joueur.h);
-
-        ctx.fillStyle = joueur.secondaire;
-        ctx.fillRect(x, y + joueur.h - 7, joueur.w, 7);
-
-        ctx.fillStyle = joueur.visage;
-        ctx.fillRect(x + 5, y + 5, 14, 10);
-
-        ctx.fillStyle = joueur.secondaire;
-        ctx.fillRect(x + 3, y, 18, 7);
-
-        ctx.fillStyle = "#171717";
-        ctx.fillRect(x + 8, y + 8, 3, 3);
-        ctx.fillRect(x + 14, y + 8, 3, 3);
-      }
-
-      dessinerEquipementJoueur(x, y);
-    }
-
-    function dessinerEpee() {
-      if (!joueur.attaqueActive) return;
-
-      const e = rectangleEpee();
-      ctx.fillStyle = "#ffe45e";
-      ctx.fillRect(Math.round(e.x), Math.round(e.y), e.w, e.h);
-
-      ctx.fillStyle = "#fff6b0";
-      if (joueur.direction === "haut" || joueur.direction === "bas") {
-        ctx.fillRect(Math.round(e.x + 2), Math.round(e.y + 2), 3, Math.max(2, e.h - 4));
-      } else {
-        ctx.fillRect(Math.round(e.x + 2), Math.round(e.y + 2), Math.max(2, e.w - 4), 3);
-      }
-    }
-
-    /* =========================================================
-       HUD ET ÉCRANS
-       ========================================================= */
-    function dessinerCoeur(x, y, plein) {
-      ctx.fillStyle = plein ? "#e53b44" : "#4d2729";
-      ctx.fillRect(x + 4, y, 8, 4);
-      ctx.fillRect(x + 16, y, 8, 4);
-      ctx.fillRect(x, y + 4, 28, 10);
-      ctx.fillRect(x + 4, y + 14, 20, 7);
-      ctx.fillRect(x + 8, y + 21, 12, 4);
-    }
-
-    function dessinerHUD() {
-      ctx.fillStyle = "#171b1b";
-      ctx.fillRect(0, 0, W, HUD);
-      ctx.fillStyle = "#d7ba62";
-      ctx.fillRect(0, HUD - 4, W, 4);
-
-      ctx.fillStyle = "#f4e6a4";
-      ctx.font = "bold 12px monospace";
-      ctx.textAlign = "left";
-      ctx.fillText(joueur.nom || "PERSONNAGE", 14, 16);
-      ctx.fillText("NIVEAU " + (niveauIndex + 1) + "/" + NIVEAUX.length, 14, 34);
-
-      for (let i = 0; i < joueur.vieMax; i++) {
-        dessinerCoeur(14 + i * 30, 43, i < joueur.vie);
-      }
-
-      ctx.fillStyle = "#ffe878";
-      ctx.fillText("OR : " + stats.or, 14, 84);
-      ctx.fillStyle = "#fff";
-      ctx.fillText("SCORE : " + stats.score, 116, 84);
-      ctx.fillStyle = "#dcb8ff";
-      ctx.fillText("FRAG : " + stats.fragments, 245, 84);
-
-      ctx.textAlign = "right";
-      ctx.fillText("ENNEMIS : " + ennemisActifs.length, W - 14, 17);
-      ctx.fillText("ATQ : " + attaqueJoueur() + "  DEF : " + defenseJoueur(), W - 14, 35);
-      ctx.fillText(
-        "ART : " + artefactsObtenus.size + "/3  ÉQ : " + equipementsObtenus.size + "/3",
-        W - 14,
-        52
-      );
-
-      const p = Math.min(niveau.objectif.progression(), niveau.objectif.cible);
-      ctx.fillStyle = "#9cefa4";
-      ctx.font = "bold 10px monospace";
-      ctx.fillText(niveau.objectif.texte + " [" + p + "/" + niveau.objectif.cible + "]", W - 14, 69);
-
-      const manquantsPorte = artefactsManquants(niveau.porteRequise || []);
-      ctx.fillStyle = sortieOuverte ? "#7fff9b" : (manquantsPorte.length ? "#e0a4ff" : "#c9c9c9");
-      ctx.fillText(
-        sortieOuverte
-          ? "SORTIE OUVERTE"
-          : (manquantsPorte.length ? "CLÉ(S) MANQUANTE(S)" : "SORTIE VERROUILLÉE"),
-        W - 14,
-        86
-      );
-      ctx.textAlign = "left";
-    }
-
-    function dessinerMessage() {
-      if (message.temps <= 0 || !message.texte) return;
-
-      ctx.fillStyle = "rgba(10,14,10,.92)";
-      ctx.fillRect(43, 111, 426, 52);
-      ctx.fillStyle = "#dfc96f";
-      ctx.fillRect(43, 111, 426, 4);
-      ctx.fillRect(43, 159, 426, 4);
-      ctx.fillStyle = "#fff";
-      ctx.font = "bold 14px monospace";
-      ctx.textAlign = "center";
-      ctx.fillText(message.texte, W / 2, 143);
-      ctx.textAlign = "left";
-    }
-
-    function dessinerTransition() {
-      if (!transition) return;
-
-      ctx.fillStyle = "rgba(5,8,5,.91)";
-      ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = "#d8c16b";
-      ctx.fillRect(68, 120, 376, 210);
-      ctx.fillStyle = "#151915";
-      ctx.fillRect(75, 127, 362, 196);
-
-      ctx.textAlign = "center";
-      ctx.fillStyle = "#82f39d";
-      ctx.font = "bold 25px monospace";
-      ctx.fillText("NIVEAU TERMINÉ", W / 2, 178);
-
-      ctx.fillStyle = "#f1e5b5";
-      ctx.font = "14px monospace";
-      ctx.fillText(niveau.nom, W / 2, 212);
-      ctx.fillText("Score : " + stats.score, W / 2, 240);
-      ctx.fillText("Équipement : " + equipementsObtenus.size + "/3", W / 2, 265);
-
-      ctx.fillStyle = "#fff";
-      ctx.font = "bold 13px monospace";
-      ctx.fillText("ENTRÉE OU ESPACE POUR CONTINUER", W / 2, 302);
-      ctx.textAlign = "left";
-    }
-
-    function dessinerFin() {
-      if (!jeuTermine) return;
-
-      ctx.fillStyle = "rgba(5,7,7,.93)";
-      ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = victoire ? "#1f6b3a" : "#6b1f28";
-      ctx.fillRect(52, 88, 408, 280);
-      ctx.fillStyle = "#e9cf76";
-      ctx.fillRect(59, 95, 394, 266);
-      ctx.fillStyle = "#151818";
-      ctx.fillRect(67, 103, 378, 250);
-
-      ctx.textAlign = "center";
-      ctx.fillStyle = victoire ? "#7ff09b" : "#ff6571";
-      ctx.font = "bold 25px monospace";
-      ctx.fillText(victoire ? "LES CINQ ROYAUMES SONT LIBRES !" : "GAME OVER", W / 2, 150);
-
-      ctx.fillStyle = "#f3e8bb";
-      ctx.font = "14px monospace";
-
-      if (victoire) {
-        ctx.fillText(joueur.nom + " termine l’aventure.", W / 2, 188);
-        ctx.fillText("Score final : " + stats.score, W / 2, 218);
-        ctx.fillText("Or : " + stats.or, W / 2, 244);
-        ctx.fillText("Artéfacts : " + artefactsObtenus.size + "/3", W / 2, 270);
-        ctx.fillText("Équipements : " + equipementsObtenus.size + "/3", W / 2, 296);
-      } else {
-        ctx.fillText(joueur.nom + " a perdu tous ses cœurs.", W / 2, 220);
-      }
-
-      ctx.fillStyle = "#fff";
-      ctx.font = "bold 13px monospace";
-      ctx.fillText("APPUYEZ SUR UNE TOUCHE POUR REJOUER", W / 2, 333);
-      ctx.textAlign = "left";
-    }
-
-    function render() {
-      ctx.clearRect(0, 0, W, H);
-
-      if (!personnageSelectionne) {
-        ctx.fillStyle = "#101510";
-        ctx.fillRect(0, 0, W, H);
-        return;
-      }
-
-      dessinerCarte();
-      dessinerTresors();
-      dessinerCoffresSpeciaux();
-      dessinerArtefacts();
-      dessinerEquipements();
-      dessinerEnnemis();
-      dessinerEpee();
-      dessinerJoueur();
-      dessinerHUD();
-      dessinerMessage();
-      dessinerTransition();
-      dessinerFin();
-    }
-
-    /* =========================================================
-       COLLECTIONS ET MODALES
-       ========================================================= */
-    function mettreAJourInventaire() {
-      const ressources = document.getElementById("inventory-resources");
-      const equipementHTML = document.getElementById("inventory-equipment");
-      const artefactsHTML = document.getElementById("inventory-artifacts");
-      const inventaireComplet = document.getElementById("inventory-full");
-
-      if (!ressources || !equipementHTML || !artefactsHTML || !inventaireComplet) return;
-
-      ressources.innerHTML =
-        '<div class="inventory-line">Or : <strong>' + stats.or + '</strong></div>' +
-        '<div class="inventory-line">Trésors : <strong>' + stats.tresors + '</strong></div>' +
-        '<div class="inventory-line">Fragments : <strong>' + stats.fragments + '</strong></div>';
-
-      const equipementActuel = Object.entries(joueur.equipement)
-        .map(([slot, id]) => {
-          if (!id) return '<div class="inventory-line inventory-empty">' + slot + ' : vide</div>';
-
-          const niveauObjet = niveauxEquipement[id] || 0;
-          const def = equipements[id];
-
-          return (
-            '<div class="inventory-line">' +
-            slot + ' : <strong>' + def.nom + '</strong> niv. ' + niveauObjet +
-            '</div>'
-          );
-        })
-        .join("");
-
-      equipementHTML.innerHTML =
-        equipementActuel +
-        '<div class="inventory-line">ATQ ' + attaqueJoueur() +
-        ' · DEF ' + defenseJoueur() +
-        ' · Blocage ' + Math.round(chanceBlocage() * 100) + '%</div>';
-
-      const artefactsActuels = Object.values(artefacts)
-        .map(item => {
-          const obtenu = artefactsObtenus.has(item.id);
-          return '<span class="inventory-token">' +
-            (obtenu ? "✓ " + item.nom : "🔒 ???") +
-            '</span>';
-        })
-        .join("");
-
-      artefactsHTML.innerHTML =
-        artefactsActuels +
-        '<div class="inventory-line lock-requirement">Porte : ' +
-        ((niveau && niveau.porteRequise && niveau.porteRequise.length)
-          ? nomsArtefacts(niveau.porteRequise)
-          : "aucune clé") +
-        '</div>';
-
-      inventaireComplet.innerHTML =
-        '<div class="collection-card"><h3>RESSOURCES</h3>' +
-        ressources.innerHTML +
-        '<p>Coffres mystiques ouverts : ' + stats.coffresMystiques + '</p></div>' +
-        '<div class="collection-card"><h3>ÉQUIPEMENT ACTUEL</h3>' +
-        equipementHTML.innerHTML + '</div>' +
-        '<div class="collection-card"><h3>ARTÉFACTS-CLÉS</h3>' +
-        artefactsHTML.innerHTML + '</div>';
-    }
-
-    function remplirCollection() {
-      const listeArtefacts = document.getElementById("artifact-list");
-      const listeEquipements = document.getElementById("equipment-list");
-
-      listeArtefacts.innerHTML = "";
-      listeEquipements.innerHTML = "";
-
-      Object.values(artefacts).forEach(item => {
-        const obtenu = artefactsObtenus.has(item.id);
-        const utiliseIci = (niveau.porteRequise || []).includes(item.id);
-        const carte = document.createElement("div");
-
-        carte.className = "collection-card" + (obtenu ? "" : " locked");
-        carte.innerHTML =
-          "<h3>" + (obtenu ? item.nom : "Artéfact inconnu") + "</h3>" +
-          "<p>" + (obtenu ? item.description : "Explore les différents niveaux pour le découvrir.") + "</p>" +
-          "<p class='lock-requirement'>" +
-          (utiliseIci ? "Requis pour la porte de ce niveau." : "Conservé comme clé de quête.") +
-          "</p>";
-
-        listeArtefacts.appendChild(carte);
-      });
-
-      Object.values(equipements).forEach(item => {
-        const obtenu = equipementsObtenus.has(item.id);
-        const equipe = joueur.equipement[item.slot] === item.id;
-        const niveauObjet = niveauxEquipement[item.id] || 0;
-        const cout = coutAmelioration(item.id);
-        const max = niveauObjet >= 2;
-        const carte = document.createElement("div");
-
-        carte.className = "collection-card" + (obtenu ? "" : " locked");
-        carte.innerHTML =
-          "<h3>" +
-          (obtenu
-            ? item.nom + (equipe ? " — ÉQUIPÉ" : "") + " — NIV. " + niveauObjet
-            : "Équipement inconnu") +
-          "</h3>" +
-          "<p>" + (obtenu ? item.description : "Cet équipement se trouve dans un niveau avancé.") + "</p>" +
-          (obtenu
-            ? "<button class='craft-button' data-upgrade='" + item.id + "' " +
-              (max ? "disabled" : "") + ">" +
-              (max ? "NIVEAU MAXIMUM" : "AMÉLIORER — " + cout.or + " OR + " + cout.fragments + " FRAGMENT(S)") +
-              "</button>"
-            : "");
-
-        listeEquipements.appendChild(carte);
-      });
-
-      mettreAJourInventaire();
-    }
-
-    function ouvrirModale(id) {
-      document.getElementById(id).classList.add("visible");
-      pause = true;
-    }
-
-    function fermerModales() {
-      document.querySelectorAll(".modal").forEach(m => m.classList.remove("visible"));
-
-      if (document.getElementById("character-screen").classList.contains("hidden")) {
-        pause = false;
-      }
-
-      canvas.focus();
-    }
-
-    document.getElementById("show-controls").addEventListener("click", () => ouvrirModale("controls-modal"));
-    document.getElementById("show-artifacts").addEventListener("click", () => {
-      remplirCollection();
-      ouvrirModale("artifacts-modal");
-    });
-    document.getElementById("show-equipment").addEventListener("click", () => {
-      remplirCollection();
-      ouvrirModale("equipment-modal");
-    });
-
-    document.getElementById("show-inventory").addEventListener("click", () => {
-      remplirCollection();
-      ouvrirModale("inventory-modal");
-    });
-
-    document.getElementById("equipment-list").addEventListener("click", event => {
-      const bouton = event.target.closest("[data-upgrade]");
-      if (!bouton) return;
-      ameliorerEquipement(bouton.dataset.upgrade);
-    });
-
-    document.querySelectorAll("[data-close-modal]").forEach(b => {
-      b.addEventListener("click", fermerModales);
-    });
-
-    document.querySelectorAll(".modal").forEach(m => {
-      m.addEventListener("click", event => {
-        if (event.target === m) fermerModales();
-      });
-    });
-
-    function afficherSelectionPersonnage() {
-      pause = true;
-      document.getElementById("character-screen").classList.remove("hidden");
-    }
-
-    document.querySelectorAll("[data-character]").forEach(bouton => {
-      bouton.addEventListener("click", () => {
-        appliquerPersonnage(bouton.dataset.character);
-        document.getElementById("character-screen").classList.add("hidden");
-        pause = false;
-        recommencerAventure();
-      });
-    });
-
-    /* =========================================================
-       BOUCLE PRINCIPALE
-       ========================================================= */
-    function boucle(tempsActuel) {
-      let dt = (tempsActuel - ancienTemps) / 1000;
-      ancienTemps = tempsActuel;
-      dt = clamp(dt, 0, .05);
-
-      update(dt);
-      render();
-      requestAnimationFrame(boucle);
-    }
-
-    remplirCollection();
-    mettreAJourInventaire();
-    requestAnimationFrame(boucle);
-  </script>
+  );
+
+/* =========================================================
+   BOUCLE PRINCIPALE
+   ========================================================= */
+
+function loop(now) {
+  const deltaTime =
+    clamp(
+      (now - last) / 1000,
+      0,
+      0.05
+    );
+
+  last = now;
+
+  update(deltaTime);
+  render();
+
+  requestAnimationFrame(loop);
+}
+
+/* =========================================================
+   INITIALISATION
+   ========================================================= */
+
+updateInventory();
+requestAnimationFrame(loop);
+</script>
 </body>
 </html>
