@@ -2,16 +2,17 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
   >
 
-  <title>La Quête des Trois Royaumes</title>
+  <title>La Quête des Trois Artéfacts</title>
 
   <style>
     /* =========================================================
-       RÉINITIALISATION GÉNÉRALE
+       BASE GÉNÉRALE
        ========================================================= */
 
     * {
@@ -24,71 +25,73 @@
       min-height: 100%;
       margin: 0;
       background:
-        radial-gradient(circle at top, #243124 0%, #111711 55%, #080b08 100%);
-      color: #ffffff;
+        radial-gradient(circle at top, #263526, #111811 60%, #070a07);
+      color: white;
       font-family: monospace;
-      overflow-x: hidden;
     }
 
     body {
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 18px;
+      padding: 16px;
     }
 
     button {
       font: inherit;
     }
 
-    /* =========================================================
-       STRUCTURE PRINCIPALE
-       ========================================================= */
-
     #game-shell {
       width: 540px;
       max-width: 100%;
     }
 
+    /* =========================================================
+       BARRE SUPÉRIEURE
+       ========================================================= */
+
     #top-bar {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 12px;
       padding: 10px;
-      border: 3px solid #d5bd68;
-      background: #171c17;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+      border: 3px solid #dbc36e;
+      background: #161c16;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
     }
 
     #game-title {
-      color: #f3df91;
-      font-size: 15px;
+      color: #f4df91;
       font-weight: bold;
       letter-spacing: 1px;
     }
 
-    .menu-button {
-      min-height: 38px;
-      padding: 8px 12px;
-      border: 3px solid #f0dc86;
-      background: #34592d;
-      color: #ffffff;
-      cursor: pointer;
-      box-shadow:
-        inset -3px -3px 0 #1d351a,
-        inset 3px 3px 0 #5f8b53;
+    #top-buttons {
+      display: flex;
+      gap: 8px;
     }
 
-    .menu-button:hover,
-    .menu-button:focus-visible {
-      background: #4d7a42;
-      outline: 3px solid #ffffff;
+    .ui-button {
+      min-height: 38px;
+      padding: 7px 10px;
+      border: 3px solid #e3ce7c;
+      background: #355c31;
+      color: white;
+      cursor: pointer;
+      box-shadow:
+        inset 3px 3px 0 #5f8758,
+        inset -3px -3px 0 #1d341a;
+    }
+
+    .ui-button:hover,
+    .ui-button:focus-visible {
+      background: #4b7b44;
+      outline: 2px solid white;
       outline-offset: 2px;
     }
 
-    .menu-button:active {
+    .ui-button:active {
       transform: translateY(2px);
     }
 
@@ -97,10 +100,9 @@
        ========================================================= */
 
     #canvas-container {
-      position: relative;
       width: 512px;
       max-width: 100%;
-      margin: 0 auto;
+      margin: auto;
     }
 
     canvas {
@@ -117,11 +119,19 @@
         0 14px 35px rgba(0, 0, 0, 0.65);
     }
 
+    #status-text {
+      margin-top: 12px;
+      color: #f2e6b8;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
     /* =========================================================
-       FENÊTRE DES COMMANDES
+       FENÊTRES MODALES
        ========================================================= */
 
-    #controls-modal {
+    .modal {
       position: fixed;
       inset: 0;
       z-index: 100;
@@ -129,75 +139,79 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      background: rgba(0, 0, 0, 0.78);
+      background: rgba(0, 0, 0, 0.8);
     }
 
-    #controls-modal.visible {
+    .modal.visible {
       display: flex;
     }
 
-    #controls-panel {
-      position: relative;
-      width: 460px;
+    .modal-panel {
+      width: 470px;
       max-width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
       padding: 22px;
-      border: 5px solid #e0c66e;
+      border: 5px solid #dfc76e;
       background: #151a15;
       box-shadow:
-        0 0 0 5px #5c4122,
-        0 18px 60px rgba(0, 0, 0, 0.75);
+        0 0 0 5px #5d4223,
+        0 20px 60px rgba(0, 0, 0, 0.8);
     }
 
-    #controls-panel h2 {
+    .modal-panel h2 {
       margin: 0 0 18px;
       color: #f3df91;
       text-align: center;
-      font-size: 22px;
     }
 
-    .control-row {
+    .control-row,
+    .artifact-row {
       display: grid;
-      grid-template-columns: 155px 1fr;
-      align-items: center;
+      grid-template-columns: 150px 1fr;
       gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid #394139;
-    }
-
-    .control-row:last-of-type {
-      border-bottom: none;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid #384038;
     }
 
     .key {
       display: inline-block;
-      padding: 7px 9px;
-      border: 2px solid #cbb66c;
+      padding: 7px 8px;
+      border: 2px solid #cfbb70;
       background: #303830;
-      color: #ffffff;
-      text-align: center;
-      box-shadow: inset -2px -2px 0 #1b211b;
-    }
-
-    #controls-note {
-      margin-top: 18px;
-      color: #c5d7c5;
-      line-height: 1.5;
       text-align: center;
     }
 
-    #close-controls {
+    .artifact-card {
+      margin-bottom: 12px;
+      padding: 12px;
+      border: 2px solid #685d38;
+      background: #232923;
+    }
+
+    .artifact-card.locked {
+      opacity: 0.45;
+    }
+
+    .artifact-card h3 {
+      margin: 0 0 6px;
+      color: #ffe879;
+    }
+
+    .modal-close {
       width: 100%;
       margin-top: 18px;
     }
 
     /* =========================================================
-       COMMANDES TACTILES POUR MOBILE
+       COMMANDES TACTILES
        ========================================================= */
 
     #mobile-controls {
       display: none;
       grid-template-columns: 1fr 1fr;
-      gap: 18px;
+      gap: 16px;
       margin-top: 16px;
       user-select: none;
       touch-action: none;
@@ -215,13 +229,12 @@
       border: 3px solid #d9c477;
       background: #293329;
       color: white;
-      font-size: 22px;
+      font-size: 21px;
       font-weight: bold;
-      cursor: pointer;
       touch-action: none;
       box-shadow:
-        inset -3px -3px 0 #131813,
-        inset 3px 3px 0 #526252;
+        inset 3px 3px 0 #526252,
+        inset -3px -3px 0 #131813;
     }
 
     .touch-button.active,
@@ -260,30 +273,17 @@
       width: 92px;
       height: 92px;
       border-radius: 50%;
-      background: #9a312f;
-      font-size: 16px;
+      background: #9b312f;
+      font-size: 15px;
     }
-
-    /* =========================================================
-       TEXTE SOUS LE JEU
-       ========================================================= */
-
-    #status-text {
-      margin-top: 14px;
-      color: #f2e6b8;
-      text-align: center;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    /* =========================================================
-       ADAPTATION MOBILE
-       ========================================================= */
 
     @media (max-width: 700px), (pointer: coarse) {
       body {
-        align-items: flex-start;
-        padding: 8px;
+        padding: 7px;
+      }
+
+      canvas {
+        height: auto;
       }
 
       #mobile-controls {
@@ -291,20 +291,21 @@
       }
 
       #game-title {
-        font-size: 12px;
+        font-size: 11px;
       }
 
-      canvas {
-        height: auto;
-      }
-    }
-
-    @media (max-width: 430px) {
       #top-bar {
         align-items: stretch;
         flex-direction: column;
       }
 
+      #top-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 430px) {
       #direction-pad {
         grid-template-columns: repeat(3, 46px);
         grid-template-rows: repeat(3, 46px);
@@ -315,7 +316,8 @@
         height: 80px;
       }
 
-      .control-row {
+      .control-row,
+      .artifact-row {
         grid-template-columns: 1fr;
         text-align: center;
       }
@@ -326,34 +328,31 @@
 <body>
   <main id="game-shell">
 
-    <!-- Barre supérieure avec le bouton demandé -->
     <header id="top-bar">
-      <div id="game-title">LA QUÊTE DES TROIS ROYAUMES</div>
+      <div id="game-title">LA QUÊTE DES TROIS ARTÉFACTS</div>
 
-      <button
-        id="show-controls"
-        class="menu-button"
-        type="button"
-        aria-haspopup="dialog"
-        aria-controls="controls-modal"
-      >
-        COMMANDES
-      </button>
+      <div id="top-buttons">
+        <button id="show-controls" class="ui-button" type="button">
+          COMMANDES
+        </button>
+
+        <button id="show-artifacts" class="ui-button" type="button">
+          ARTÉFACTS
+        </button>
+      </div>
     </header>
 
-    <!-- Canvas rétro de 512 × 448 pixels -->
     <div id="canvas-container">
       <canvas
         id="game"
         width="512"
         height="448"
         tabindex="0"
-        aria-label="Jeu d'aventure rétro en trois tableaux"
+        aria-label="Jeu d'aventure rétro"
       ></canvas>
     </div>
 
-    <!-- Commandes tactiles pour téléphone et tablette -->
-    <section id="mobile-controls" aria-label="Commandes tactiles">
+    <section id="mobile-controls">
       <div id="direction-pad">
         <button id="touch-up" class="touch-button" type="button">▲</button>
         <button id="touch-left" class="touch-button" type="button">◀</button>
@@ -369,61 +368,62 @@
     </section>
 
     <div id="status-text">
-      Traversez les trois tableaux, éliminez les ennemis et atteignez la sortie.
+      Accomplissez la quête affichée en haut de l'écran pour progresser.
     </div>
   </main>
 
-  <!-- Fenêtre qui apparaît lorsqu'on appuie sur COMMANDES -->
-  <div
-    id="controls-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="controls-title"
-  >
-    <div id="controls-panel">
-      <h2 id="controls-title">COMMANDES DU JEU</h2>
+  <!-- Fenêtre des commandes -->
+  <div id="controls-modal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-panel">
+      <h2>COMMANDES</h2>
 
       <div class="control-row">
-        <div>
-          <span class="key">↑ ↓ ← →</span>
-        </div>
-        <div>Déplacer le héros</div>
+        <span class="key">↑ ↓ ← →</span>
+        <span>Déplacer le héros</span>
       </div>
 
       <div class="control-row">
-        <div>
-          <span class="key">Z Q S D</span>
-        </div>
-        <div>Déplacement alternatif</div>
+        <span class="key">Z Q S D</span>
+        <span>Déplacement alternatif</span>
       </div>
 
       <div class="control-row">
-        <div>
-          <span class="key">ESPACE</span>
-        </div>
-        <div>Attaquer avec l'épée</div>
+        <span class="key">ESPACE</span>
+        <span>Attaquer avec l'épée</span>
       </div>
 
       <div class="control-row">
-        <div>
-          <span class="key">ENTRÉE</span>
-        </div>
-        <div>Continuer après un tableau</div>
+        <span class="key">ENTRÉE</span>
+        <span>Continuer vers le tableau suivant</span>
       </div>
 
       <div class="control-row">
-        <div>
-          <span class="key">R</span>
-        </div>
-        <div>Recommencer la partie</div>
+        <span class="key">R</span>
+        <span>Recommencer toute l'aventure</span>
       </div>
 
-      <p id="controls-note">
-        Éliminez tous les ennemis d'un tableau. La porte de sortie
-        apparaîtra ensuite à droite de l'écran.
-      </p>
+      <button
+        class="ui-button modal-close"
+        data-close-modal="controls-modal"
+        type="button"
+      >
+        RETOUR AU JEU
+      </button>
+    </div>
+  </div>
 
-      <button id="close-controls" class="menu-button" type="button">
+  <!-- Fenêtre des artéfacts -->
+  <div id="artifacts-modal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-panel">
+      <h2>ARTÉFACTS DU HÉROS</h2>
+
+      <div id="artifact-list"></div>
+
+      <button
+        class="ui-button modal-close"
+        data-close-modal="artifacts-modal"
+        type="button"
+      >
         RETOUR AU JEU
       </button>
     </div>
@@ -433,7 +433,7 @@
     "use strict";
 
     /* =========================================================
-       CANVAS ET CONSTANTES GÉNÉRALES
+       CONFIGURATION DU CANVAS
        ========================================================= */
 
     const canvas = document.getElementById("game");
@@ -443,11 +443,11 @@
 
     const LARGEUR_CANVAS = 512;
     const HAUTEUR_CANVAS = 448;
-    const HAUTEUR_INTERFACE = 64;
+    const HAUTEUR_INTERFACE = 96;
 
     const TAILLE_CASE = 32;
     const COLONNES = 16;
-    const LIGNES = 12;
+    const LIGNES = 11;
 
     const SOL = 0;
     const ARBRE = 1;
@@ -456,59 +456,292 @@
     const ROCHE = 4;
 
     /* =========================================================
-       ÉLÉMENTS HTML
+       OUTILS GÉNÉRAUX
        ========================================================= */
 
-    const boutonCommandes = document.getElementById("show-controls");
-    const boutonFermerCommandes = document.getElementById("close-controls");
-    const fenetreCommandes = document.getElementById("controls-modal");
-
-    /* =========================================================
-       GESTION DE LA FENÊTRE DES COMMANDES
-       ========================================================= */
-
-    let jeuEnPause = false;
-
-    function ouvrirCommandes() {
-      fenetreCommandes.classList.add("visible");
-      jeuEnPause = true;
-      boutonFermerCommandes.focus();
+    function limiter(valeur, minimum, maximum) {
+      return Math.max(minimum, Math.min(maximum, valeur));
     }
 
-    function fermerCommandes() {
-      fenetreCommandes.classList.remove("visible");
-      jeuEnPause = false;
-      boutonCommandes.focus();
-      canvas.focus();
+    function entierAleatoire(minimum, maximum) {
+      return Math.floor(
+        Math.random() * (maximum - minimum + 1)
+      ) + minimum;
     }
 
-    boutonCommandes.addEventListener("click", ouvrirCommandes);
-    boutonFermerCommandes.addEventListener("click", fermerCommandes);
+    function rectanglesSeTouchent(a, b) {
+      return (
+        a.x < b.x + b.largeur &&
+        a.x + a.largeur > b.x &&
+        a.y < b.y + b.hauteur &&
+        a.y + a.hauteur > b.y
+      );
+    }
 
-    fenetreCommandes.addEventListener("click", function (event) {
-      if (event.target === fenetreCommandes) {
-        fermerCommandes();
-      }
-    });
+    function positionDepuisCase(
+      colonne,
+      ligne,
+      largeur = 24,
+      hauteur = 24
+    ) {
+      return {
+        x: colonne * TAILLE_CASE + (TAILLE_CASE - largeur) / 2,
+        y:
+          HAUTEUR_INTERFACE +
+          ligne * TAILLE_CASE +
+          (TAILLE_CASE - hauteur) / 2
+      };
+    }
 
     /* =========================================================
-       DÉFINITION DES TROIS TABLEAUX
+       DÉFINITION DES ARTÉFACTS
        ========================================================= */
 
     /*
-      Chaque tableau contient :
+      Chaque artéfact possède :
+      - un identifiant unique;
       - un nom;
-      - une couleur principale;
-      - une matrice de terrain;
-      - des positions de départ pour les ennemis;
-      - une position de départ pour le joueur.
+      - une description;
+      - une fonction appliquant son bonus au joueur.
     */
+
+    const definitionsArtefacts = {
+      bottesDuVent: {
+        id: "bottesDuVent",
+        nom: "Bottes du Vent",
+        description: "Augmente la vitesse de déplacement de 25 %.",
+        symbole: "B",
+        appliquer() {
+          joueur.multiplicateurVitesse = 1.25;
+        }
+      },
+
+      coeurAncien: {
+        id: "coeurAncien",
+        nom: "Cœur Ancien",
+        description: "Ajoute un cœur permanent et soigne le héros.",
+        symbole: "C",
+        appliquer() {
+          joueur.vieMaximum += 1;
+          joueur.vie = joueur.vieMaximum;
+        }
+      },
+
+      emblemeGuerrier: {
+        id: "emblemeGuerrier",
+        nom: "Emblème du Guerrier",
+        description: "Augmente les dégâts de l'épée de 1.",
+        symbole: "E",
+        appliquer() {
+          joueur.degatsEpee += 1;
+        }
+      }
+    };
+
+    const artefactsObtenus = new Set();
+
+    function obtenirArtefact(idArtefact) {
+      if (artefactsObtenus.has(idArtefact)) {
+        return;
+      }
+
+      const artefact = definitionsArtefacts[idArtefact];
+
+      if (!artefact) {
+        return;
+      }
+
+      artefactsObtenus.add(idArtefact);
+      artefact.appliquer();
+
+      afficherMessage(
+        "ARTÉFACT OBTENU : " + artefact.nom,
+        2.5
+      );
+
+      verifierProgressionQuete();
+      mettreAJourListeArtefacts();
+    }
+
+    function mettreAJourListeArtefacts() {
+      const conteneur = document.getElementById("artifact-list");
+
+      conteneur.innerHTML = "";
+
+      Object.values(definitionsArtefacts).forEach(function (artefact) {
+        const obtenu = artefactsObtenus.has(artefact.id);
+
+        const carte = document.createElement("div");
+        carte.className =
+          "artifact-card" + (obtenu ? "" : " locked");
+
+        const titre = document.createElement("h3");
+        titre.textContent = obtenu
+          ? artefact.nom
+          : "Artéfact inconnu";
+
+        const description = document.createElement("p");
+        description.textContent = obtenu
+          ? artefact.description
+          : "Explorez les différents tableaux pour le découvrir.";
+
+        carte.appendChild(titre);
+        carte.appendChild(description);
+        conteneur.appendChild(carte);
+      });
+    }
+
+    /* =========================================================
+       SYSTÈME DE QUÊTES
+       ========================================================= */
+
+    /*
+      Les quêtes utilisent des conditions vérifiées automatiquement.
+
+      Une quête peut dépendre :
+      - du nombre de trésors ramassés;
+      - d'un artéfact particulier;
+      - du nombre d'ennemis vaincus;
+      - de la progression dans les tableaux.
+    */
+
+    const quetes = [
+      {
+        id: "collecteur",
+        titre: "Les premières richesses",
+        description: "Ramasser 3 trésors.",
+        cible: 3,
+
+        progression() {
+          return statistiques.tresorsRamasses;
+        },
+
+        terminee() {
+          return statistiques.tresorsRamasses >= 3;
+        }
+      },
+
+      {
+        id: "bottes",
+        titre: "Le secret des ruines",
+        description: "Trouver les Bottes du Vent.",
+        cible: 1,
+
+        progression() {
+          return artefactsObtenus.has("bottesDuVent") ? 1 : 0;
+        },
+
+        terminee() {
+          return artefactsObtenus.has("bottesDuVent");
+        }
+      },
+
+      {
+        id: "guerrier",
+        titre: "Épreuve du guerrier",
+        description: "Vaincre 8 ennemis au total.",
+        cible: 8,
+
+        progression() {
+          return statistiques.ennemisVaincus;
+        },
+
+        terminee() {
+          return statistiques.ennemisVaincus >= 8;
+        }
+      },
+
+      {
+        id: "artefactsFinaux",
+        titre: "Les trois reliques",
+        description: "Rassembler les 3 artéfacts uniques.",
+        cible: 3,
+
+        progression() {
+          return artefactsObtenus.size;
+        },
+
+        terminee() {
+          return artefactsObtenus.size >= 3;
+        }
+      }
+    ];
+
+    let indexQueteActuelle = 0;
+
+    function obtenirQueteActuelle() {
+      return quetes[indexQueteActuelle] || null;
+    }
+
+    function verifierProgressionQuete() {
+      const quete = obtenirQueteActuelle();
+
+      if (!quete || !quete.terminee()) {
+        return;
+      }
+
+      afficherMessage(
+        "QUÊTE TERMINÉE : " + quete.titre,
+        2.5
+      );
+
+      indexQueteActuelle += 1;
+
+      /*
+        Lorsqu'une quête est terminée et que tous les ennemis
+        du tableau ont été vaincus, la porte peut s'ouvrir.
+      */
+      verifierOuvertureSortie();
+    }
+
+    function queteNecessairePourTableauTerminee() {
+      /*
+        Tableau 1 : la première quête doit être terminée.
+        Tableau 2 : la deuxième quête doit être terminée.
+        Tableau 3 : la quatrième quête doit être terminée.
+      */
+
+      if (indexTableau === 0) {
+        return indexQueteActuelle >= 1;
+      }
+
+      if (indexTableau === 1) {
+        return indexQueteActuelle >= 2;
+      }
+
+      if (indexTableau === 2) {
+        return indexQueteActuelle >= 4;
+      }
+
+      return false;
+    }
+
+    /* =========================================================
+       STATISTIQUES ET SCORE
+       ========================================================= */
+
+    const statistiques = {
+      score: 0,
+      or: 0,
+      tresorsRamasses: 0,
+      coffresOuverts: 0,
+      ennemisVaincus: 0
+    };
+
+    function ajouterScore(points) {
+      statistiques.score += points;
+    }
+
+    /* =========================================================
+       CARTES DES TROIS TABLEAUX
+       ========================================================= */
 
     const tableaux = [
       {
-        nom: "TABLEAU 1 — FORÊT DES ÉCHOS",
-        couleurSol: "#5daa4b",
+        nom: "FORÊT DES RICHESSES",
+        couleurSol: "#5baa4b",
         couleurDetail: "#4b9340",
+
         carte: [
           [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
           [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -520,21 +753,41 @@
           [1,0,2,0,1,0,2,0,0,1,1,0,0,2,0,1],
           [1,0,2,0,1,0,0,0,0,0,0,0,1,1,0,1],
           [1,0,0,0,0,0,1,0,2,2,0,0,0,0,0,1],
-          [1,0,0,2,2,0,0,0,0,0,0,2,2,0,0,1],
           [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         ],
-        joueur: { colonne: 1, ligne: 1 },
+
+        joueur: {
+          colonne: 1,
+          ligne: 1
+        },
+
         ennemis: [
-          { colonne: 12, ligne: 1 },
-          { colonne: 3, ligne: 8 },
-          { colonne: 13, ligne: 9 }
+          { colonne: 12, ligne: 1, vie: 2 },
+          { colonne: 3, ligne: 8, vie: 2 },
+          { colonne: 13, ligne: 8, vie: 2 }
+        ],
+
+        tresors: [
+          { type: "or", colonne: 4, ligne: 1, valeur: 10 },
+          { type: "or", colonne: 10, ligne: 2, valeur: 10 },
+          { type: "coffre", colonne: 3, ligne: 5, valeur: 40 },
+          { type: "or", colonne: 13, ligne: 5, valeur: 10 }
+        ],
+
+        artefacts: [
+          {
+            id: "coeurAncien",
+            colonne: 10,
+            ligne: 8
+          }
         ]
       },
 
       {
-        nom: "TABLEAU 2 — RUINES DU CRÉPUSCULE",
-        couleurSol: "#8b774f",
-        couleurDetail: "#77623d",
+        nom: "RUINES DU VENT",
+        couleurSol: "#88774f",
+        couleurDetail: "#75613e",
+
         carte: [
           [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
           [2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,2],
@@ -546,22 +799,42 @@
           [2,0,0,2,0,0,0,0,0,4,2,2,0,0,0,2],
           [2,4,0,2,2,2,0,4,0,0,0,2,0,4,0,2],
           [2,0,0,0,0,0,0,4,2,2,0,2,0,0,0,2],
-          [2,0,2,2,0,4,0,0,0,0,0,0,0,2,0,2],
           [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
         ],
-        joueur: { colonne: 1, ligne: 1 },
+
+        joueur: {
+          colonne: 1,
+          ligne: 1
+        },
+
         ennemis: [
-          { colonne: 13, ligne: 1 },
-          { colonne: 5, ligne: 5 },
-          { colonne: 9, ligne: 7 },
-          { colonne: 13, ligne: 9 }
+          { colonne: 13, ligne: 1, vie: 2 },
+          { colonne: 5, ligne: 5, vie: 2 },
+          { colonne: 9, ligne: 7, vie: 3 },
+          { colonne: 13, ligne: 8, vie: 2 }
+        ],
+
+        tresors: [
+          { type: "or", colonne: 4, ligne: 3, valeur: 15 },
+          { type: "coffre", colonne: 10, ligne: 3, valeur: 50 },
+          { type: "or", colonne: 2, ligne: 7, valeur: 15 },
+          { type: "coffre", colonne: 14, ligne: 7, valeur: 50 }
+        ],
+
+        artefacts: [
+          {
+            id: "bottesDuVent",
+            colonne: 8,
+            ligne: 5
+          }
         ]
       },
 
       {
-        nom: "TABLEAU 3 — FORTERESSE ROUGE",
-        couleurSol: "#644848",
-        couleurDetail: "#523838",
+        nom: "FORTERESSE DU GUERRIER",
+        couleurSol: "#684949",
+        couleurDetail: "#553939",
+
         carte: [
           [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
           [2,0,0,0,0,0,2,0,0,0,2,0,0,0,0,2],
@@ -573,222 +846,106 @@
           [2,0,0,0,0,0,4,0,0,4,0,0,0,0,0,2],
           [2,0,2,2,2,0,2,0,2,2,2,2,2,2,0,2],
           [2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,2],
-          [2,0,2,0,0,0,2,2,0,0,2,2,0,2,0,2],
           [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
         ],
-        joueur: { colonne: 1, ligne: 1 },
+
+        joueur: {
+          colonne: 1,
+          ligne: 1
+        },
+
         ennemis: [
-          { colonne: 13, ligne: 1 },
-          { colonne: 7, ligne: 3 },
-          { colonne: 5, ligne: 7 },
-          { colonne: 13, ligne: 7 },
-          { colonne: 8, ligne: 9 }
+          { colonne: 13, ligne: 1, vie: 3 },
+          { colonne: 7, ligne: 3, vie: 3 },
+          { colonne: 5, ligne: 7, vie: 3 },
+          { colonne: 13, ligne: 7, vie: 3 },
+          { colonne: 8, ligne: 9, vie: 5 }
+        ],
+
+        tresors: [
+          { type: "or", colonne: 3, ligne: 3, valeur: 20 },
+          { type: "coffre", colonne: 10, ligne: 5, valeur: 75 },
+          { type: "or", colonne: 3, ligne: 9, valeur: 20 },
+          { type: "coffre", colonne: 13, ligne: 9, valeur: 75 }
+        ],
+
+        artefacts: [
+          {
+            id: "emblemeGuerrier",
+            colonne: 8,
+            ligne: 7
+          }
         ]
       }
     ];
 
     /* =========================================================
-       ÉTAT DU CLAVIER ET DES COMMANDES
-       ========================================================= */
-
-    const touches = Object.create(null);
-
-    const touchesBloquees = new Set([
-      "ArrowUp",
-      "ArrowDown",
-      "ArrowLeft",
-      "ArrowRight",
-      "Space"
-    ]);
-
-    window.addEventListener("keydown", function (event) {
-      if (touchesBloquees.has(event.code)) {
-        event.preventDefault();
-      }
-
-      if (event.code === "Escape" && fenetreCommandes.classList.contains("visible")) {
-        fermerCommandes();
-        return;
-      }
-
-      if (jeuEnPause) {
-        return;
-      }
-
-      touches[event.code] = true;
-
-      if (event.code === "Space" && !event.repeat) {
-        demarrerAttaque();
-      }
-
-      if (event.code === "KeyR" && !event.repeat) {
-        recommencerAventure();
-      }
-
-      if (
-        (event.code === "Enter" || event.code === "Space") &&
-        transitionTableau &&
-        !event.repeat
-      ) {
-        chargerTableau(indexTableau + 1);
-      }
-
-      if (jeuTermine && !event.repeat) {
-        recommencerAventure();
-      }
-    });
-
-    window.addEventListener("keyup", function (event) {
-      touches[event.code] = false;
-    });
-
-    window.addEventListener("blur", function () {
-      for (const code in touches) {
-        touches[code] = false;
-      }
-    });
-
-    /* =========================================================
-       COMMANDES TACTILES
-       ========================================================= */
-
-    function connecterBoutonDirection(id, codeTouche) {
-      const bouton = document.getElementById(id);
-
-      function activer(event) {
-        event.preventDefault();
-        touches[codeTouche] = true;
-        bouton.classList.add("active");
-        canvas.focus();
-      }
-
-      function desactiver(event) {
-        event.preventDefault();
-        touches[codeTouche] = false;
-        bouton.classList.remove("active");
-      }
-
-      bouton.addEventListener("pointerdown", activer);
-      bouton.addEventListener("pointerup", desactiver);
-      bouton.addEventListener("pointercancel", desactiver);
-      bouton.addEventListener("pointerleave", desactiver);
-    }
-
-    connecterBoutonDirection("touch-up", "ArrowUp");
-    connecterBoutonDirection("touch-down", "ArrowDown");
-    connecterBoutonDirection("touch-left", "ArrowLeft");
-    connecterBoutonDirection("touch-right", "ArrowRight");
-
-    const boutonAttaque = document.getElementById("touch-attack");
-
-    boutonAttaque.addEventListener("pointerdown", function (event) {
-      event.preventDefault();
-
-      if (jeuTermine) {
-        recommencerAventure();
-        return;
-      }
-
-      if (transitionTableau) {
-        chargerTableau(indexTableau + 1);
-        return;
-      }
-
-      demarrerAttaque();
-      boutonAttaque.classList.add("active");
-      canvas.focus();
-    });
-
-    boutonAttaque.addEventListener("pointerup", function () {
-      boutonAttaque.classList.remove("active");
-    });
-
-    boutonAttaque.addEventListener("pointercancel", function () {
-      boutonAttaque.classList.remove("active");
-    });
-
-    /* =========================================================
-       OUTILS GÉOMÉTRIQUES
-       ========================================================= */
-
-    function rectanglesSeTouchent(a, b) {
-      return (
-        a.x < b.x + b.largeur &&
-        a.x + a.largeur > b.x &&
-        a.y < b.y + b.hauteur &&
-        a.y + a.hauteur > b.y
-      );
-    }
-
-    function limiter(valeur, minimum, maximum) {
-      return Math.max(minimum, Math.min(maximum, valeur));
-    }
-
-    function entierAleatoire(minimum, maximum) {
-      return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
-    }
-
-    function positionDepuisCase(colonne, ligne, largeur = 24, hauteur = 24) {
-      return {
-        x: colonne * TAILLE_CASE + (TAILLE_CASE - largeur) / 2,
-        y:
-          HAUTEUR_INTERFACE +
-          ligne * TAILLE_CASE +
-          (TAILLE_CASE - hauteur) / 2
-      };
-    }
-
-    /* =========================================================
-       ÉTAT DU JOUEUR
+       JOUEUR
        ========================================================= */
 
     const joueur = {
       x: 0,
       y: 0,
+
       largeur: 24,
       hauteur: 24,
-      vitesse: 150,
+
+      vitesseBase: 150,
+      multiplicateurVitesse: 1,
+
       direction: "bas",
 
       vie: 3,
       vieMaximum: 3,
 
+      degatsEpee: 1,
+
       invulnerable: false,
       tempsInvulnerabilite: 0,
-      dureeInvulnerabilite: 1.2,
+      dureeInvulnerabilite: 1.15,
 
       attaqueActive: false,
       tempsAttaque: 0,
       dureeAttaque: 0.18,
 
       rechargeAttaque: 0,
-      dureeRecharge: 0.27,
+      dureeRecharge: 0.26,
 
       ennemisTouchesPendantAttaque: new Set()
     };
 
     /* =========================================================
-       ÉTAT DES ENNEMIS
+       ENNEMIS
        ========================================================= */
 
     let ennemis = [];
-    let compteurIdentifiants = 0;
+    let prochainIdentifiantEnnemi = 1;
 
-    function creerEnnemi(colonne, ligne, vie = 2) {
-      const position = positionDepuisCase(colonne, ligne);
+    function creerEnnemi(definition) {
+      const position = positionDepuisCase(
+        definition.colonne,
+        definition.ligne
+      );
 
       return {
-        identifiant: ++compteurIdentifiants,
+        identifiant: prochainIdentifiantEnnemi++,
+
         x: position.x,
         y: position.y,
+
         largeur: 24,
         hauteur: 24,
+
         vitesse: entierAleatoire(50, 82),
-        vie,
-        vieMaximum: vie,
+
+        vie: definition.vie,
+        vieMaximum: definition.vie,
+
         directionX: 0,
         directionY: 0,
+
         tempsAvantChangementDirection: 0,
+
         tempsRecul: 0,
         reculX: 0,
         reculY: 0
@@ -804,15 +961,122 @@
         { x: 0, y: 0 }
       ];
 
-      const direction = directions[entierAleatoire(0, directions.length - 1)];
+      const direction =
+        directions[entierAleatoire(0, directions.length - 1)];
 
       ennemi.directionX = direction.x;
       ennemi.directionY = direction.y;
-      ennemi.tempsAvantChangementDirection = 0.45 + Math.random() * 1.5;
+
+      ennemi.tempsAvantChangementDirection =
+        0.5 + Math.random() * 1.5;
     }
 
     /* =========================================================
-       ÉTAT GLOBAL DE L'AVENTURE
+       TRÉSORS ET ARTÉFACTS PRÉSENTS SUR LA CARTE
+       ========================================================= */
+
+    let tresorsActifs = [];
+    let artefactsActifs = [];
+
+    function creerTresor(definition, index) {
+      const taille = definition.type === "coffre" ? 24 : 16;
+
+      const position = positionDepuisCase(
+        definition.colonne,
+        definition.ligne,
+        taille,
+        taille
+      );
+
+      return {
+        id: index,
+
+        type: definition.type,
+
+        x: position.x,
+        y: position.y,
+
+        largeur: taille,
+        hauteur: taille,
+
+        valeur: definition.valeur,
+
+        ramasse: false
+      };
+    }
+
+    function creerArtefactCarte(definition) {
+      const position = positionDepuisCase(
+        definition.colonne,
+        definition.ligne,
+        22,
+        22
+      );
+
+      return {
+        id: definition.id,
+
+        x: position.x,
+        y: position.y,
+
+        largeur: 22,
+        hauteur: 22,
+
+        ramasse: artefactsObtenus.has(definition.id)
+      };
+    }
+
+    function verifierCollectes() {
+      for (const tresor of tresorsActifs) {
+        if (
+          tresor.ramasse ||
+          !rectanglesSeTouchent(joueur, tresor)
+        ) {
+          continue;
+        }
+
+        tresor.ramasse = true;
+
+        statistiques.tresorsRamasses += 1;
+        statistiques.or += tresor.valeur;
+
+        if (tresor.type === "coffre") {
+          statistiques.coffresOuverts += 1;
+          ajouterScore(tresor.valeur * 10);
+
+          afficherMessage(
+            "COFFRE OUVERT : +" + tresor.valeur + " OR",
+            1.8
+          );
+        } else {
+          ajouterScore(tresor.valeur * 5);
+
+          afficherMessage(
+            "+" + tresor.valeur + " OR",
+            1
+          );
+        }
+
+        verifierProgressionQuete();
+      }
+
+      for (const artefact of artefactsActifs) {
+        if (
+          artefact.ramasse ||
+          !rectanglesSeTouchent(joueur, artefact)
+        ) {
+          continue;
+        }
+
+        artefact.ramasse = true;
+
+        ajouterScore(500);
+        obtenirArtefact(artefact.id);
+      }
+    }
+
+    /* =========================================================
+       ÉTAT GLOBAL DU JEU
        ========================================================= */
 
     let indexTableau = 0;
@@ -820,8 +1084,11 @@
 
     let sortieOuverte = false;
     let transitionTableau = false;
+
     let jeuTermine = false;
     let victoireFinale = false;
+
+    let jeuEnPause = false;
 
     let tempsEcoule = 0;
     let ancienTemps = performance.now();
@@ -831,13 +1098,18 @@
 
     const porteSortie = {
       x: LARGEUR_CANVAS - TAILLE_CASE,
-      y: HAUTEUR_INTERFACE + 5 * TAILLE_CASE,
+      y: HAUTEUR_INTERFACE + 4 * TAILLE_CASE,
       largeur: TAILLE_CASE,
       hauteur: TAILLE_CASE * 2
     };
 
+    function afficherMessage(message, duree) {
+      messageTemporaire = message;
+      tempsMessage = duree;
+    }
+
     /* =========================================================
-       CHARGEMENT DES TABLEAUX
+       CHARGEMENT ET PROGRESSION DES TABLEAUX
        ========================================================= */
 
     function chargerTableau(nouvelIndex) {
@@ -863,33 +1135,92 @@
 
       joueur.x = depart.x;
       joueur.y = depart.y;
+
       joueur.direction = "bas";
       joueur.invulnerable = false;
       joueur.tempsInvulnerabilite = 0;
+
       joueur.attaqueActive = false;
       joueur.rechargeAttaque = 0;
       joueur.ennemisTouchesPendantAttaque.clear();
 
-      ennemis = tableauActuel.ennemis.map(function (position, index) {
-        const vie = indexTableau === 2 && index === tableauActuel.ennemis.length - 1
-          ? 4
-          : 2;
+      ennemis = tableauActuel.ennemis.map(creerEnnemi);
 
-        return creerEnnemi(position.colonne, position.ligne, vie);
-      });
+      tresorsActifs = tableauActuel.tresors.map(
+        creerTresor
+      );
 
-      messageTemporaire = tableauActuel.nom;
-      tempsMessage = 2.2;
+      artefactsActifs = tableauActuel.artefacts.map(
+        creerArtefactCarte
+      );
+
+      afficherMessage(
+        "TABLEAU " +
+        (indexTableau + 1) +
+        " : " +
+        tableauActuel.nom,
+        2.3
+      );
 
       ancienTemps = performance.now();
       canvas.focus();
     }
 
+    function verifierOuvertureSortie() {
+      if (
+        ennemis.length === 0 &&
+        queteNecessairePourTableauTerminee() &&
+        !sortieOuverte
+      ) {
+        sortieOuverte = true;
+
+        afficherMessage(
+          "LA SORTIE EST OUVERTE !",
+          2
+        );
+      }
+    }
+
+    function verifierSortie() {
+      if (
+        !sortieOuverte ||
+        transitionTableau ||
+        jeuTermine
+      ) {
+        return;
+      }
+
+      if (
+        joueur.x + joueur.largeur >
+        LARGEUR_CANVAS - 4
+      ) {
+        transitionTableau = true;
+      }
+    }
+
     function recommencerAventure() {
-      joueur.vie = joueur.vieMaximum;
+      statistiques.score = 0;
+      statistiques.or = 0;
+      statistiques.tresorsRamasses = 0;
+      statistiques.coffresOuverts = 0;
+      statistiques.ennemisVaincus = 0;
+
+      artefactsObtenus.clear();
+      indexQueteActuelle = 0;
+
+      joueur.vieMaximum = 3;
+      joueur.vie = 3;
+
+      joueur.multiplicateurVitesse = 1;
+      joueur.degatsEpee = 1;
+
       tempsEcoule = 0;
+
       jeuTermine = false;
       victoireFinale = false;
+      transitionTableau = false;
+
+      mettreAJourListeArtefacts();
       chargerTableau(0);
     }
 
@@ -900,7 +1231,10 @@
     function obtenirCaseDepuisPosition(x, y) {
       return {
         colonne: Math.floor(x / TAILLE_CASE),
-        ligne: Math.floor((y - HAUTEUR_INTERFACE) / TAILLE_CASE)
+
+        ligne: Math.floor(
+          (y - HAUTEUR_INTERFACE) / TAILLE_CASE
+        )
       };
     }
 
@@ -914,14 +1248,10 @@
         return true;
       }
 
-      /*
-        La porte située à droite devient franchissable lorsque tous
-        les ennemis ont été vaincus.
-      */
       if (
         sortieOuverte &&
         colonne === COLONNES - 1 &&
-        (ligne === 5 || ligne === 6)
+        (ligne === 4 || ligne === 5)
       ) {
         return false;
       }
@@ -929,20 +1259,43 @@
       return tableauActuel.carte[ligne][colonne] !== SOL;
     }
 
-    function rectangleToucheCarte(x, y, largeur, hauteur) {
+    function rectangleToucheCarte(
+      x,
+      y,
+      largeur,
+      hauteur
+    ) {
       const marge = 2;
 
       const points = [
         { x: x + marge, y: y + marge },
-        { x: x + largeur - marge, y: y + marge },
-        { x: x + marge, y: y + hauteur - marge },
-        { x: x + largeur - marge, y: y + hauteur - marge }
+
+        {
+          x: x + largeur - marge,
+          y: y + marge
+        },
+
+        {
+          x: x + marge,
+          y: y + hauteur - marge
+        },
+
+        {
+          x: x + largeur - marge,
+          y: y + hauteur - marge
+        }
       ];
 
       for (const point of points) {
-        const position = obtenirCaseDepuisPosition(point.x, point.y);
+        const position =
+          obtenirCaseDepuisPosition(point.x, point.y);
 
-        if (caseEstSolide(position.colonne, position.ligne)) {
+        if (
+          caseEstSolide(
+            position.colonne,
+            position.ligne
+          )
+        ) {
           return true;
         }
       }
@@ -950,7 +1303,11 @@
       return false;
     }
 
-    function deplacerAvecCollisions(entite, mouvementX, mouvementY) {
+    function deplacerAvecCollisions(
+      entite,
+      mouvementX,
+      mouvementY
+    ) {
       let collisionX = false;
       let collisionY = false;
 
@@ -984,11 +1341,170 @@
         collisionY = true;
       }
 
-      return { collisionX, collisionY };
+      return {
+        collisionX,
+        collisionY
+      };
     }
 
     /* =========================================================
-       ATTAQUE À L'ÉPÉE
+       CLAVIER
+       ========================================================= */
+
+    const touches = Object.create(null);
+
+    const touchesBloquees = new Set([
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "Space"
+    ]);
+
+    window.addEventListener("keydown", function (event) {
+      if (touchesBloquees.has(event.code)) {
+        event.preventDefault();
+      }
+
+      if (jeuEnPause) {
+        if (event.code === "Escape") {
+          fermerToutesLesModales();
+        }
+
+        return;
+      }
+
+      touches[event.code] = true;
+
+      if (
+        event.code === "Space" &&
+        !event.repeat
+      ) {
+        if (transitionTableau) {
+          chargerTableau(indexTableau + 1);
+        } else if (jeuTermine) {
+          recommencerAventure();
+        } else {
+          demarrerAttaque();
+        }
+      }
+
+      if (
+        event.code === "Enter" &&
+        transitionTableau &&
+        !event.repeat
+      ) {
+        chargerTableau(indexTableau + 1);
+      }
+
+      if (
+        event.code === "KeyR" &&
+        !event.repeat
+      ) {
+        recommencerAventure();
+      }
+
+      if (
+        jeuTermine &&
+        !event.repeat &&
+        event.code !== "KeyR"
+      ) {
+        recommencerAventure();
+      }
+    });
+
+    window.addEventListener("keyup", function (event) {
+      touches[event.code] = false;
+    });
+
+    window.addEventListener("blur", function () {
+      for (const code in touches) {
+        touches[code] = false;
+      }
+    });
+
+    /* =========================================================
+       COMMANDES TACTILES
+       ========================================================= */
+
+    function connecterBoutonDirection(
+      idBouton,
+      codeTouche
+    ) {
+      const bouton = document.getElementById(idBouton);
+
+      function activer(event) {
+        event.preventDefault();
+
+        touches[codeTouche] = true;
+        bouton.classList.add("active");
+
+        canvas.focus();
+      }
+
+      function desactiver(event) {
+        event.preventDefault();
+
+        touches[codeTouche] = false;
+        bouton.classList.remove("active");
+      }
+
+      bouton.addEventListener("pointerdown", activer);
+      bouton.addEventListener("pointerup", desactiver);
+      bouton.addEventListener("pointercancel", desactiver);
+      bouton.addEventListener("pointerleave", desactiver);
+    }
+
+    connecterBoutonDirection(
+      "touch-up",
+      "ArrowUp"
+    );
+
+    connecterBoutonDirection(
+      "touch-down",
+      "ArrowDown"
+    );
+
+    connecterBoutonDirection(
+      "touch-left",
+      "ArrowLeft"
+    );
+
+    connecterBoutonDirection(
+      "touch-right",
+      "ArrowRight"
+    );
+
+    const boutonAttaque =
+      document.getElementById("touch-attack");
+
+    boutonAttaque.addEventListener(
+      "pointerdown",
+      function (event) {
+        event.preventDefault();
+
+        if (jeuTermine) {
+          recommencerAventure();
+        } else if (transitionTableau) {
+          chargerTableau(indexTableau + 1);
+        } else {
+          demarrerAttaque();
+        }
+
+        boutonAttaque.classList.add("active");
+        canvas.focus();
+      }
+    );
+
+    boutonAttaque.addEventListener(
+      "pointerup",
+      function () {
+        boutonAttaque.classList.remove("active");
+      }
+    );
+
+    /* =========================================================
+       ATTAQUE
        ========================================================= */
 
     function demarrerAttaque() {
@@ -1003,8 +1519,12 @@
       }
 
       joueur.attaqueActive = true;
-      joueur.tempsAttaque = joueur.dureeAttaque;
-      joueur.rechargeAttaque = joueur.dureeRecharge;
+      joueur.tempsAttaque =
+        joueur.dureeAttaque;
+
+      joueur.rechargeAttaque =
+        joueur.dureeRecharge;
+
       joueur.ennemisTouchesPendantAttaque.clear();
     }
 
@@ -1012,40 +1532,59 @@
       const longueur = 30;
       const epaisseur = 10;
 
-      switch (joueur.direction) {
-        case "haut":
-          return {
-            x: joueur.x + joueur.largeur / 2 - epaisseur / 2,
-            y: joueur.y - longueur,
-            largeur: epaisseur,
-            hauteur: longueur
-          };
+      if (joueur.direction === "haut") {
+        return {
+          x:
+            joueur.x +
+            joueur.largeur / 2 -
+            epaisseur / 2,
 
-        case "bas":
-          return {
-            x: joueur.x + joueur.largeur / 2 - epaisseur / 2,
-            y: joueur.y + joueur.hauteur,
-            largeur: epaisseur,
-            hauteur: longueur
-          };
+          y: joueur.y - longueur,
 
-        case "gauche":
-          return {
-            x: joueur.x - longueur,
-            y: joueur.y + joueur.hauteur / 2 - epaisseur / 2,
-            largeur: longueur,
-            hauteur: epaisseur
-          };
-
-        case "droite":
-        default:
-          return {
-            x: joueur.x + joueur.largeur,
-            y: joueur.y + joueur.hauteur / 2 - epaisseur / 2,
-            largeur: longueur,
-            hauteur: epaisseur
-          };
+          largeur: epaisseur,
+          hauteur: longueur
+        };
       }
+
+      if (joueur.direction === "bas") {
+        return {
+          x:
+            joueur.x +
+            joueur.largeur / 2 -
+            epaisseur / 2,
+
+          y: joueur.y + joueur.hauteur,
+
+          largeur: epaisseur,
+          hauteur: longueur
+        };
+      }
+
+      if (joueur.direction === "gauche") {
+        return {
+          x: joueur.x - longueur,
+
+          y:
+            joueur.y +
+            joueur.hauteur / 2 -
+            epaisseur / 2,
+
+          largeur: longueur,
+          hauteur: epaisseur
+        };
+      }
+
+      return {
+        x: joueur.x + joueur.largeur,
+
+        y:
+          joueur.y +
+          joueur.hauteur / 2 -
+          epaisseur / 2,
+
+        largeur: longueur,
+        hauteur: epaisseur
+      };
     }
 
     function verifierCoupsEpee() {
@@ -1057,49 +1596,62 @@
 
       for (const ennemi of ennemis) {
         if (
-          joueur.ennemisTouchesPendantAttaque.has(ennemi.identifiant)
+          joueur.ennemisTouchesPendantAttaque.has(
+            ennemi.identifiant
+          )
         ) {
           continue;
         }
 
-        if (rectanglesSeTouchent(epee, ennemi)) {
-          joueur.ennemisTouchesPendantAttaque.add(ennemi.identifiant);
+        if (!rectanglesSeTouchent(epee, ennemi)) {
+          continue;
+        }
 
-          ennemi.vie -= 1;
-          ennemi.tempsRecul = 0.12;
+        joueur.ennemisTouchesPendantAttaque.add(
+          ennemi.identifiant
+        );
 
-          switch (joueur.direction) {
-            case "haut":
-              ennemi.reculX = 0;
-              ennemi.reculY = -140;
-              break;
+        ennemi.vie -= joueur.degatsEpee;
+        ennemi.tempsRecul = 0.12;
 
-            case "bas":
-              ennemi.reculX = 0;
-              ennemi.reculY = 140;
-              break;
+        if (joueur.direction === "haut") {
+          ennemi.reculX = 0;
+          ennemi.reculY = -140;
+        }
 
-            case "gauche":
-              ennemi.reculX = -140;
-              ennemi.reculY = 0;
-              break;
+        if (joueur.direction === "bas") {
+          ennemi.reculX = 0;
+          ennemi.reculY = 140;
+        }
 
-            case "droite":
-              ennemi.reculX = 140;
-              ennemi.reculY = 0;
-              break;
-          }
+        if (joueur.direction === "gauche") {
+          ennemi.reculX = -140;
+          ennemi.reculY = 0;
+        }
+
+        if (joueur.direction === "droite") {
+          ennemi.reculX = 140;
+          ennemi.reculY = 0;
         }
       }
+
+      const nombreAvant = ennemis.length;
 
       ennemis = ennemis.filter(function (ennemi) {
         return ennemi.vie > 0;
       });
 
-      if (ennemis.length === 0 && !sortieOuverte) {
-        sortieOuverte = true;
-        messageTemporaire = "LA PORTE EST OUVERTE !";
-        tempsMessage = 2;
+      const ennemisElimines =
+        nombreAvant - ennemis.length;
+
+      if (ennemisElimines > 0) {
+        statistiques.ennemisVaincus +=
+          ennemisElimines;
+
+        ajouterScore(ennemisElimines * 100);
+
+        verifierProgressionQuete();
+        verifierOuvertureSortie();
       }
     }
 
@@ -1134,25 +1686,44 @@
       if (gauche) directionX -= 1;
       if (droite) directionX += 1;
 
-      if (directionX !== 0 && directionY !== 0) {
+      if (
+        directionX !== 0 &&
+        directionY !== 0
+      ) {
         directionX *= Math.SQRT1_2;
         directionY *= Math.SQRT1_2;
       }
 
-      if (Math.abs(directionX) > Math.abs(directionY)) {
-        if (directionX < 0) joueur.direction = "gauche";
-        if (directionX > 0) joueur.direction = "droite";
+      if (
+        Math.abs(directionX) >
+        Math.abs(directionY)
+      ) {
+        if (directionX < 0) {
+          joueur.direction = "gauche";
+        }
+
+        if (directionX > 0) {
+          joueur.direction = "droite";
+        }
       } else if (directionY !== 0) {
-        if (directionY < 0) joueur.direction = "haut";
-        if (directionY > 0) joueur.direction = "bas";
+        if (directionY < 0) {
+          joueur.direction = "haut";
+        }
+
+        if (directionY > 0) {
+          joueur.direction = "bas";
+        }
       }
 
-      const ralentissement = joueur.attaqueActive ? 0.7 : 1;
+      const vitesse =
+        joueur.vitesseBase *
+        joueur.multiplicateurVitesse *
+        (joueur.attaqueActive ? 0.7 : 1);
 
       deplacerAvecCollisions(
         joueur,
-        directionX * joueur.vitesse * ralentissement * deltaTime,
-        directionY * joueur.vitesse * ralentissement * deltaTime
+        directionX * vitesse * deltaTime,
+        directionY * vitesse * deltaTime
       );
 
       if (joueur.attaqueActive) {
@@ -1160,13 +1731,16 @@
 
         if (joueur.tempsAttaque <= 0) {
           joueur.attaqueActive = false;
-          joueur.tempsAttaque = 0;
         }
       }
 
       if (joueur.rechargeAttaque > 0) {
         joueur.rechargeAttaque -= deltaTime;
-        joueur.rechargeAttaque = Math.max(0, joueur.rechargeAttaque);
+
+        joueur.rechargeAttaque = Math.max(
+          0,
+          joueur.rechargeAttaque
+        );
       }
 
       if (joueur.invulnerable) {
@@ -1174,7 +1748,6 @@
 
         if (joueur.tempsInvulnerabilite <= 0) {
           joueur.invulnerable = false;
-          joueur.tempsInvulnerabilite = 0;
         }
       }
     }
@@ -1197,59 +1770,62 @@
           continue;
         }
 
-        ennemi.tempsAvantChangementDirection -= deltaTime;
+        ennemi.tempsAvantChangementDirection -=
+          deltaTime;
 
-        if (ennemi.tempsAvantChangementDirection <= 0) {
+        if (
+          ennemi.tempsAvantChangementDirection <= 0
+        ) {
           choisirDirectionEnnemi(ennemi);
         }
 
         const collisions = deplacerAvecCollisions(
           ennemi,
-          ennemi.directionX * ennemi.vitesse * deltaTime,
-          ennemi.directionY * ennemi.vitesse * deltaTime
+
+          ennemi.directionX *
+          ennemi.vitesse *
+          deltaTime,
+
+          ennemi.directionY *
+          ennemi.vitesse *
+          deltaTime
         );
 
-        if (collisions.collisionX || collisions.collisionY) {
+        if (
+          collisions.collisionX ||
+          collisions.collisionY
+        ) {
           choisirDirectionEnnemi(ennemi);
         }
       }
     }
 
-    /* =========================================================
-       DÉGÂTS SUBIS PAR LE JOUEUR
-       ========================================================= */
-
-    function verifierCollisionsEnnemisJoueur() {
-      if (joueur.invulnerable || jeuTermine || transitionTableau) {
+    function verifierDegatsJoueur() {
+      if (
+        joueur.invulnerable ||
+        jeuTermine ||
+        transitionTableau
+      ) {
         return;
       }
 
       for (const ennemi of ennemis) {
-        if (!rectanglesSeTouchent(joueur, ennemi)) {
+        if (
+          !rectanglesSeTouchent(joueur, ennemi)
+        ) {
           continue;
         }
 
         joueur.vie -= 1;
+
         joueur.invulnerable = true;
-        joueur.tempsInvulnerabilite = joueur.dureeInvulnerabilite;
 
-        const centreJoueurX = joueur.x + joueur.largeur / 2;
-        const centreJoueurY = joueur.y + joueur.hauteur / 2;
-        const centreEnnemiX = ennemi.x + ennemi.largeur / 2;
-        const centreEnnemiY = ennemi.y + ennemi.hauteur / 2;
-
-        let reculX = centreJoueurX - centreEnnemiX;
-        let reculY = centreJoueurY - centreEnnemiY;
-
-        const longueur = Math.hypot(reculX, reculY) || 1;
-
-        reculX = reculX / longueur * 28;
-        reculY = reculY / longueur * 28;
-
-        deplacerAvecCollisions(joueur, reculX, reculY);
+        joueur.tempsInvulnerabilite =
+          joueur.dureeInvulnerabilite;
 
         if (joueur.vie <= 0) {
           joueur.vie = 0;
+
           jeuTermine = true;
           victoireFinale = false;
         }
@@ -1259,28 +1835,15 @@
     }
 
     /* =========================================================
-       PASSAGE VERS LE TABLEAU SUIVANT
-       ========================================================= */
-
-    function verifierSortie() {
-      if (!sortieOuverte || transitionTableau || jeuTermine) {
-        return;
-      }
-
-      if (
-        joueur.x + joueur.largeur >
-        LARGEUR_CANVAS - 5
-      ) {
-        transitionTableau = true;
-      }
-    }
-
-    /* =========================================================
        MISE À JOUR PRINCIPALE
        ========================================================= */
 
     function update(deltaTime) {
-      if (jeuEnPause || jeuTermine || transitionTableau) {
+      if (
+        jeuEnPause ||
+        jeuTermine ||
+        transitionTableau
+      ) {
         return;
       }
 
@@ -1292,29 +1855,45 @@
 
       mettreAJourJoueur(deltaTime);
       mettreAJourEnnemis(deltaTime);
+
       verifierCoupsEpee();
-      verifierCollisionsEnnemisJoueur();
+      verifierDegatsJoueur();
+      verifierCollectes();
+      verifierOuvertureSortie();
       verifierSortie();
     }
 
     /* =========================================================
-       DESSIN DU SOL ET DES OBSTACLES
+       DESSIN DE LA CARTE
        ========================================================= */
 
     function dessinerSol(x, y, colonne, ligne) {
-      ctx.fillStyle = tableauActuel.couleurSol;
-      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
+      ctx.fillStyle =
+        tableauActuel.couleurSol;
 
-      ctx.fillStyle = tableauActuel.couleurDetail;
+      ctx.fillRect(
+        x,
+        y,
+        TAILLE_CASE,
+        TAILLE_CASE
+      );
 
-      const motif = (colonne * 7 + ligne * 11) % 5;
+      ctx.fillStyle =
+        tableauActuel.couleurDetail;
+
+      const motif =
+        (colonne * 7 + ligne * 11) % 5;
 
       if (motif === 0) {
         ctx.fillRect(x + 5, y + 7, 3, 3);
         ctx.fillRect(x + 22, y + 20, 4, 3);
-      } else if (motif === 1) {
+      }
+
+      if (motif === 1) {
         ctx.fillRect(x + 16, y + 6, 3, 5);
-      } else if (motif === 2) {
+      }
+
+      if (motif === 2) {
         ctx.fillRect(x + 8, y + 22, 6, 2);
       }
     }
@@ -1335,32 +1914,37 @@
 
     function dessinerMur(x, y) {
       ctx.fillStyle = "#735235";
-      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
+      ctx.fillRect(x, y, 32, 32);
 
       ctx.fillStyle = "#3e2c21";
-      ctx.fillRect(x, y + 14, TAILLE_CASE, 3);
+      ctx.fillRect(x, y + 14, 32, 3);
       ctx.fillRect(x + 14, y, 3, 14);
       ctx.fillRect(x + 6, y + 17, 3, 15);
       ctx.fillRect(x + 23, y + 17, 3, 15);
 
       ctx.fillStyle = "#9b7651";
       ctx.fillRect(x + 3, y + 3, 9, 3);
-      ctx.fillRect(x + 19, y + 20, 4, 3);
     }
 
-    function dessinerEau(x, y, colonne, ligne) {
+    function dessinerEau(
+      x,
+      y,
+      colonne,
+      ligne
+    ) {
       ctx.fillStyle = "#286f9d";
-      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
+      ctx.fillRect(x, y, 32, 32);
 
       const decalage =
-        Math.floor(tempsEcoule * 12 + colonne * 3 + ligne * 5) % 16;
+        Math.floor(
+          tempsEcoule * 12 +
+          colonne * 3 +
+          ligne * 5
+        ) % 16;
 
       ctx.fillStyle = "#5db5cf";
       ctx.fillRect(x + decalage, y + 8, 10, 3);
-      ctx.fillRect(x + ((decalage + 11) % 18), y + 22, 9, 3);
-
-      ctx.fillStyle = "#174e78";
-      ctx.fillRect(x + 2, y + 15, 14, 3);
+      ctx.fillRect(x + 5, y + 22, 10, 3);
     }
 
     function dessinerRoche(x, y) {
@@ -1368,164 +1952,313 @@
       ctx.fillRect(x + 4, y + 8, 24, 20);
       ctx.fillRect(x + 8, y + 4, 16, 24);
 
-      ctx.fillStyle = "#5c6669";
+      ctx.fillStyle = "#626c70";
       ctx.fillRect(x + 9, y + 7, 8, 5);
-      ctx.fillRect(x + 6, y + 15, 5, 7);
-
-      ctx.fillStyle = "#1c2021";
-      ctx.fillRect(x + 20, y + 18, 6, 7);
     }
 
-    function dessinerPorte(x, y, ouverte) {
-      if (ouverte) {
-        ctx.fillStyle = "#111111";
-        ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE * 2);
+    function dessinerPorte() {
+      const x = porteSortie.x;
+      const y = porteSortie.y;
 
-        ctx.fillStyle = "#ffe46b";
-        ctx.fillRect(x + 6, y + 5, 5, 5);
-        ctx.fillRect(x + 6, y + 49, 5, 5);
+      if (sortieOuverte) {
+        ctx.fillStyle = "#101010";
+        ctx.fillRect(x, y, 32, 64);
 
         ctx.fillStyle = "#7de0ff";
-        ctx.fillRect(x + 16, y + 12, 8, 40);
+        ctx.fillRect(x + 15, y + 8, 8, 48);
+
+        ctx.fillStyle = "#fff178";
+        ctx.fillRect(x + 6, y + 9, 5, 5);
+        ctx.fillRect(x + 6, y + 49, 5, 5);
       } else {
         ctx.fillStyle = "#5e371f";
-        ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE * 2);
+        ctx.fillRect(x, y, 32, 64);
 
         ctx.fillStyle = "#a46935";
         ctx.fillRect(x + 4, y + 4, 24, 56);
 
-        ctx.fillStyle = "#392014";
+        ctx.fillStyle = "#372015";
         ctx.fillRect(x + 14, y + 4, 4, 56);
 
         ctx.fillStyle = "#d9b04c";
-        ctx.fillRect(x + 6, y + 14, 20, 4);
-        ctx.fillRect(x + 6, y + 43, 20, 4);
+        ctx.fillRect(x + 6, y + 15, 20, 4);
+        ctx.fillRect(x + 6, y + 44, 20, 4);
       }
     }
 
     function dessinerCarte() {
-      for (let ligne = 0; ligne < LIGNES; ligne++) {
-        for (let colonne = 0; colonne < COLONNES; colonne++) {
-          const x = colonne * TAILLE_CASE;
-          const y = HAUTEUR_INTERFACE + ligne * TAILLE_CASE;
+      for (
+        let ligne = 0;
+        ligne < LIGNES;
+        ligne++
+      ) {
+        for (
+          let colonne = 0;
+          colonne < COLONNES;
+          colonne++
+        ) {
+          const x =
+            colonne * TAILLE_CASE;
 
-          const typeCase = tableauActuel.carte[ligne][colonne];
+          const y =
+            HAUTEUR_INTERFACE +
+            ligne * TAILLE_CASE;
 
-          dessinerSol(x, y, colonne, ligne);
+          const typeCase =
+            tableauActuel.carte[ligne][colonne];
 
-          const estEmplacementPorte =
+          dessinerSol(
+            x,
+            y,
+            colonne,
+            ligne
+          );
+
+          const emplacementPorte =
             colonne === COLONNES - 1 &&
-            (ligne === 5 || ligne === 6);
+            (ligne === 4 || ligne === 5);
 
-          if (estEmplacementPorte) {
+          if (emplacementPorte) {
             continue;
           }
 
           if (typeCase === ARBRE) {
             dessinerArbre(x, y);
-          } else if (typeCase === MUR) {
+          }
+
+          if (typeCase === MUR) {
             dessinerMur(x, y);
-          } else if (typeCase === EAU) {
-            dessinerEau(x, y, colonne, ligne);
-          } else if (typeCase === ROCHE) {
+          }
+
+          if (typeCase === EAU) {
+            dessinerEau(
+              x,
+              y,
+              colonne,
+              ligne
+            );
+          }
+
+          if (typeCase === ROCHE) {
             dessinerRoche(x, y);
           }
         }
       }
 
-      dessinerPorte(
-        porteSortie.x,
-        porteSortie.y,
-        sortieOuverte
-      );
+      dessinerPorte();
     }
 
     /* =========================================================
-       DESSIN DES CŒURS
+       DESSIN DES TRÉSORS
        ========================================================= */
 
-    function dessinerCoeur(x, y, rempli) {
-      const couleur = rempli ? "#e53b44" : "#4d2729";
+    function dessinerTresors() {
+      for (const tresor of tresorsActifs) {
+        if (tresor.ramasse) {
+          continue;
+        }
 
-      ctx.fillStyle = "#f7d9a0";
-      ctx.fillRect(x + 4, y, 8, 4);
-      ctx.fillRect(x + 16, y, 8, 4);
-      ctx.fillRect(x, y + 4, 28, 12);
-      ctx.fillRect(x + 4, y + 16, 20, 8);
-      ctx.fillRect(x + 8, y + 24, 12, 4);
+        const x = Math.round(tresor.x);
+        const y = Math.round(tresor.y);
 
-      ctx.fillStyle = couleur;
-      ctx.fillRect(x + 5, y + 4, 7, 4);
-      ctx.fillRect(x + 16, y + 4, 7, 4);
-      ctx.fillRect(x + 4, y + 8, 20, 8);
-      ctx.fillRect(x + 8, y + 16, 12, 8);
-      ctx.fillRect(x + 10, y + 24, 8, 2);
+        if (tresor.type === "or") {
+          ctx.fillStyle = "#fff17a";
+
+          ctx.fillRect(
+            x + 3,
+            y,
+            tresor.largeur - 6,
+            tresor.hauteur
+          );
+
+          ctx.fillRect(
+            x,
+            y + 3,
+            tresor.largeur,
+            tresor.hauteur - 6
+          );
+
+          ctx.fillStyle = "#c68d24";
+
+          ctx.fillRect(
+            x + 6,
+            y + 4,
+            4,
+            8
+          );
+        } else {
+          ctx.fillStyle = "#56311d";
+          ctx.fillRect(
+            x,
+            y,
+            tresor.largeur,
+            tresor.hauteur
+          );
+
+          ctx.fillStyle = "#a7672d";
+          ctx.fillRect(
+            x + 2,
+            y + 3,
+            tresor.largeur - 4,
+            8
+          );
+
+          ctx.fillStyle = "#e7c34f";
+          ctx.fillRect(
+            x + 10,
+            y + 8,
+            5,
+            10
+          );
+
+          ctx.fillRect(
+            x,
+            y + 11,
+            tresor.largeur,
+            3
+          );
+        }
+      }
+    }
+
+    function dessinerArtefacts() {
+      for (const artefact of artefactsActifs) {
+        if (artefact.ramasse) {
+          continue;
+        }
+
+        const definition =
+          definitionsArtefacts[artefact.id];
+
+        const x = Math.round(artefact.x);
+        const y = Math.round(artefact.y);
+
+        /*
+          Halo autour de l'artéfact.
+        */
+        const pulsation =
+          Math.floor(tempsEcoule * 8) % 2;
+
+        ctx.fillStyle =
+          pulsation === 0
+            ? "#fff19a"
+            : "#ffbc45";
+
+        ctx.fillRect(
+          x - 3,
+          y - 3,
+          artefact.largeur + 6,
+          artefact.hauteur + 6
+        );
+
+        ctx.fillStyle = "#713e91";
+
+        ctx.fillRect(
+          x,
+          y,
+          artefact.largeur,
+          artefact.hauteur
+        );
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 14px monospace";
+        ctx.textAlign = "center";
+
+        ctx.fillText(
+          definition.symbole,
+          x + artefact.largeur / 2,
+          y + 16
+        );
+
+        ctx.textAlign = "left";
+      }
     }
 
     /* =========================================================
-       DESSIN DE L'INTERFACE DU CANVAS
+       DESSIN DES ENNEMIS
        ========================================================= */
 
-    function dessinerInterface() {
-      ctx.fillStyle = "#171b1b";
-      ctx.fillRect(0, 0, LARGEUR_CANVAS, HAUTEUR_INTERFACE);
+    function dessinerEnnemis() {
+      for (const ennemi of ennemis) {
+        const x = Math.round(ennemi.x);
+        const y = Math.round(ennemi.y);
 
-      ctx.fillStyle = "#d7ba62";
-      ctx.fillRect(0, HAUTEUR_INTERFACE - 4, LARGEUR_CANVAS, 4);
+        ctx.fillStyle =
+          "rgba(0, 0, 0, 0.25)";
 
-      ctx.fillStyle = "#f4e6a4";
-      ctx.font = "bold 13px monospace";
-      ctx.textAlign = "left";
-      ctx.fillText(
-        "TABLEAU " + (indexTableau + 1) + " / " + tableaux.length,
-        16,
-        18
-      );
+        ctx.fillRect(
+          x + 3,
+          y + ennemi.hauteur - 1,
+          ennemi.largeur,
+          5
+        );
 
-      for (let i = 0; i < joueur.vieMaximum; i++) {
-        dessinerCoeur(
-          18 + i * 36,
-          28,
-          i < joueur.vie
+        ctx.fillStyle =
+          ennemi.vieMaximum >= 5
+            ? "#822029"
+            : "#c9333e";
+
+        ctx.fillRect(
+          x,
+          y,
+          ennemi.largeur,
+          ennemi.hauteur
+        );
+
+        ctx.fillStyle = "#7c1f28";
+
+        ctx.fillRect(
+          x,
+          y + ennemi.hauteur - 7,
+          ennemi.largeur,
+          7
+        );
+
+        ctx.fillStyle = "#ffffff";
+
+        ctx.fillRect(x + 5, y + 7, 5, 5);
+        ctx.fillRect(x + 14, y + 7, 5, 5);
+
+        ctx.fillStyle = "#111111";
+
+        ctx.fillRect(x + 7, y + 8, 2, 3);
+        ctx.fillRect(x + 15, y + 8, 2, 3);
+
+        const ratioVie =
+          ennemi.vie / ennemi.vieMaximum;
+
+        ctx.fillStyle = "#35171a";
+
+        ctx.fillRect(
+          x,
+          y - 8,
+          ennemi.largeur,
+          4
+        );
+
+        ctx.fillStyle = "#ff765d";
+
+        ctx.fillRect(
+          x,
+          y - 8,
+          Math.floor(
+            ennemi.largeur * ratioVie
+          ),
+          4
         );
       }
-
-      ctx.textAlign = "center";
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 12px monospace";
-      ctx.fillText(
-        tableauActuel.nom.replace(/^TABLEAU \d+ — /, ""),
-        LARGEUR_CANVAS / 2,
-        21
-      );
-
-      ctx.textAlign = "right";
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "13px monospace";
-      ctx.fillText(
-        "ENNEMIS : " + ennemis.length,
-        LARGEUR_CANVAS - 16,
-        25
-      );
-
-      ctx.fillStyle = sortieOuverte ? "#8bff9e" : "#c5d7c5";
-      ctx.fillText(
-        sortieOuverte ? "SORTIE OUVERTE" : "PORTE FERMÉE",
-        LARGEUR_CANVAS - 16,
-        47
-      );
-
-      ctx.textAlign = "left";
     }
 
     /* =========================================================
-       DESSIN DU JOUEUR
+       DESSIN DU JOUEUR ET DE L'ÉPÉE
        ========================================================= */
 
     function dessinerJoueur() {
       if (joueur.invulnerable) {
         const visible =
-          Math.floor(joueur.tempsInvulnerabilite * 14) % 2 === 0;
+          Math.floor(
+            joueur.tempsInvulnerabilite * 14
+          ) % 2 === 0;
 
         if (!visible) {
           return;
@@ -1535,23 +2268,50 @@
       const x = Math.round(joueur.x);
       const y = Math.round(joueur.y);
 
-      ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
-      ctx.fillRect(x + 3, y + joueur.hauteur - 1, joueur.largeur, 5);
+      ctx.fillStyle =
+        "rgba(0, 0, 0, 0.28)";
+
+      ctx.fillRect(
+        x + 3,
+        y + joueur.hauteur - 1,
+        joueur.largeur,
+        5
+      );
 
       ctx.fillStyle = "#2ea043";
-      ctx.fillRect(x, y, joueur.largeur, joueur.hauteur);
+
+      ctx.fillRect(
+        x,
+        y,
+        joueur.largeur,
+        joueur.hauteur
+      );
 
       ctx.fillStyle = "#14672c";
-      ctx.fillRect(x, y + joueur.hauteur - 7, joueur.largeur, 7);
+
+      ctx.fillRect(
+        x,
+        y + joueur.hauteur - 7,
+        joueur.largeur,
+        7
+      );
 
       ctx.fillStyle = "#f0bd7a";
-      ctx.fillRect(x + 5, y + 5, 14, 10);
+
+      ctx.fillRect(
+        x + 5,
+        y + 5,
+        14,
+        10
+      );
 
       ctx.fillStyle = "#17682d";
 
       if (joueur.direction === "gauche") {
         ctx.fillRect(x - 5, y + 1, 14, 8);
-      } else if (joueur.direction === "droite") {
+      } else if (
+        joueur.direction === "droite"
+      ) {
         ctx.fillRect(x + 15, y + 1, 14, 8);
       } else {
         ctx.fillRect(x + 3, y, 18, 7);
@@ -1559,28 +2319,20 @@
 
       ctx.fillStyle = "#171717";
 
-      if (joueur.direction === "gauche") {
-        ctx.fillRect(x + 6, y + 8, 3, 3);
-      } else if (joueur.direction === "droite") {
-        ctx.fillRect(x + 15, y + 8, 3, 3);
-      } else {
-        ctx.fillRect(x + 8, y + 8, 3, 3);
-        ctx.fillRect(x + 14, y + 8, 3, 3);
-      }
+      ctx.fillRect(x + 8, y + 8, 3, 3);
+      ctx.fillRect(x + 14, y + 8, 3, 3);
     }
-
-    /* =========================================================
-       DESSIN DE L'ÉPÉE
-       ========================================================= */
 
     function dessinerEpee() {
       if (!joueur.attaqueActive) {
         return;
       }
 
-      const epee = obtenirRectangleEpee();
+      const epee =
+        obtenirRectangleEpee();
 
       ctx.fillStyle = "#ffe45e";
+
       ctx.fillRect(
         Math.round(epee.x),
         Math.round(epee.y),
@@ -1598,276 +2350,469 @@
           Math.round(epee.x + 2),
           Math.round(epee.y + 2),
           3,
-          Math.max(2, epee.hauteur - 4)
+          Math.max(
+            2,
+            epee.hauteur - 4
+          )
         );
       } else {
         ctx.fillRect(
           Math.round(epee.x + 2),
           Math.round(epee.y + 2),
-          Math.max(2, epee.largeur - 4),
+          Math.max(
+            2,
+            epee.largeur - 4
+          ),
           3
         );
       }
-
-      ctx.fillStyle = "#c68c2d";
-
-      if (joueur.direction === "haut") {
-        ctx.fillRect(joueur.x + 5, joueur.y - 4, 14, 5);
-      } else if (joueur.direction === "bas") {
-        ctx.fillRect(
-          joueur.x + 5,
-          joueur.y + joueur.hauteur - 1,
-          14,
-          5
-        );
-      } else if (joueur.direction === "gauche") {
-        ctx.fillRect(joueur.x - 4, joueur.y + 5, 5, 14);
-      } else {
-        ctx.fillRect(
-          joueur.x + joueur.largeur - 1,
-          joueur.y + 5,
-          5,
-          14
-        );
-      }
     }
 
     /* =========================================================
-       DESSIN DES ENNEMIS
+       INTERFACE DU JEU
        ========================================================= */
 
-    function dessinerEnnemi(ennemi) {
-      const x = Math.round(ennemi.x);
-      const y = Math.round(ennemi.y);
+    function dessinerCoeur(x, y, rempli) {
+      ctx.fillStyle =
+        rempli ? "#e53b44" : "#4d2729";
 
-      ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
-      ctx.fillRect(x + 3, y + ennemi.hauteur - 1, ennemi.largeur, 5);
+      ctx.fillRect(x + 4, y, 8, 4);
+      ctx.fillRect(x + 16, y, 8, 4);
+      ctx.fillRect(x, y + 4, 28, 10);
+      ctx.fillRect(x + 4, y + 14, 20, 7);
+      ctx.fillRect(x + 8, y + 21, 12, 4);
+    }
 
-      ctx.fillStyle = ennemi.vieMaximum >= 4 ? "#8e2029" : "#c9333e";
-      ctx.fillRect(x, y, ennemi.largeur, ennemi.hauteur);
+    function dessinerInterface() {
+      ctx.fillStyle = "#171b1b";
 
-      ctx.fillStyle = "#7c1f28";
-      ctx.fillRect(x, y + ennemi.hauteur - 7, ennemi.largeur, 7);
-
-      ctx.fillStyle = "#f0d29b";
-      ctx.fillRect(x + 2, y - 4, 5, 6);
-      ctx.fillRect(x + 17, y - 4, 5, 6);
-
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(x + 5, y + 7, 5, 5);
-      ctx.fillRect(x + 14, y + 7, 5, 5);
-
-      ctx.fillStyle = "#141414";
-      ctx.fillRect(x + 7, y + 8, 2, 3);
-      ctx.fillRect(x + 15, y + 8, 2, 3);
-
-      const ratioVie = ennemi.vie / ennemi.vieMaximum;
-
-      ctx.fillStyle = "#35171a";
-      ctx.fillRect(x, y - 9, ennemi.largeur, 4);
-
-      ctx.fillStyle = "#ff765d";
       ctx.fillRect(
-        x,
-        y - 9,
-        Math.floor(ennemi.largeur * ratioVie),
+        0,
+        0,
+        LARGEUR_CANVAS,
+        HAUTEUR_INTERFACE
+      );
+
+      ctx.fillStyle = "#d7ba62";
+
+      ctx.fillRect(
+        0,
+        HAUTEUR_INTERFACE - 4,
+        LARGEUR_CANVAS,
         4
       );
-    }
 
-    function dessinerEnnemis() {
-      for (const ennemi of ennemis) {
-        dessinerEnnemi(ennemi);
+      ctx.fillStyle = "#f4e6a4";
+      ctx.font = "bold 12px monospace";
+      ctx.textAlign = "left";
+
+      ctx.fillText(
+        "TABLEAU " +
+        (indexTableau + 1) +
+        "/3",
+        14,
+        17
+      );
+
+      for (
+        let i = 0;
+        i < joueur.vieMaximum;
+        i++
+      ) {
+        dessinerCoeur(
+          15 + i * 31,
+          27,
+          i < joueur.vie
+        );
       }
-    }
 
-    /* =========================================================
-       MESSAGES TEMPORAIRES
-       ========================================================= */
+      ctx.fillStyle = "#ffe878";
+      ctx.font = "bold 13px monospace";
 
-    function dessinerMessageTemporaire() {
-      if (tempsMessage <= 0 || !messageTemporaire) {
-        return;
-      }
-
-      const largeur = 390;
-      const hauteur = 54;
-      const x = (LARGEUR_CANVAS - largeur) / 2;
-      const y = 80;
-
-      ctx.fillStyle = "rgba(12, 16, 12, 0.90)";
-      ctx.fillRect(x, y, largeur, hauteur);
-
-      ctx.fillStyle = "#dfc96f";
-      ctx.fillRect(x, y, largeur, 4);
-      ctx.fillRect(x, y + hauteur - 4, largeur, 4);
+      ctx.fillText(
+        "OR : " + statistiques.or,
+        14,
+        76
+      );
 
       ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 15px monospace";
-      ctx.textAlign = "center";
+
       ctx.fillText(
-        messageTemporaire,
-        LARGEUR_CANVAS / 2,
-        y + 33
+        "SCORE : " + statistiques.score,
+        135,
+        76
+      );
+
+      ctx.textAlign = "right";
+
+      ctx.fillText(
+        "ENNEMIS : " + ennemis.length,
+        LARGEUR_CANVAS - 14,
+        18
+      );
+
+      ctx.fillText(
+        "ARTÉFACTS : " +
+        artefactsObtenus.size +
+        "/3",
+        LARGEUR_CANVAS - 14,
+        39
+      );
+
+      const quete = obtenirQueteActuelle();
+
+      ctx.fillStyle = "#9cefa4";
+      ctx.font = "bold 11px monospace";
+
+      if (quete) {
+        const progression = Math.min(
+          quete.progression(),
+          quete.cible
+        );
+
+        ctx.fillText(
+          "QUÊTE : " +
+          quete.description +
+          " [" +
+          progression +
+          "/" +
+          quete.cible +
+          "]",
+          LARGEUR_CANVAS - 14,
+          60
+        );
+      } else {
+        ctx.fillText(
+          "TOUTES LES QUÊTES SONT TERMINÉES",
+          LARGEUR_CANVAS - 14,
+          60
+        );
+      }
+
+      ctx.fillStyle =
+        sortieOuverte
+          ? "#7fff9b"
+          : "#c9c9c9";
+
+      ctx.fillText(
+        sortieOuverte
+          ? "SORTIE OUVERTE"
+          : "SORTIE VERROUILLÉE",
+        LARGEUR_CANVAS - 14,
+        81
       );
 
       ctx.textAlign = "left";
     }
 
     /* =========================================================
-       ÉCRAN ENTRE LES TABLEAUX
+       MESSAGES ET ÉCRANS
        ========================================================= */
 
-    function dessinerTransitionTableau() {
-      if (!transitionTableau) {
+    function dessinerMessageTemporaire() {
+      if (
+        tempsMessage <= 0 ||
+        !messageTemporaire
+      ) {
         return;
       }
 
-      ctx.fillStyle = "rgba(5, 8, 5, 0.88)";
-      ctx.fillRect(0, 0, LARGEUR_CANVAS, HAUTEUR_CANVAS);
+      ctx.fillStyle =
+        "rgba(10, 14, 10, 0.92)";
 
-      ctx.fillStyle = "#d8c16b";
-      ctx.fillRect(74, 130, 364, 190);
-
-      ctx.fillStyle = "#151915";
-      ctx.fillRect(81, 137, 350, 176);
-
-      ctx.textAlign = "center";
-
-      ctx.fillStyle = "#82f39d";
-      ctx.font = "bold 27px monospace";
-      ctx.fillText(
-        "TABLEAU TERMINÉ",
-        LARGEUR_CANVAS / 2,
-        190
+      ctx.fillRect(
+        54,
+        111,
+        404,
+        50
       );
 
-      ctx.fillStyle = "#f1e5b5";
-      ctx.font = "15px monospace";
-      ctx.fillText(
-        "Le héros poursuit son aventure.",
-        LARGEUR_CANVAS / 2,
-        229
+      ctx.fillStyle = "#dfc96f";
+
+      ctx.fillRect(
+        54,
+        111,
+        404,
+        4
+      );
+
+      ctx.fillRect(
+        54,
+        157,
+        404,
+        4
       );
 
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 14px monospace";
-      ctx.fillText(
-        "APPUYEZ SUR ENTRÉE",
-        LARGEUR_CANVAS / 2,
-        273
-      );
+      ctx.textAlign = "center";
 
-      ctx.fillStyle = "#bdd0bd";
-      ctx.font = "12px monospace";
       ctx.fillText(
-        "ou sur le bouton ÉPÉE",
+        messageTemporaire,
         LARGEUR_CANVAS / 2,
-        295
+        142
       );
 
       ctx.textAlign = "left";
     }
 
-    /* =========================================================
-       ÉCRAN DE FIN
-       ========================================================= */
+    function dessinerTransition() {
+      if (!transitionTableau) {
+        return;
+      }
+
+      ctx.fillStyle =
+        "rgba(5, 8, 5, 0.9)";
+
+      ctx.fillRect(
+        0,
+        0,
+        LARGEUR_CANVAS,
+        HAUTEUR_CANVAS
+      );
+
+      ctx.fillStyle = "#d8c16b";
+      ctx.fillRect(70, 125, 372, 200);
+
+      ctx.fillStyle = "#151915";
+      ctx.fillRect(77, 132, 358, 186);
+
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "#82f39d";
+      ctx.font = "bold 26px monospace";
+
+      ctx.fillText(
+        "TABLEAU TERMINÉ",
+        LARGEUR_CANVAS / 2,
+        185
+      );
+
+      ctx.fillStyle = "#f1e5b5";
+      ctx.font = "14px monospace";
+
+      ctx.fillText(
+        "Trésors : " +
+        statistiques.tresorsRamasses,
+        LARGEUR_CANVAS / 2,
+        224
+      );
+
+      ctx.fillText(
+        "Score : " +
+        statistiques.score,
+        LARGEUR_CANVAS / 2,
+        248
+      );
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 13px monospace";
+
+      ctx.fillText(
+        "ENTRÉE OU ESPACE POUR CONTINUER",
+        LARGEUR_CANVAS / 2,
+        289
+      );
+
+      ctx.textAlign = "left";
+    }
 
     function dessinerEcranFin() {
       if (!jeuTermine) {
         return;
       }
 
-      ctx.fillStyle = "rgba(5, 7, 7, 0.90)";
-      ctx.fillRect(0, 0, LARGEUR_CANVAS, HAUTEUR_CANVAS);
+      ctx.fillStyle =
+        "rgba(5, 7, 7, 0.92)";
 
-      ctx.fillStyle = victoireFinale ? "#1f6b3a" : "#6b1f28";
-      ctx.fillRect(62, 110, 388, 224);
+      ctx.fillRect(
+        0,
+        0,
+        LARGEUR_CANVAS,
+        HAUTEUR_CANVAS
+      );
+
+      ctx.fillStyle =
+        victoireFinale
+          ? "#1f6b3a"
+          : "#6b1f28";
+
+      ctx.fillRect(55, 98, 402, 260);
 
       ctx.fillStyle = "#e9cf76";
-      ctx.fillRect(68, 116, 376, 212);
+      ctx.fillRect(62, 105, 388, 246);
 
       ctx.fillStyle = "#151818";
-      ctx.fillRect(76, 124, 360, 196);
+      ctx.fillRect(70, 113, 372, 230);
 
       ctx.textAlign = "center";
-      ctx.font = "bold 31px monospace";
 
-      ctx.fillStyle = victoireFinale ? "#7ff09b" : "#ff6571";
+      ctx.fillStyle =
+        victoireFinale
+          ? "#7ff09b"
+          : "#ff6571";
+
+      ctx.font = "bold 27px monospace";
+
       ctx.fillText(
-        victoireFinale ? "AVENTURE TERMINÉE !" : "GAME OVER",
+        victoireFinale
+          ? "AVENTURE TERMINÉE !"
+          : "GAME OVER",
         LARGEUR_CANVAS / 2,
-        180
+        158
       );
 
       ctx.fillStyle = "#f3e8bb";
-      ctx.font = "15px monospace";
+      ctx.font = "14px monospace";
 
       if (victoireFinale) {
         ctx.fillText(
-          "Les trois royaumes sont libérés.",
+          "Les trois artéfacts sont réunis.",
           LARGEUR_CANVAS / 2,
-          220
+          195
         );
 
         ctx.fillText(
-          "Temps : " + Math.floor(tempsEcoule) + " secondes",
+          "Score final : " +
+          statistiques.score,
           LARGEUR_CANVAS / 2,
-          245
+          224
+        );
+
+        ctx.fillText(
+          "Or : " +
+          statistiques.or +
+          "   Trésors : " +
+          statistiques.tresorsRamasses,
+          LARGEUR_CANVAS / 2,
+          250
+        );
+
+        ctx.fillText(
+          "Temps : " +
+          Math.floor(tempsEcoule) +
+          " secondes",
+          LARGEUR_CANVAS / 2,
+          276
         );
       } else {
         ctx.fillText(
-          "Le héros a perdu ses trois cœurs.",
+          "Le héros a perdu tous ses cœurs.",
           LARGEUR_CANVAS / 2,
-          225
+          218
         );
       }
 
       ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 14px monospace";
+      ctx.font = "bold 13px monospace";
+
       ctx.fillText(
         "APPUYEZ SUR UNE TOUCHE",
         LARGEUR_CANVAS / 2,
-        285
-      );
-
-      ctx.fillStyle = "#b9d9c0";
-      ctx.font = "12px monospace";
-      ctx.fillText(
-        "pour recommencer l'aventure",
-        LARGEUR_CANVAS / 2,
-        307
+        316
       );
 
       ctx.textAlign = "left";
     }
 
     /* =========================================================
-       RENDU PRINCIPAL
+       FENÊTRES HTML
+       ========================================================= */
+
+    function ouvrirModale(idModale) {
+      document
+        .getElementById(idModale)
+        .classList.add("visible");
+
+      jeuEnPause = true;
+    }
+
+    function fermerToutesLesModales() {
+      document
+        .querySelectorAll(".modal")
+        .forEach(function (modale) {
+          modale.classList.remove("visible");
+        });
+
+      jeuEnPause = false;
+      canvas.focus();
+    }
+
+    document
+      .getElementById("show-controls")
+      .addEventListener("click", function () {
+        ouvrirModale("controls-modal");
+      });
+
+    document
+      .getElementById("show-artifacts")
+      .addEventListener("click", function () {
+        mettreAJourListeArtefacts();
+        ouvrirModale("artifacts-modal");
+      });
+
+    document
+      .querySelectorAll("[data-close-modal]")
+      .forEach(function (bouton) {
+        bouton.addEventListener(
+          "click",
+          fermerToutesLesModales
+        );
+      });
+
+    document
+      .querySelectorAll(".modal")
+      .forEach(function (modale) {
+        modale.addEventListener(
+          "click",
+          function (event) {
+            if (event.target === modale) {
+              fermerToutesLesModales();
+            }
+          }
+        );
+      });
+
+    /* =========================================================
+       RENDU
        ========================================================= */
 
     function render() {
-      ctx.clearRect(0, 0, LARGEUR_CANVAS, HAUTEUR_CANVAS);
+      ctx.clearRect(
+        0,
+        0,
+        LARGEUR_CANVAS,
+        HAUTEUR_CANVAS
+      );
 
       dessinerCarte();
+      dessinerTresors();
+      dessinerArtefacts();
       dessinerEnnemis();
       dessinerEpee();
       dessinerJoueur();
+
       dessinerInterface();
       dessinerMessageTemporaire();
-      dessinerTransitionTableau();
+      dessinerTransition();
       dessinerEcranFin();
     }
 
     /* =========================================================
-       BOUCLE PRINCIPALE DU JEU
+       BOUCLE PRINCIPALE
        ========================================================= */
 
     function boucleJeu(tempsActuel) {
-      let deltaTime = (tempsActuel - ancienTemps) / 1000;
+      let deltaTime =
+        (tempsActuel - ancienTemps) / 1000;
+
       ancienTemps = tempsActuel;
 
-      deltaTime = limiter(deltaTime, 0, 0.05);
+      deltaTime = limiter(
+        deltaTime,
+        0,
+        0.05
+      );
 
       update(deltaTime);
       render();
@@ -1876,10 +2821,12 @@
     }
 
     /* =========================================================
-       DÉMARRAGE DE L'AVENTURE
+       DÉMARRAGE
        ========================================================= */
 
+    mettreAJourListeArtefacts();
     recommencerAventure();
+
     requestAnimationFrame(boucleJeu);
   </script>
 </body>
