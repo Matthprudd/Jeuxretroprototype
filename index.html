@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Quête du Héros — Jeu rétro HTML5</title>
+
+  <style>
+    /* =========================================================
+       STYLE GÉNÉRAL DE LA PAGE
+       ========================================================= */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      background: #101510;
+      color: white;
+      font-family: monospace;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    /* Conteneur principal du jeu */
+    #game-wrapper {
+      position: relative;
+      width: 512px;
+      max-width: 100%;
+      user-select: none;
+    }
+
+    /* Canvas rétro en 512 × 448 pixels */
+    canvas {
+      display: block;
+      width: 512px;
+      height: 448px;
+      max-width: 100%;
+      border: 6px solid #d8c37a;
+      background: #4d9d47;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      box-shadow:
+        0 0 0 4px #3e2c18,
+        0 12px 40px rgba(0, 0, 0, 0.65);
+    }
+
+    /* Petit rappel des commandes sous le jeu */
+    #instructions {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #f3e8bb;
+    }
+
+    /* Adaptation aux écrans étroits */
+    @media (max-width: 560px) {
+      body {
+        padding: 8px;
+      }
+
+      canvas {
+        height: auto;
+      }
+
+      #instructions {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="game-wrapper">
+    <canvas
+      id="game"
+      width="512"
+      height="448"
+      aria-label="Jeu d'aventure rétro"
+    ></canvas>
+
+    <div id="instructions">
+      Déplacement : flèches ou ZQSD — Attaque : Espace
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+
+    /* =========================================================
+       CONFIGURATION GÉNÉRALE
+       ========================================================= */
+
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    /* Désactive le lissage pour conserver un rendu rétro net */
+    ctx.imageSmoothingEnabled = false;
+
+    const LARGEUR_CANVAS = canvas.width;
+    const HAUTEUR_CANVAS = canvas.height;
+
+    /*
+      La zone supérieure sert d'interface.
+      La carte commence donc à Y = 64.
+    */
+    const HAUTEUR_INTERFACE = 64;
+
+    /*
+      Taille logique d'une case de la grille.
+      512 / 32 = 16 colonnes.
+      (448 - 64) / 32 = 12 lignes.
+    */
+    const TAILLE_CASE = 32;
+    const COLONNES = 16;
+    const LIGNES = 12;
+
+    /*
+      Types de cases :
+      0 = sol
+      1 = arbre
+      2 = mur
+      3 = eau
+    */
+    const SOL = 0;
+    const ARBRE = 1;
+    const MUR = 2;
+    const EAU = 3;
+
+    /* =========================================================
+       CARTE DU JEU
+       ========================================================= */
+
+    /*
+      Matrice représentant l'écran de jeu.
+      Chaque valeur correspond à une case solide ou libre.
+    */
+    const carte = [
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 2, 2, 0, 0, 0, 1, 1, 0, 0, 0, 2, 2, 0, 1],
+      [1, 0, 2, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 2, 0, 1],
+      [1, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 0, 0, 0, 1],
+      [1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 0, 1],
+      [1, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 0, 1],
+      [1, 0, 2, 0, 1, 0, 2, 0, 0, 1, 1, 0, 0, 0, 0, 1],
+      [1, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 1, 0, 2, 2, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    ];
+
+    /* =========================================================
+       GESTION DU CLAVIER
+       ========================================================= */
+
+    const touches = Object.create(null);
+
+    /*
+      Certaines touches du clavier doivent être interceptées afin
+      d'empêcher la page de défiler pendant le jeu.
+    */
+    const touchesBloquees = new Set([
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "Space"
+    ]);
+
+    window.addEventListener("keydown", function (event) {
+      if (touchesBloquees.has(event.code)) {
+        event.preventDefault();
+      }
+
+      touches[event.code] = true;
+
+      /*
+        Si le joueur est sur l'écran de fin, n'importe quelle touche
+        permet de recommencer la partie.
+      */
+      if (jeuTermine) {
+        recommencerJeu();
+        return;
+      }
+
+      /*
+        L'attaque ne doit être déclenchée qu'une fois par pression.
+        event.repeat évite de relancer l'attaque automatiquement
+        lorsque la touche Espace reste enfoncée.
+      */
+      if (event.code === "Space" && !event.repeat) {
+        demarrerAttaque();
+      }
+    });
+
+    window.addEventListener("keyup", function (event) {
+      touches[event.code] = false;
+    });
+
+    /*
+      Réinitialise les touches lorsque la fenêtre perd le focus,
+      afin d'éviter qu'une direction reste bloquée.
+    */
+    window.addEventListener("blur", function () {
+      for (const code in touches) {
+        touches[code] = false;
+      }
+    });
+
+    /* =========================================================
+       OUTILS GÉOMÉTRIQUES ET COLLISIONS
+       ========================================================= */
+
+    /*
+      Retourne vrai lorsque deux rectangles se chevauchent.
+    */
+    function rectanglesSeTouchent(a, b) {
+      return (
+        a.x < b.x + b.largeur &&
+        a.x + a.largeur > b.x &&
+        a.y < b.y + b.hauteur &&
+        a.y + a.hauteur > b.y
+      );
+    }
+
+    /*
+      Retourne la case de carte correspondant à une position.
+    */
+    function obtenirCaseDepuisPosition(x, y) {
+      const colonne = Math.floor(x / TAILLE_CASE);
+      const ligne = Math.floor((y - HAUTEUR_INTERFACE) / TAILLE_CASE);
+
+      return { colonne, ligne };
+    }
+
+    /*
+      Vérifie si une case de la matrice bloque le passage.
+    */
+    function caseEstSolide(colonne, ligne) {
+      if (
+        colonne < 0 ||
+        colonne >= COLONNES ||
+        ligne < 0 ||
+        ligne >= LIGNES
+      ) {
+        return true;
+      }
+
+      return carte[ligne][colonne] !== SOL;
+    }
+
+    /*
+      Vérifie si un rectangle entre en collision avec un obstacle.
+      Les quatre coins sont testés.
+    */
+    function rectangleToucheCarte(x, y, largeur, hauteur) {
+      const marge = 2;
+
+      const points = [
+        { x: x + marge, y: y + marge },
+        { x: x + largeur - marge, y: y + marge },
+        { x: x + marge, y: y + hauteur - marge },
+        { x: x + largeur - marge, y: y + hauteur - marge }
+      ];
+
+      for (const point of points) {
+        const position = obtenirCaseDepuisPosition(point.x, point.y);
+
+        if (caseEstSolide(position.colonne, position.ligne)) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    /*
+      Déplace une entité séparément sur les axes X et Y.
+      Cette méthode évite qu'une collision bloque les deux axes.
+    */
+    function deplacerAvecCollisions(entite, mouvementX, mouvementY) {
+      let collisionX = false;
+      let collisionY = false;
+
+      const futurX = entite.x + mouvementX;
+
+      if (
+        !rectangleToucheCarte(
+          futurX,
+          entite.y,
+          entite.largeur,
+          entite.hauteur
+        )
+      ) {
+        entite.x = futurX;
+      } else {
+        collisionX = true;
+      }
+
+      const futurY = entite.y + mouvementY;
+
+      if (
+        !rectangleToucheCarte(
+          entite.x,
+          futurY,
+          entite.largeur,
+          entite.hauteur
+        )
+      ) {
+        entite.y = futurY;
+      } else {
+        collisionY = true;
+      }
+
+      return { collisionX, collisionY };
+    }
+
+    /*
+      Limite une valeur entre un minimum et un maximum.
+    */
+    function limiter(valeur, minimum, maximum) {
+      return Math.max(minimum, Math.min(maximum, valeur));
+    }
+
+    /*
+      Produit un nombre entier aléatoire inclusif.
+    */
+    function entierAleatoire(minimum, maximum) {
+      return Math.floor(
+        Math.random() * (maximum - minimum + 1)
+      ) + minimum;
+    }
+
+    /* =========================================================
+       JOUEUR
+       ========================================================= */
+
+    const joueur = {
+      x: 64,
+      y: HAUTEUR_INTERFACE + 64,
+      largeur: 24,
+      hauteur: 24,
+      vitesse: 150,
+      direction: "bas",
+      vie: 3,
+      vieMaximum: 3,
+      invulnerable: false,
+      tempsInvulnerabilite: 0,
+      dureeInvulnerabilite: 1.15,
+      attaqueActive: false,
+      tempsAttaque: 0,
+      dureeAttaque: 0.19,
+      rechargeAttaque: 0,
+      dureeRecharge: 0.24,
+      ennemisTouchesPendantAttaque: new Set()
+    };
+
+    /* =========================================================
+       ENNEMIS
+       ========================================================= */
+
+    let ennemis = [];
+
+    /*
+      Crée un ennemi rouge à une position donnée.
+    */
+    function creerEnnemi(x, y) {
+      return {
+        x,
+        y,
+        largeur: 24,
+        hauteur: 24,
+        vitesse: entierAleatoire(55, 85),
+        vie: 2,
+        vieMaximum: 2,
+        directionX: 0,
+        directionY: 0,
+        tempsAvantChangementDirection: 0,
+        tempsRecul: 0,
+        reculX: 0,
+        reculY: 0,
+        identifiant: crypto.randomUUID
+          ? crypto.randomUUID()
+          : String(Math.random())
+      };
+    }
+
+    /*
+      Installe plusieurs ennemis à des endroits libres.
+    */
+    function creerEnnemisInitiaux() {
+      ennemis = [
+        creerEnnemi(384, HAUTEUR_INTERFACE + 64),
+        creerEnnemi(96, HAUTEUR_INTERFACE + 256),
+        creerEnnemi(384, HAUTEUR_INTERFACE + 256),
+        creerEnnemi(256, HAUTEUR_INTERFACE + 320)
+      ];
+    }
+
+    /*
+      Choisit une direction aléatoire pour un ennemi.
+    */
+    function choisirDirectionEnnemi(ennemi) {
+      const directions = [
+        { x: 1, y: 0 },
+        { x: -1, y: 0 },
+        { x: 0, y: 1 },
+        { x: 0, y: -1 },
+        { x: 0, y: 0 }
+      ];
+
+      const direction = directions[
+        entierAleatoire(0, directions.length - 1)
+      ];
+
+      ennemi.directionX = direction.x;
+      ennemi.directionY = direction.y;
+      ennemi.tempsAvantChangementDirection =
+        0.5 + Math.random() * 1.7;
+    }
+
+    /* =========================================================
+       ÉTAT GLOBAL DU JEU
+       ========================================================= */
+
+    let jeuTermine = false;
+    let victoire = false;
+    let tempsEcoule = 0;
+    let ancienTemps = performance.now();
+
+    /*
+      Remet toutes les valeurs principales à leur état initial.
+    */
+    function recommencerJeu() {
+      joueur.x = 64;
+      joueur.y = HAUTEUR_INTERFACE + 64;
+      joueur.direction = "bas";
+      joueur.vie = joueur.vieMaximum;
+      joueur.invulnerable = false;
+      joueur.tempsInvulnerabilite = 0;
+      joueur.attaqueActive = false;
+      joueur.tempsAttaque = 0;
+      joueur.rechargeAttaque = 0;
+      joueur.ennemisTouchesPendantAttaque.clear();
+
+      creerEnnemisInitiaux();
+
+      jeuTermine = false;
+      victoire = false;
+      tempsEcoule = 0;
+      ancienTemps = performance.now();
+    }
+
+    /* =========================================================
+       ATTAQUE À L'ÉPÉE
+       ========================================================= */
+
+    /*
+      Démarre l'animation d'attaque lorsque l'épée est disponible.
+    */
+    function demarrerAttaque() {
+      if (
+        jeuTermine ||
+        joueur.attaqueActive ||
+        joueur.rechargeAttaque > 0
+      ) {
+        return;
+      }
+
+      joueur.attaqueActive = true;
+      joueur.tempsAttaque = joueur.dureeAttaque;
+      joueur.rechargeAttaque = joueur.dureeRecharge;
+      joueur.ennemisTouchesPendantAttaque.clear();
+    }
+
+    /*
+      Calcule le rectangle occupé par l'épée selon la direction
+      actuelle du joueur.
+    */
+    function obtenirRectangleEpee() {
+      const longueur = 30;
+      const epaisseur = 10;
+
+      switch (joueur.direction) {
+        case "haut":
+          return {
+            x: joueur.x + joueur.largeur / 2 - epaisseur / 2,
+            y: joueur.y - longueur,
+            largeur: epaisseur,
+            hauteur: longueur
+          };
+
+        case "bas":
+          return {
+            x: joueur.x + joueur.largeur / 2 - epaisseur / 2,
+            y: joueur.y + joueur.hauteur,
+            largeur: epaisseur,
+            hauteur: longueur
+          };
+
+        case "gauche":
+          return {
+            x: joueur.x - longueur,
+            y: joueur.y + joueur.hauteur / 2 - epaisseur / 2,
+            largeur: longueur,
+            hauteur: epaisseur
+          };
+
+        case "droite":
+        default:
+          return {
+            x: joueur.x + joueur.largeur,
+            y: joueur.y + joueur.hauteur / 2 - epaisseur / 2,
+            largeur: longueur,
+            hauteur: epaisseur
+          };
+      }
+    }
+
+    /*
+      Inflige des dégâts aux ennemis touchés par l'épée.
+      Un ennemi ne peut être frappé qu'une seule fois par attaque.
+    */
+    function verifierCoupsEpee() {
+      if (!joueur.attaqueActive) {
+        return;
+      }
+
+      const epee = obtenirRectangleEpee();
+
+      for (const ennemi of ennemis) {
+        if (
+          joueur.ennemisTouchesPendantAttaque.has(
+            ennemi.identifiant
+          )
+        ) {
+          continue;
+        }
+
+        if (rectanglesSeTouchent(epee, ennemi)) {
+          joueur.ennemisTouchesPendantAttaque.add(
+            ennemi.identifiant
+          );
+
+          ennemi.vie -= 1;
+          ennemi.tempsRecul = 0.12;
+
+          /*
+            Le recul pousse l'ennemi dans la direction de l'épée.
+          */
+          switch (joueur.direction) {
+            case "haut":
+              ennemi.reculX = 0;
+              ennemi.reculY = -130;
+              break;
+
+            case "bas":
+              ennemi.reculX = 0;
+              ennemi.reculY = 130;
+              break;
+
+            case "gauche":
+              ennemi.reculX = -130;
+              ennemi.reculY = 0;
+              break;
+
+            case "droite":
+              ennemi.reculX = 130;
+              ennemi.reculY = 0;
+              break;
+          }
+        }
+      }
+
+      /*
+        Supprime les ennemis dont la vie est tombée à zéro.
+      */
+      ennemis = ennemis.filter(function (ennemi) {
+        return ennemi.vie > 0;
+      });
+
+      /*
+        La partie est gagnée lorsque tous les ennemis sont éliminés.
+      */
+      if (ennemis.length === 0) {
+        victoire = true;
+        jeuTermine = true;
+      }
+    }
+
+    /* =========================================================
+       MISE À JOUR DU JOUEUR
+       ========================================================= */
+
+    function mettreAJourJoueur(deltaTime) {
+      let directionX = 0;
+      let directionY = 0;
+
+      /*
+        Commandes compatibles avec :
+        - Flèches directionnelles
+        - ZQSD
+        - WASD
+      */
+      const haut =
+        touches.ArrowUp ||
+        touches.KeyZ ||
+        touches.KeyW;
+
+      const bas =
+        touches.ArrowDown ||
+        touches.KeyS;
+
+      const gauche =
+        touches.ArrowLeft ||
+        touches.KeyQ ||
+        touches.KeyA;
+
+      const droite =
+        touches.ArrowRight ||
+        touches.KeyD;
+
+      if (haut) {
+        directionY -= 1;
+      }
+
+      if (bas) {
+        directionY += 1;
+      }
+
+      if (gauche) {
+        directionX -= 1;
+      }
+
+      if (droite) {
+        directionX += 1;
+      }
+
+      /*
+        Normalise le mouvement diagonal pour éviter qu'il soit
+        plus rapide que le mouvement horizontal ou vertical.
+      */
+      if (directionX !== 0 && directionY !== 0) {
+        const facteurDiagonal = Math.SQRT1_2;
+        directionX *= facteurDiagonal;
+        directionY *= facteurDiagonal;
+      }
+
+      /*
+        Met à jour l'orientation du joueur.
+        La direction dominante devient la direction de l'épée.
+      */
+      if (Math.abs(directionX) > Math.abs(directionY)) {
+        if (directionX < 0) {
+          joueur.direction = "gauche";
+        } else if (directionX > 0) {
+          joueur.direction = "droite";
+        }
+      } else if (directionY !== 0) {
+        if (directionY < 0) {
+          joueur.direction = "haut";
+        } else {
+          joueur.direction = "bas";
+        }
+      }
+
+      /*
+        Le joueur peut se déplacer pendant l'attaque, mais un peu
+        moins rapidement pour donner du poids au coup.
+      */
+      const ralentissement = joueur.attaqueActive ? 0.68 : 1;
+
+      const mouvementX =
+        directionX *
+        joueur.vitesse *
+        ralentissement *
+        deltaTime;
+
+      const mouvementY =
+        directionY *
+        joueur.vitesse *
+        ralentissement *
+        deltaTime;
+
+      deplacerAvecCollisions(
+        joueur,
+        mouvementX,
+        mouvementY
+      );
+
+      /*
+        Gestion du temps d'attaque.
+      */
+      if (joueur.attaqueActive) {
+        joueur.tempsAttaque -= deltaTime;
+
+        if (joueur.tempsAttaque <= 0) {
+          joueur.attaqueActive = false;
+          joueur.tempsAttaque = 0;
+        }
+      }
+
+      /*
+        Gestion du délai minimal entre deux attaques.
+      */
+      if (joueur.rechargeAttaque > 0) {
+        joueur.rechargeAttaque -= deltaTime;
+        joueur.rechargeAttaque = Math.max(
+          0,
+          joueur.rechargeAttaque
+        );
+      }
+
+      /*
+        Gestion de l'invulnérabilité temporaire.
+      */
+      if (joueur.invulnerable) {
+        joueur.tempsInvulnerabilite -= deltaTime;
+
+        if (joueur.tempsInvulnerabilite <= 0) {
+          joueur.invulnerable = false;
+          joueur.tempsInvulnerabilite = 0;
+        }
+      }
+    }
+
+    /* =========================================================
+       MISE À JOUR DES ENNEMIS
+       ========================================================= */
+
+    function mettreAJourEnnemis(deltaTime) {
+      for (const ennemi of ennemis) {
+        /*
+          Applique brièvement un recul lorsqu'un ennemi reçoit un coup.
+        */
+        if (ennemi.tempsRecul > 0) {
+          ennemi.tempsRecul -= deltaTime;
+
+          deplacerAvecCollisions(
+            ennemi,
+            ennemi.reculX * deltaTime,
+            ennemi.reculY * deltaTime
+          );
+
+          continue;
+        }
+
+        ennemi.tempsAvantChangementDirection -= deltaTime;
+
+        if (ennemi.tempsAvantChangementDirection <= 0) {
+          choisirDirectionEnnemi(ennemi);
+        }
+
+        const mouvementX =
+          ennemi.directionX *
+          ennemi.vitesse *
+          deltaTime;
+
+        const mouvementY =
+          ennemi.directionY *
+          ennemi.vitesse *
+          deltaTime;
+
+        const collisions = deplacerAvecCollisions(
+          ennemi,
+          mouvementX,
+          mouvementY
+        );
+
+        /*
+          Lorsqu'un ennemi rencontre un obstacle, il choisit
+          immédiatement une autre direction.
+        */
+        if (collisions.collisionX || collisions.collisionY) {
+          choisirDirectionEnnemi(ennemi);
+        }
+      }
+    }
+
+    /* =========================================================
+       COLLISIONS ENTRE LE JOUEUR ET LES ENNEMIS
+       ========================================================= */
+
+    function verifierCollisionsEnnemisJoueur() {
+      if (joueur.invulnerable || jeuTermine) {
+        return;
+      }
+
+      for (const ennemi of ennemis) {
+        if (rectanglesSeTouchent(joueur, ennemi)) {
+          joueur.vie -= 1;
+          joueur.invulnerable = true;
+          joueur.tempsInvulnerabilite =
+            joueur.dureeInvulnerabilite;
+
+          /*
+            Éloigne légèrement le joueur de l'ennemi.
+          */
+          const centreJoueurX =
+            joueur.x + joueur.largeur / 2;
+
+          const centreJoueurY =
+            joueur.y + joueur.hauteur / 2;
+
+          const centreEnnemiX =
+            ennemi.x + ennemi.largeur / 2;
+
+          const centreEnnemiY =
+            ennemi.y + ennemi.hauteur / 2;
+
+          let reculX = centreJoueurX - centreEnnemiX;
+          let reculY = centreJoueurY - centreEnnemiY;
+
+          const longueur =
+            Math.hypot(reculX, reculY) || 1;
+
+          reculX = reculX / longueur * 28;
+          reculY = reculY / longueur * 28;
+
+          deplacerAvecCollisions(
+            joueur,
+            reculX,
+            reculY
+          );
+
+          if (joueur.vie <= 0) {
+            joueur.vie = 0;
+            victoire = false;
+            jeuTermine = true;
+          }
+
+          break;
+        }
+      }
+    }
+
+    /* =========================================================
+       FONCTION DE MISE À JOUR PRINCIPALE
+       ========================================================= */
+
+    function update(deltaTime) {
+      if (jeuTermine) {
+        return;
+      }
+
+      tempsEcoule += deltaTime;
+
+      mettreAJourJoueur(deltaTime);
+      mettreAJourEnnemis(deltaTime);
+      verifierCoupsEpee();
+      verifierCollisionsEnnemisJoueur();
+    }
+
+    /* =========================================================
+       DESSIN DE L'INTERFACE
+       ========================================================= */
+
+    function dessinerCoeur(x, y, rempli) {
+      const couleur = rempli ? "#e53b44" : "#4d2729";
+      const contour = "#f7d9a0";
+
+      ctx.fillStyle = contour;
+      ctx.fillRect(x + 4, y, 8, 4);
+      ctx.fillRect(x + 16, y, 8, 4);
+      ctx.fillRect(x, y + 4, 28, 12);
+      ctx.fillRect(x + 4, y + 16, 20, 8);
+      ctx.fillRect(x + 8, y + 24, 12, 4);
+
+      ctx.fillStyle = couleur;
+      ctx.fillRect(x + 5, y + 4, 7, 4);
+      ctx.fillRect(x + 16, y + 4, 7, 4);
+      ctx.fillRect(x + 4, y + 8, 20, 8);
+      ctx.fillRect(x + 8, y + 16, 12, 8);
+      ctx.fillRect(x + 10, y + 24, 8, 2);
+    }
+
+    function dessinerInterface() {
+      /*
+        Fond sombre de la barre d'interface.
+      */
+      ctx.fillStyle = "#171b1b";
+      ctx.fillRect(
+        0,
+        0,
+        LARGEUR_CANVAS,
+        HAUTEUR_INTERFACE
+      );
+
+      /*
+        Bordure inférieure dorée.
+      */
+      ctx.fillStyle = "#d7ba62";
+      ctx.fillRect(
+        0,
+        HAUTEUR_INTERFACE - 4,
+        LARGEUR_CANVAS,
+        4
+      );
+
+      /*
+        Titre.
+      */
+      ctx.fillStyle = "#f4e6a4";
+      ctx.font = "bold 15px monospace";
+      ctx.textAlign = "left";
+      ctx.fillText("LA QUÊTE DU HÉROS", 16, 20);
+
+      /*
+        Affichage des cœurs.
+      */
+      for (let i = 0; i < joueur.vieMaximum; i++) {
+        dessinerCoeur(
+          18 + i * 36,
+          28,
+          i < joueur.vie
+        );
+      }
+
+      /*
+        Compteur d'ennemis.
+      */
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "14px monospace";
+      ctx.textAlign = "right";
+      ctx.fillText(
+        "ENNEMIS : " + ennemis.length,
+        LARGEUR_CANVAS - 16,
+        26
+      );
+
+      /*
+        Temps écoulé.
+      */
+      ctx.fillStyle = "#b9d9c0";
+      ctx.fillText(
+        "TEMPS : " + Math.floor(tempsEcoule) + "s",
+        LARGEUR_CANVAS - 16,
+        47
+      );
+    }
+
+    /* =========================================================
+       DESSIN DE LA CARTE
+       ========================================================= */
+
+    function dessinerSol(x, y, colonne, ligne) {
+      /*
+        Sol principal.
+      */
+      ctx.fillStyle = "#5fae4d";
+      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
+
+      /*
+        Petits détails géométriques pour casser l'uniformité.
+      */
+      const motif = (colonne * 7 + ligne * 11) % 5;
+
+      ctx.fillStyle = "#4d9844";
+
+      if (motif === 0) {
+        ctx.fillRect(x + 5, y + 7, 3, 3);
+        ctx.fillRect(x + 22, y + 20, 4, 3);
+      } else if (motif === 1) {
+        ctx.fillRect(x + 16, y + 6, 3, 5);
+      } else if (motif === 2) {
+        ctx.fillRect(x + 8, y + 22, 6, 2);
+      }
+    }
+
+    function dessinerArbre(x, y) {
+      /*
+        Ombre sous l'arbre.
+      */
+      ctx.fillStyle = "#284426";
+      ctx.fillRect(x + 4, y + 6, 24, 24);
+
+      /*
+        Tronc.
+      */
+      ctx.fillStyle = "#70442a";
+      ctx.fillRect(x + 12, y + 18, 8, 12);
+
+      /*
+        Feuillage en carrés.
+      */
+      ctx.fillStyle = "#174f2b";
+      ctx.fillRect(x + 5, y + 4, 22, 18);
+      ctx.fillRect(x + 2, y + 9, 28, 10);
+      ctx.fillRect(x + 8, y + 1, 16, 24);
+
+      /*
+        Reflets.
+      */
+      ctx.fillStyle = "#2f7840";
+      ctx.fillRect(x + 8, y + 5, 6, 5);
+      ctx.fillRect(x + 18, y + 10, 5, 6);
+    }
+
+    function dessinerMur(x, y) {
+      /*
+        Bloc principal.
+      */
+      ctx.fillStyle = "#735235";
+      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
+
+      /*
+        Mortier.
+      */
+      ctx.fillStyle = "#3e2c21";
+      ctx.fillRect(x, y + 14, TAILLE_CASE, 3);
+      ctx.fillRect(x + 14, y, 3, 14);
+      ctx.fillRect(x + 6, y + 17, 3, 15);
+      ctx.fillRect(x + 23, y + 17, 3, 15);
+
+      /*
+        Lumière sur la pierre.
+      */
+      ctx.fillStyle = "#9b7651";
+      ctx.fillRect(x + 3, y + 3, 9, 3);
+      ctx.fillRect(x + 19, y + 20, 4, 3);
+    }
+
+    function dessinerEau(x, y, colonne, ligne) {
+      ctx.fillStyle = "#286f9d";
+      ctx.fillRect(x, y, TAILLE_CASE, TAILLE_CASE);
+
+      /*
+        Ondulations simples animées.
+      */
+      const decalage =
+        Math.floor(tempsEcoule * 12 + colonne * 3 + ligne * 5) % 16;
+
+      ctx.fillStyle = "#5db5cf";
+      ctx.fillRect(x + decalage, y + 8, 10, 3);
+      ctx.fillRect(x + ((decalage + 11) % 18), y + 22, 9, 3);
+
+      ctx.fillStyle = "#174e78";
+      ctx.fillRect(x + 2, y + 15, 14, 3);
+    }
+
+    function dessinerCarte() {
+      for (let ligne = 0; ligne < LIGNES; ligne++) {
+        for (
+          let colonne = 0;
+          colonne < COLONNES;
+          colonne++
+        ) {
+          const x = colonne * TAILLE_CASE;
+          const y =
+            HAUTEUR_INTERFACE +
+            ligne * TAILLE_CASE;
+
+          const typeCase = carte[ligne][colonne];
+
+          dessinerSol(x, y, colonne, ligne);
+
+          if (typeCase === ARBRE) {
+            dessinerArbre(x, y);
+          } else if (typeCase === MUR) {
+            dessinerMur(x, y);
+          } else if (typeCase === EAU) {
+            dessinerEau(x, y, colonne, ligne);
+          }
+        }
+      }
+    }
+
+    /* =========================================================
+       DESSIN DU JOUEUR
+       ========================================================= */
+
+    function dessinerJoueur() {
+      /*
+        Pendant l'invulnérabilité, le joueur clignote.
+      */
+      if (joueur.invulnerable) {
+        const visible =
+          Math.floor(joueur.tempsInvulnerabilite * 14) % 2 === 0;
+
+        if (!visible) {
+          return;
+        }
+      }
+
+      /*
+        Ombre.
+      */
+      ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
+      ctx.fillRect(
+        Math.round(joueur.x + 3),
+        Math.round(joueur.y + joueur.hauteur - 1),
+        joueur.largeur,
+        5
+      );
+
+      /*
+        Corps vert principal.
+      */
+      ctx.fillStyle = "#2ea043";
+      ctx.fillRect(
+        Math.round(joueur.x),
+        Math.round(joueur.y),
+        joueur.largeur,
+        joueur.hauteur
+      );
+
+      /*
+        Partie sombre du costume.
+      */
+      ctx.fillStyle = "#14672c";
+      ctx.fillRect(
+        Math.round(joueur.x),
+        Math.round(joueur.y + joueur.hauteur - 7),
+        joueur.largeur,
+        7
+      );
+
+      /*
+        Visage carré.
+      */
+      ctx.fillStyle = "#f0bd7a";
+      ctx.fillRect(
+        Math.round(joueur.x + 5),
+        Math.round(joueur.y + 5),
+        14,
+        10
+      );
+
+      /*
+        Chapeau vert.
+      */
+      ctx.fillStyle = "#17682d";
+
+      if (joueur.direction === "gauche") {
+        ctx.fillRect(
+          Math.round(joueur.x - 5),
+          Math.round(joueur.y + 1),
+          14,
+          8
+        );
+      } else if (joueur.direction === "droite") {
+        ctx.fillRect(
+          Math.round(joueur.x + 15),
+          Math.round(joueur.y + 1),
+          14,
+          8
+        );
+      } else {
+        ctx.fillRect(
+          Math.round(joueur.x + 3),
+          Math.round(joueur.y),
+          18,
+          7
+        );
+      }
+
+      /*
+        Yeux orientés selon la direction.
+      */
+      ctx.fillStyle = "#171717";
+
+      if (joueur.direction === "gauche") {
+        ctx.fillRect(
+          Math.round(joueur.x + 6),
+          Math.round(joueur.y + 8),
+          3,
+          3
+        );
+      } else if (joueur.direction === "droite") {
+        ctx.fillRect(
+          Math.round(joueur.x + 15),
+          Math.round(joueur.y + 8),
+          3,
+          3
+        );
+      } else {
+        ctx.fillRect(
+          Math.round(joueur.x + 8),
+          Math.round(joueur.y + 8),
+          3,
+          3
+        );
+        ctx.fillRect(
+          Math.round(joueur.x + 14),
+          Math.round(joueur.y + 8),
+          3,
+          3
+        );
+      }
+    }
+
+    /* =========================================================
+       DESSIN DE L'ÉPÉE
+       ========================================================= */
+
+    function dessinerEpee() {
+      if (!joueur.attaqueActive) {
+        return;
+      }
+
+      const epee = obtenirRectangleEpee();
+
+      /*
+        Lame jaune.
+      */
+      ctx.fillStyle = "#ffe45e";
+      ctx.fillRect(
+        Math.round(epee.x),
+        Math.round(epee.y),
+        epee.largeur,
+        epee.hauteur
+      );
+
+      /*
+        Partie lumineuse de la lame.
+      */
+      ctx.fillStyle = "#fff6b0";
+
+      if (
+        joueur.direction === "haut" ||
+        joueur.direction === "bas"
+      ) {
+        ctx.fillRect(
+          Math.round(epee.x + 2),
+          Math.round(epee.y + 2),
+          3,
+          Math.max(2, epee.hauteur - 4)
+        );
+      } else {
+        ctx.fillRect(
+          Math.round(epee.x + 2),
+          Math.round(epee.y + 2),
+          Math.max(2, epee.largeur - 4),
+          3
+        );
+      }
+
+      /*
+        Garde de l'épée.
+      */
+      ctx.fillStyle = "#c68c2d";
+
+      if (joueur.direction === "haut") {
+        ctx.fillRect(
+          joueur.x + 5,
+          joueur.y - 4,
+          14,
+          5
+        );
+      } else if (joueur.direction === "bas") {
+        ctx.fillRect(
+          joueur.x + 5,
+          joueur.y + joueur.hauteur - 1,
+          14,
+          5
+        );
+      } else if (joueur.direction === "gauche") {
+        ctx.fillRect(
+          joueur.x - 4,
+          joueur.y + 5,
+          5,
+          14
+        );
+      } else {
+        ctx.fillRect(
+          joueur.x + joueur.largeur - 1,
+          joueur.y + 5,
+          5,
+          14
+        );
+      }
+    }
+
+    /* =========================================================
+       DESSIN DES ENNEMIS
+       ========================================================= */
+
+    function dessinerEnnemi(ennemi) {
+      const x = Math.round(ennemi.x);
+      const y = Math.round(ennemi.y);
+
+      /*
+        Ombre.
+      */
+      ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+      ctx.fillRect(
+        x + 3,
+        y + ennemi.hauteur - 1,
+        ennemi.largeur,
+        5
+      );
+
+      /*
+        Corps rouge.
+      */
+      ctx.fillStyle = "#c9333e";
+      ctx.fillRect(
+        x,
+        y,
+        ennemi.largeur,
+        ennemi.hauteur
+      );
+
+      /*
+        Partie sombre.
+      */
+      ctx.fillStyle = "#7c1f28";
+      ctx.fillRect(
+        x,
+        y + ennemi.hauteur - 7,
+        ennemi.largeur,
+        7
+      );
+
+      /*
+        Cornes.
+      */
+      ctx.fillStyle = "#f0d29b";
+      ctx.fillRect(x + 2, y - 4, 5, 6);
+      ctx.fillRect(x + 17, y - 4, 5, 6);
+
+      /*
+        Yeux.
+      */
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(x + 5, y + 7, 5, 5);
+      ctx.fillRect(x + 14, y + 7, 5, 5);
+
+      ctx.fillStyle = "#141414";
+      ctx.fillRect(x + 7, y + 8, 2, 3);
+      ctx.fillRect(x + 15, y + 8, 2, 3);
+
+      /*
+        Petite barre de vie de l'ennemi.
+      */
+      const largeurBarre = ennemi.largeur;
+      const ratioVie =
+        ennemi.vie / ennemi.vieMaximum;
+
+      ctx.fillStyle = "#35171a";
+      ctx.fillRect(x, y - 9, largeurBarre, 4);
+
+      ctx.fillStyle = "#ff765d";
+      ctx.fillRect(
+        x,
+        y - 9,
+        Math.floor(largeurBarre * ratioVie),
+        4
+      );
+    }
+
+    function dessinerEnnemis() {
+      for (const ennemi of ennemis) {
+        dessinerEnnemi(ennemi);
+      }
+    }
+
+    /* =========================================================
+       ÉCRAN DE FIN
+       ========================================================= */
+
+    function dessinerEcranFin() {
+      if (!jeuTermine) {
+        return;
+      }
+
+      /*
+        Voile sombre semi-transparent.
+      */
+      ctx.fillStyle = "rgba(5, 7, 7, 0.84)";
+      ctx.fillRect(
+        0,
+        0,
+        LARGEUR_CANVAS,
+        HAUTEUR_CANVAS
+      );
+
+      /*
+        Cadre central.
+      */
+      ctx.fillStyle = victoire
+        ? "#1f6b3a"
+        : "#6b1f28";
+
+      ctx.fillRect(
+        72,
+        126,
+        LARGEUR_CANVAS - 144,
+        194
+      );
+
+      ctx.fillStyle = "#e9cf76";
+      ctx.fillRect(
+        78,
+        132,
+        LARGEUR_CANVAS - 156,
+        182
+      );
+
+      ctx.fillStyle = "#151818";
+      ctx.fillRect(
+        84,
+        138,
+        LARGEUR_CANVAS - 168,
+        170
+      );
+
+      /*
+        Message principal.
+      */
+      ctx.textAlign = "center";
+      ctx.font = "bold 34px monospace";
+
+      ctx.fillStyle = victoire
+        ? "#7ff09b"
+        : "#ff6571";
+
+      ctx.fillText(
+        victoire ? "VICTOIRE !" : "GAME OVER",
+        LARGEUR_CANVAS / 2,
+        192
+      );
+
+      /*
+        Message secondaire.
+      */
+      ctx.fillStyle = "#f3e8bb";
+      ctx.font = "16px monospace";
+
+      if (victoire) {
+        ctx.fillText(
+          "Tous les ennemis sont vaincus.",
+          LARGEUR_CANVAS / 2,
+          228
+        );
+      } else {
+        ctx.fillText(
+          "Le héros a perdu ses trois cœurs.",
+          LARGEUR_CANVAS / 2,
+          228
+        );
+      }
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 15px monospace";
+      ctx.fillText(
+        "APPUYEZ SUR UNE TOUCHE",
+        LARGEUR_CANVAS / 2,
+        272
+      );
+
+      ctx.fillStyle = "#b9d9c0";
+      ctx.font = "13px monospace";
+      ctx.fillText(
+        "pour recommencer",
+        LARGEUR_CANVAS / 2,
+        294
+      );
+
+      ctx.textAlign = "left";
+    }
+
+    /* =========================================================
+       FONCTION DE RENDU PRINCIPALE
+       ========================================================= */
+
+    function render() {
+      /*
+        Efface entièrement l'image précédente.
+      */
+      ctx.clearRect(
+        0,
+        0,
+        LARGEUR_CANVAS,
+        HAUTEUR_CANVAS
+      );
+
+      /*
+        Ordre de dessin :
+        1. carte
+        2. ennemis
+        3. épée
+        4. joueur
+        5. interface
+        6. écran de fin
+      */
+      dessinerCarte();
+      dessinerEnnemis();
+      dessinerEpee();
+      dessinerJoueur();
+      dessinerInterface();
+      dessinerEcranFin();
+    }
+
+    /* =========================================================
+       BOUCLE PRINCIPALE DU JEU
+       ========================================================= */
+
+    function boucleJeu(tempsActuel) {
+      /*
+        Conversion des millisecondes en secondes.
+      */
+      let deltaTime =
+        (tempsActuel - ancienTemps) / 1000;
+
+      ancienTemps = tempsActuel;
+
+      /*
+        Limite deltaTime pour éviter les grands sauts après une
+        perte de focus ou un ralentissement important.
+      */
+      deltaTime = limiter(deltaTime, 0, 0.05);
+
+      update(deltaTime);
+      render();
+
+      requestAnimationFrame(boucleJeu);
+    }
+
+    /* =========================================================
+       DÉMARRAGE INITIAL
+       ========================================================= */
+
+    creerEnnemisInitiaux();
+    requestAnimationFrame(boucleJeu);
+  </script>
+</body>
+</html>
