@@ -144,7 +144,7 @@
 
     #character-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 14px;
     }
 
@@ -268,6 +268,83 @@
     .modal-close {
       width: 100%;
       margin-top: 18px;
+    }
+
+
+    /* =========================================================
+       INVENTAIRE STRUCTURÉ TOUJOURS VISIBLE
+       ========================================================= */
+    #inventory-bar {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr 1.4fr;
+      gap: 8px;
+      width: 512px;
+      max-width: 100%;
+      margin: 0 auto 12px;
+    }
+
+    .inventory-section {
+      min-height: 78px;
+      padding: 9px;
+      border: 2px solid #75683c;
+      background: #1b211b;
+      box-shadow: inset 0 0 0 2px #101410;
+    }
+
+    .inventory-section h3 {
+      margin: 0 0 7px;
+      color: #f2d978;
+      font-size: 11px;
+      letter-spacing: .5px;
+    }
+
+    .inventory-line {
+      margin: 3px 0;
+      color: #dce7dc;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .inventory-empty { color: #7f8d7f; }
+
+    .inventory-token {
+      display: inline-block;
+      margin: 2px 2px 0 0;
+      padding: 2px 4px;
+      border: 1px solid #a9934f;
+      background: #303830;
+      color: #fff2a4;
+      font-size: 10px;
+    }
+
+    .craft-button {
+      margin-top: 7px;
+      padding: 5px 7px;
+      border: 2px solid #dac36e;
+      background: #704b25;
+      color: #fff;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .craft-button:disabled {
+      cursor: not-allowed;
+      opacity: .45;
+    }
+
+    .lock-requirement {
+      color: #ffcf76;
+      font-size: 11px;
+    }
+
+    @media (max-width: 560px) {
+      #inventory-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .inventory-section {
+        min-height: auto;
+      }
     }
 
     /* =========================================================
@@ -438,8 +515,26 @@
         <button id="show-controls" class="ui-button" type="button">COMMANDES</button>
         <button id="show-artifacts" class="ui-button" type="button">ARTÉFACTS</button>
         <button id="show-equipment" class="ui-button" type="button">ÉQUIPEMENT</button>
+        <button id="show-inventory" class="ui-button" type="button">INVENTAIRE</button>
       </div>
     </header>
+
+    <section id="inventory-bar" aria-label="Inventaire du joueur">
+      <div class="inventory-section">
+        <h3>RESSOURCES</h3>
+        <div id="inventory-resources"></div>
+      </div>
+
+      <div class="inventory-section">
+        <h3>ÉQUIPEMENT</h3>
+        <div id="inventory-equipment"></div>
+      </div>
+
+      <div class="inventory-section">
+        <h3>ARTÉFACTS-CLÉS</h3>
+        <div id="inventory-artifacts"></div>
+      </div>
+    </section>
 
     <div id="canvas-container">
       <canvas id="game" width="512" height="448" tabindex="0" aria-label="Jeu d'aventure rétro"></canvas>
@@ -488,8 +583,16 @@
 
   <div id="equipment-modal" class="modal" role="dialog" aria-modal="true">
     <div class="modal-panel">
-      <h2>ÉQUIPEMENT</h2>
+      <h2>ÉQUIPEMENT ET AMÉLIORATIONS</h2>
       <div id="equipment-list"></div>
+      <button class="ui-button modal-close" data-close-modal type="button">RETOUR AU JEU</button>
+    </div>
+  </div>
+
+  <div id="inventory-modal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-panel">
+      <h2>INVENTAIRE COMPLET</h2>
+      <div id="inventory-full"></div>
       <button class="ui-button modal-close" data-close-modal type="button">RETOUR AU JEU</button>
     </div>
   </div>
@@ -672,19 +775,19 @@
         id: "coeurAncien",
         nom: "Cœur Ancien",
         symbole: "C",
-        description: "Ajoute un cœur maximum et soigne entièrement."
+        description: "Ajoute un cœur maximum. Sert aussi de clé vivante pour certaines portes."
       },
       bottesDuVent: {
         id: "bottesDuVent",
         nom: "Bottes du Vent",
         symbole: "B",
-        description: "Augmente la vitesse de déplacement de 20 %."
+        description: "Augmente la vitesse de 20 %. Active les mécanismes liés au vent."
       },
       emblemeGuerrier: {
         id: "emblemeGuerrier",
         nom: "Emblème du Guerrier",
         symbole: "E",
-        description: "Ajoute 1 point de dégâts à l’épée."
+        description: "Ajoute 1 dégât. Déverrouille les sceaux guerriers anciens."
       }
     };
 
@@ -703,6 +806,7 @@
       stats.score += 500;
       afficherMessage("ARTÉFACT OBTENU : " + artefacts[id].nom, 2.4);
       remplirCollection();
+      mettreAJourInventaire();
       verifierObjectif();
     }
 
@@ -738,6 +842,16 @@
 
     const equipementsObtenus = new Set();
 
+    /*
+      Niveau 0 : objet normal.
+      Niveau 1 et 2 : améliorations fabriquées avec de l'or et des fragments.
+    */
+    const niveauxEquipement = {
+      casqueFer: 0,
+      armureAncienne: 0,
+      bouclierRoyal: 0
+    };
+
     function obtenirEquipement(id) {
       const item = equipements[id];
       if (!item || equipementsObtenus.has(id)) return;
@@ -749,16 +863,72 @@
 
       afficherMessage(item.nom.toUpperCase() + " ÉQUIPÉ !", 2.3);
       remplirCollection();
+      mettreAJourInventaire();
       verifierObjectif();
+    }
+
+    function coutAmelioration(id) {
+      const niveauActuel = niveauxEquipement[id] || 0;
+      return {
+        or: 75 + niveauActuel * 75,
+        fragments: 1 + niveauActuel
+      };
+    }
+
+    function ameliorerEquipement(id) {
+      if (!equipementsObtenus.has(id)) {
+        afficherMessage("ÉQUIPEMENT NON OBTENU", 1.4);
+        return;
+      }
+
+      const niveauActuel = niveauxEquipement[id] || 0;
+
+      if (niveauActuel >= 2) {
+        afficherMessage("AMÉLIORATION MAXIMALE ATTEINTE", 1.5);
+        return;
+      }
+
+      const cout = coutAmelioration(id);
+
+      if (stats.or < cout.or || stats.fragments < cout.fragments) {
+        afficherMessage(
+          "IL FAUT " + cout.or + " OR ET " + cout.fragments + " FRAGMENT(S)",
+          2
+        );
+        return;
+      }
+
+      stats.or -= cout.or;
+      stats.fragments -= cout.fragments;
+      niveauxEquipement[id] = niveauActuel + 1;
+
+      recalculerStatistiques(true);
+      stats.score += 250 * niveauxEquipement[id];
+
+      afficherMessage(
+        equipements[id].nom.toUpperCase() + " AMÉLIORÉ NIV. " + niveauxEquipement[id],
+        2.2
+      );
+
+      remplirCollection();
+      mettreAJourInventaire();
     }
 
     function bonusEquipement(cle) {
       let total = 0;
+
       Object.values(joueur.equipement).forEach(id => {
-        if (id && equipements[id] && equipements[id].bonus[cle]) {
-          total += equipements[id].bonus[cle];
-        }
+        if (!id || !equipements[id]) return;
+
+        const base = equipements[id].bonus[cle] || 0;
+        const niveau = niveauxEquipement[id] || 0;
+
+        if (cle === "defense") total += base + niveau;
+        else if (cle === "vie") total += base + Math.floor(niveau / 2);
+        else if (cle === "blocage") total += base + niveau * .05;
+        else total += base;
       });
+
       return total;
     }
 
@@ -831,7 +1001,11 @@
           ["or",4,1,10],["or",10,2,10],["coffre",3,5,40],["or",13,5,10]
         ],
         artefacts: [["coeurAncien",10,8]],
-        equipements: []
+        equipements: [],
+        porteRequise: [],
+        coffresSpeciaux: [
+          ["coffreSylvestre",13,2,["coeurAncien"],60,1]
+        ]
       },
       {
         nom: "RUINES DU VENT",
@@ -859,7 +1033,11 @@
         ennemis: [[13,1,2],[5,5,2],[9,7,3],[13,8,2]],
         tresors: [["or",4,3,15],["coffre",10,3,50],["or",2,7,15]],
         artefacts: [["bottesDuVent",8,5]],
-        equipements: []
+        equipements: [],
+        porteRequise: ["coeurAncien"],
+        coffresSpeciaux: [
+          ["coffreDuVent",12,8,["coeurAncien","bottesDuVent"],90,1]
+        ]
       },
       {
         nom: "FORTERESSE DU GUERRIER",
@@ -887,7 +1065,11 @@
         ennemis: [[13,1,3],[7,3,3],[5,7,3],[13,7,3],[8,9,5]],
         tresors: [["or",3,3,20],["coffre",10,5,75]],
         artefacts: [["emblemeGuerrier",8,7]],
-        equipements: [["casqueFer",13,9]]
+        equipements: [["casqueFer",13,9]],
+        porteRequise: ["coeurAncien","bottesDuVent"],
+        coffresSpeciaux: [
+          ["coffreDuSceau",3,9,["bottesDuVent","emblemeGuerrier"],120,1]
+        ]
       },
       {
         nom: "CAVERNE DE GLACE",
@@ -915,7 +1097,11 @@
         ennemis: [[13,1,3],[4,5,3],[10,7,4],[13,9,4]],
         tresors: [["or",3,3,25],["coffre",12,5,85]],
         artefacts: [],
-        equipements: [["armureAncienne",8,9]]
+        equipements: [["armureAncienne",8,9]],
+        porteRequise: ["coeurAncien","bottesDuVent","emblemeGuerrier"],
+        coffresSpeciaux: [
+          ["coffreDeGlace",12,7,["coeurAncien","bottesDuVent","emblemeGuerrier"],150,2]
+        ]
       },
       {
         nom: "VOLCAN DU ROI SOMBRE",
@@ -943,7 +1129,11 @@
         ennemis: [[13,1,4],[6,3,4],[3,7,4],[9,7,5],[13,9,7]],
         tresors: [["coffre",3,5,100],["coffre",10,9,120]],
         artefacts: [],
-        equipements: [["bouclierRoyal",12,7]]
+        equipements: [["bouclierRoyal",12,7]],
+        porteRequise: ["coeurAncien","bottesDuVent","emblemeGuerrier"],
+        coffresSpeciaux: [
+          ["tresorRoyal",8,5,["coeurAncien","bottesDuVent","emblemeGuerrier"],220,2]
+        ]
       }
     ];
 
@@ -955,7 +1145,9 @@
       or: 0,
       tresors: 0,
       tresorsNiveau: 0,
-      ennemis: 0
+      ennemis: 0,
+      fragments: 0,
+      coffresMystiques: 0
     };
 
     const message = { texte: "", temps: 0 };
@@ -966,7 +1158,9 @@
     let tresorsActifs = [];
     let artefactsActifs = [];
     let equipementsActifs = [];
+    let coffresSpeciauxActifs = [];
     let prochainEnnemiId = 1;
+    let porteMessageCooldown = 0;
 
     let sortieOuverte = false;
     let transition = false;
@@ -1017,6 +1211,35 @@
       return { id, x: p.x, y: p.y, w: 24, h: 24, pris: equipementsObtenus.has(id) };
     }
 
+    function creerCoffreSpecial([id, col, row, requis, or, fragments]) {
+      const p = positionCase(col, row, 28, 24);
+
+      return {
+        id,
+        x: p.x,
+        y: p.y,
+        w: 28,
+        h: 24,
+        requis,
+        or,
+        fragments,
+        ouvert: false,
+        messageCooldown: 0
+      };
+    }
+
+    function nomsArtefacts(ids) {
+      return ids.map(id => artefacts[id] ? artefacts[id].nom : id).join(" + ");
+    }
+
+    function artefactsPossedes(ids = []) {
+      return ids.every(id => artefactsObtenus.has(id));
+    }
+
+    function artefactsManquants(ids = []) {
+      return ids.filter(id => !artefactsObtenus.has(id));
+    }
+
     function chargerNiveau(index) {
       if (index >= NIVEAUX.length) {
         transition = false;
@@ -1045,7 +1268,10 @@
       tresorsActifs = niveau.tresors.map(creerTresor);
       artefactsActifs = niveau.artefacts.map(creerArtefact);
       equipementsActifs = niveau.equipements.map(creerEquipement);
+      coffresSpeciauxActifs = (niveau.coffresSpeciaux || []).map(creerCoffreSpecial);
+      porteMessageCooldown = 0;
 
+      mettreAJourInventaire();
       afficherMessage("NIVEAU " + (niveauIndex + 1) + " : " + niveau.nom, 2.4);
       ancienTemps = performance.now();
       canvas.focus();
@@ -1059,9 +1285,12 @@
       stats.tresors = 0;
       stats.tresorsNiveau = 0;
       stats.ennemis = 0;
+      stats.fragments = 0;
+      stats.coffresMystiques = 0;
 
       artefactsObtenus.clear();
       equipementsObtenus.clear();
+      Object.keys(niveauxEquipement).forEach(id => niveauxEquipement[id] = 0);
 
       appliquerPersonnage(personnageSelectionne);
 
@@ -1076,11 +1305,40 @@
 
     function verifierObjectif() {
       const objectifAtteint = niveau.objectif.progression() >= niveau.objectif.cible;
+      const clesValides = artefactsPossedes(niveau.porteRequise || []);
 
-      if (ennemisActifs.length === 0 && objectifAtteint && !sortieOuverte) {
+      if (ennemisActifs.length === 0 && objectifAtteint && clesValides && !sortieOuverte) {
         sortieOuverte = true;
-        afficherMessage("OBJECTIF TERMINÉ — SORTIE OUVERTE !", 2.2);
+        afficherMessage("SERRURE ACTIVÉE — SORTIE OUVERTE !", 2.2);
       }
+    }
+
+    function verifierPorteVerrouillee(dt) {
+      porteMessageCooldown = Math.max(0, porteMessageCooldown - dt);
+
+      if (sortieOuverte || transition || jeuTermine) return;
+
+      const zonePorte = {
+        x: porte.x - 42,
+        y: porte.y - 10,
+        w: porte.w + 50,
+        h: porte.h + 20
+      };
+
+      if (!collisionRect(joueur, zonePorte) || porteMessageCooldown > 0) return;
+
+      const objectifAtteint = niveau.objectif.progression() >= niveau.objectif.cible;
+      const manquants = artefactsManquants(niveau.porteRequise || []);
+
+      if (ennemisActifs.length > 0) {
+        afficherMessage("ÉLIMINE D’ABORD LES ENNEMIS", 1.6);
+      } else if (!objectifAtteint) {
+        afficherMessage("OBJECTIF INCOMPLET : " + niveau.objectif.texte, 2);
+      } else if (manquants.length) {
+        afficherMessage("IL VOUS MANQUE : " + nomsArtefacts(manquants), 2.2);
+      }
+
+      porteMessageCooldown = 1.4;
     }
 
     /* =========================================================
@@ -1299,6 +1557,7 @@
       if (tues > 0) {
         stats.ennemis += tues;
         stats.score += tues * 100;
+        mettreAJourInventaire();
         verifierObjectif();
       }
     }
@@ -1373,6 +1632,40 @@
         objet.pris = true;
         obtenirEquipement(objet.id);
       });
+
+      coffresSpeciauxActifs.forEach(coffre => {
+        coffre.messageCooldown = Math.max(0, coffre.messageCooldown - .016);
+
+        if (coffre.ouvert || !collisionRect(joueur, coffre)) return;
+
+        const manquants = artefactsManquants(coffre.requis);
+
+        if (manquants.length) {
+          if (coffre.messageCooldown <= 0) {
+            afficherMessage(
+              "COFFRE SCELLÉ — IL MANQUE : " + nomsArtefacts(manquants),
+              2.2
+            );
+            coffre.messageCooldown = 1.4;
+          }
+          return;
+        }
+
+        coffre.ouvert = true;
+        stats.or += Math.round(coffre.or * joueur.multiplicateurOr);
+        stats.fragments += coffre.fragments;
+        stats.coffresMystiques += 1;
+        stats.score += 800 + coffre.fragments * 250;
+
+        afficherMessage(
+          "COFFRE MYSTIQUE : +" + coffre.or + " OR, +" + coffre.fragments + " FRAGMENT(S)",
+          2.4
+        );
+
+        mettreAJourInventaire();
+      });
+
+      mettreAJourInventaire();
     }
 
     /* =========================================================
@@ -1464,6 +1757,7 @@
       verifierDegats();
       verifierCollectes();
       verifierObjectif();
+      verifierPorteVerrouillee(dt);
       verifierSortie();
     }
 
@@ -1577,6 +1871,17 @@
         ctx.fillStyle = "#d9b04c";
         ctx.fillRect(x + 6, y + 15, 20, 4);
         ctx.fillRect(x + 6, y + 44, 20, 4);
+
+        const requis = niveau.porteRequise || [];
+        if (requis.length) {
+          ctx.fillStyle = "#8f4fb3";
+          ctx.fillRect(x + 8, y + 24, 16, 17);
+          ctx.fillStyle = "#f2d77d";
+          ctx.font = "bold 9px monospace";
+          ctx.textAlign = "center";
+          ctx.fillText(requis.length + " CLÉ", x + 16, y + 35);
+          ctx.textAlign = "left";
+        }
       }
     }
 
@@ -1621,6 +1926,33 @@
           ctx.fillRect(x + 10, y + 8, 5, 10);
           ctx.fillRect(x, y + 11, t.w, 3);
         }
+      });
+    }
+
+
+    function dessinerCoffresSpeciaux() {
+      coffresSpeciauxActifs.forEach(coffre => {
+        if (coffre.ouvert) return;
+
+        const x = Math.round(coffre.x);
+        const y = Math.round(coffre.y);
+        const deverrouille = artefactsPossedes(coffre.requis);
+
+        ctx.fillStyle = deverrouille ? "#fff19a" : "#b56bff";
+        ctx.fillRect(x - 3, y - 3, coffre.w + 6, coffre.h + 6);
+
+        ctx.fillStyle = "#3e204f";
+        ctx.fillRect(x, y, coffre.w, coffre.h);
+
+        ctx.fillStyle = "#8d4eb0";
+        ctx.fillRect(x + 2, y + 3, coffre.w - 4, 8);
+
+        ctx.fillStyle = deverrouille ? "#ffe66d" : "#d8b0ff";
+        ctx.fillRect(x + 12, y + 8, 5, 11);
+        ctx.fillRect(x, y + 11, coffre.w, 3);
+
+        ctx.fillStyle = "#151515";
+        ctx.fillRect(x + 13, y + 10, 3, 5);
       });
     }
 
@@ -1827,6 +2159,8 @@
       ctx.fillText("OR : " + stats.or, 14, 84);
       ctx.fillStyle = "#fff";
       ctx.fillText("SCORE : " + stats.score, 116, 84);
+      ctx.fillStyle = "#dcb8ff";
+      ctx.fillText("FRAG : " + stats.fragments, 245, 84);
 
       ctx.textAlign = "right";
       ctx.fillText("ENNEMIS : " + ennemisActifs.length, W - 14, 17);
@@ -1842,8 +2176,15 @@
       ctx.font = "bold 10px monospace";
       ctx.fillText(niveau.objectif.texte + " [" + p + "/" + niveau.objectif.cible + "]", W - 14, 69);
 
-      ctx.fillStyle = sortieOuverte ? "#7fff9b" : "#c9c9c9";
-      ctx.fillText(sortieOuverte ? "SORTIE OUVERTE" : "SORTIE VERROUILLÉE", W - 14, 86);
+      const manquantsPorte = artefactsManquants(niveau.porteRequise || []);
+      ctx.fillStyle = sortieOuverte ? "#7fff9b" : (manquantsPorte.length ? "#e0a4ff" : "#c9c9c9");
+      ctx.fillText(
+        sortieOuverte
+          ? "SORTIE OUVERTE"
+          : (manquantsPorte.length ? "CLÉ(S) MANQUANTE(S)" : "SORTIE VERROUILLÉE"),
+        W - 14,
+        86
+      );
       ctx.textAlign = "left";
     }
 
@@ -1936,6 +2277,7 @@
 
       dessinerCarte();
       dessinerTresors();
+      dessinerCoffresSpeciaux();
       dessinerArtefacts();
       dessinerEquipements();
       dessinerEnnemis();
@@ -1950,6 +2292,67 @@
     /* =========================================================
        COLLECTIONS ET MODALES
        ========================================================= */
+    function mettreAJourInventaire() {
+      const ressources = document.getElementById("inventory-resources");
+      const equipementHTML = document.getElementById("inventory-equipment");
+      const artefactsHTML = document.getElementById("inventory-artifacts");
+      const inventaireComplet = document.getElementById("inventory-full");
+
+      if (!ressources || !equipementHTML || !artefactsHTML || !inventaireComplet) return;
+
+      ressources.innerHTML =
+        '<div class="inventory-line">Or : <strong>' + stats.or + '</strong></div>' +
+        '<div class="inventory-line">Trésors : <strong>' + stats.tresors + '</strong></div>' +
+        '<div class="inventory-line">Fragments : <strong>' + stats.fragments + '</strong></div>';
+
+      const equipementActuel = Object.entries(joueur.equipement)
+        .map(([slot, id]) => {
+          if (!id) return '<div class="inventory-line inventory-empty">' + slot + ' : vide</div>';
+
+          const niveauObjet = niveauxEquipement[id] || 0;
+          const def = equipements[id];
+
+          return (
+            '<div class="inventory-line">' +
+            slot + ' : <strong>' + def.nom + '</strong> niv. ' + niveauObjet +
+            '</div>'
+          );
+        })
+        .join("");
+
+      equipementHTML.innerHTML =
+        equipementActuel +
+        '<div class="inventory-line">ATQ ' + attaqueJoueur() +
+        ' · DEF ' + defenseJoueur() +
+        ' · Blocage ' + Math.round(chanceBlocage() * 100) + '%</div>';
+
+      const artefactsActuels = Object.values(artefacts)
+        .map(item => {
+          const obtenu = artefactsObtenus.has(item.id);
+          return '<span class="inventory-token">' +
+            (obtenu ? "✓ " + item.nom : "🔒 ???") +
+            '</span>';
+        })
+        .join("");
+
+      artefactsHTML.innerHTML =
+        artefactsActuels +
+        '<div class="inventory-line lock-requirement">Porte : ' +
+        ((niveau && niveau.porteRequise && niveau.porteRequise.length)
+          ? nomsArtefacts(niveau.porteRequise)
+          : "aucune clé") +
+        '</div>';
+
+      inventaireComplet.innerHTML =
+        '<div class="collection-card"><h3>RESSOURCES</h3>' +
+        ressources.innerHTML +
+        '<p>Coffres mystiques ouverts : ' + stats.coffresMystiques + '</p></div>' +
+        '<div class="collection-card"><h3>ÉQUIPEMENT ACTUEL</h3>' +
+        equipementHTML.innerHTML + '</div>' +
+        '<div class="collection-card"><h3>ARTÉFACTS-CLÉS</h3>' +
+        artefactsHTML.innerHTML + '</div>';
+    }
+
     function remplirCollection() {
       const listeArtefacts = document.getElementById("artifact-list");
       const listeEquipements = document.getElementById("equipment-list");
@@ -1959,24 +2362,47 @@
 
       Object.values(artefacts).forEach(item => {
         const obtenu = artefactsObtenus.has(item.id);
+        const utiliseIci = (niveau.porteRequise || []).includes(item.id);
         const carte = document.createElement("div");
+
         carte.className = "collection-card" + (obtenu ? "" : " locked");
         carte.innerHTML =
           "<h3>" + (obtenu ? item.nom : "Artéfact inconnu") + "</h3>" +
-          "<p>" + (obtenu ? item.description : "Explore les différents niveaux pour le découvrir.") + "</p>";
+          "<p>" + (obtenu ? item.description : "Explore les différents niveaux pour le découvrir.") + "</p>" +
+          "<p class='lock-requirement'>" +
+          (utiliseIci ? "Requis pour la porte de ce niveau." : "Conservé comme clé de quête.") +
+          "</p>";
+
         listeArtefacts.appendChild(carte);
       });
 
       Object.values(equipements).forEach(item => {
         const obtenu = equipementsObtenus.has(item.id);
         const equipe = joueur.equipement[item.slot] === item.id;
+        const niveauObjet = niveauxEquipement[item.id] || 0;
+        const cout = coutAmelioration(item.id);
+        const max = niveauObjet >= 2;
         const carte = document.createElement("div");
+
         carte.className = "collection-card" + (obtenu ? "" : " locked");
         carte.innerHTML =
-          "<h3>" + (obtenu ? item.nom + (equipe ? " — ÉQUIPÉ" : "") : "Équipement inconnu") + "</h3>" +
-          "<p>" + (obtenu ? item.description : "Cet équipement se trouve dans un niveau avancé.") + "</p>";
+          "<h3>" +
+          (obtenu
+            ? item.nom + (equipe ? " — ÉQUIPÉ" : "") + " — NIV. " + niveauObjet
+            : "Équipement inconnu") +
+          "</h3>" +
+          "<p>" + (obtenu ? item.description : "Cet équipement se trouve dans un niveau avancé.") + "</p>" +
+          (obtenu
+            ? "<button class='craft-button' data-upgrade='" + item.id + "' " +
+              (max ? "disabled" : "") + ">" +
+              (max ? "NIVEAU MAXIMUM" : "AMÉLIORER — " + cout.or + " OR + " + cout.fragments + " FRAGMENT(S)") +
+              "</button>"
+            : "");
+
         listeEquipements.appendChild(carte);
       });
+
+      mettreAJourInventaire();
     }
 
     function ouvrirModale(id) {
@@ -2002,6 +2428,17 @@
     document.getElementById("show-equipment").addEventListener("click", () => {
       remplirCollection();
       ouvrirModale("equipment-modal");
+    });
+
+    document.getElementById("show-inventory").addEventListener("click", () => {
+      remplirCollection();
+      ouvrirModale("inventory-modal");
+    });
+
+    document.getElementById("equipment-list").addEventListener("click", event => {
+      const bouton = event.target.closest("[data-upgrade]");
+      if (!bouton) return;
+      ameliorerEquipement(bouton.dataset.upgrade);
     });
 
     document.querySelectorAll("[data-close-modal]").forEach(b => {
@@ -2042,6 +2479,7 @@
     }
 
     remplirCollection();
+    mettreAJourInventaire();
     requestAnimationFrame(boucle);
   </script>
 </body>
