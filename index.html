@@ -2,74 +2,59 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-  >
-
-  <title>La Quête des Trois Artéfacts</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>La Quête des Cinq Royaumes</title>
 
   <style>
     /* =========================================================
-       BASE GÉNÉRALE
+       BASE ET MISE EN PAGE
        ========================================================= */
+    * { box-sizing: border-box; }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
+    html, body {
       width: 100%;
       min-height: 100%;
       margin: 0;
-      background:
-        radial-gradient(circle at top, #263526, #111811 60%, #070a07);
-      color: white;
+      background: radial-gradient(circle at top, #293829, #101610 58%, #060906);
+      color: #fff;
       font-family: monospace;
     }
 
     body {
       display: flex;
       justify-content: center;
-      padding: 16px;
+      padding: 14px;
     }
 
-    button {
-      font: inherit;
-    }
+    button { font: inherit; }
 
     #game-shell {
-      width: 540px;
+      width: 548px;
       max-width: 100%;
     }
 
-    /* =========================================================
-       BARRE SUPÉRIEURE
-       ========================================================= */
-
     #top-bar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       gap: 10px;
       margin-bottom: 12px;
       padding: 10px;
       border: 3px solid #dbc36e;
       background: #161c16;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 8px 25px rgba(0,0,0,.5);
     }
 
     #game-title {
       color: #f4df91;
-      font-weight: bold;
+      font-weight: 700;
       letter-spacing: 1px;
     }
 
     #top-buttons {
       display: flex;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 7px;
     }
 
     .ui-button {
@@ -77,27 +62,19 @@
       padding: 7px 10px;
       border: 3px solid #e3ce7c;
       background: #355c31;
-      color: white;
+      color: #fff;
       cursor: pointer;
-      box-shadow:
-        inset 3px 3px 0 #5f8758,
-        inset -3px -3px 0 #1d341a;
+      box-shadow: inset 3px 3px 0 #5f8758, inset -3px -3px 0 #1d341a;
     }
 
     .ui-button:hover,
     .ui-button:focus-visible {
       background: #4b7b44;
-      outline: 2px solid white;
+      outline: 2px solid #fff;
       outline-offset: 2px;
     }
 
-    .ui-button:active {
-      transform: translateY(2px);
-    }
-
-    /* =========================================================
-       CANVAS
-       ========================================================= */
+    .ui-button:active { transform: translateY(2px); }
 
     #canvas-container {
       width: 512px;
@@ -114,9 +91,7 @@
       background: #4d9d47;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
-      box-shadow:
-        0 0 0 4px #49341d,
-        0 14px 35px rgba(0, 0, 0, 0.65);
+      box-shadow: 0 0 0 4px #49341d, 0 14px 35px rgba(0,0,0,.65);
     }
 
     #status-text {
@@ -128,35 +103,124 @@
     }
 
     /* =========================================================
-       FENÊTRES MODALES
+       ÉCRAN DE SÉLECTION DU PERSONNAGE
        ========================================================= */
+    #character-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      overflow-y: auto;
+      background: radial-gradient(circle, rgba(54,75,49,.98), rgba(5,8,5,.99));
+    }
 
+    #character-screen.hidden { display: none; }
+
+    #character-panel {
+      width: 790px;
+      max-width: 100%;
+      padding: 24px;
+      border: 5px solid #e0c66e;
+      background: #151a15;
+      box-shadow: 0 0 0 5px #5d4223, 0 20px 70px rgba(0,0,0,.85);
+    }
+
+    #character-panel h1 {
+      margin: 0 0 8px;
+      color: #f3df91;
+      text-align: center;
+      font-size: 25px;
+    }
+
+    #character-panel > p {
+      margin: 0 0 20px;
+      color: #cad8ca;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    #character-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .character-card {
+      padding: 14px;
+      border: 3px solid #6a603e;
+      background: #222922;
+      color: #fff;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .character-card:hover,
+    .character-card:focus-visible {
+      border-color: #ffe47c;
+      background: #303a30;
+      outline: none;
+      transform: translateY(-3px);
+    }
+
+    .character-preview {
+      position: relative;
+      width: 92px;
+      height: 92px;
+      margin: 0 auto 12px;
+      border: 3px solid #d8c37a;
+      background: #101510;
+    }
+
+    .character-card h2 {
+      margin: 0 0 7px;
+      color: #ffe279;
+      font-size: 18px;
+    }
+
+    .character-card p {
+      min-height: 50px;
+      color: #adbdad;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .character-card ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: #d9e2d9;
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    /* =========================================================
+       MODALES
+       ========================================================= */
     .modal {
       position: fixed;
       inset: 0;
-      z-index: 100;
+      z-index: 200;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.8);
+      padding: 18px;
+      background: rgba(0,0,0,.82);
     }
 
-    .modal.visible {
-      display: flex;
-    }
+    .modal.visible { display: flex; }
 
     .modal-panel {
-      width: 470px;
+      width: 500px;
       max-width: 100%;
       max-height: 90vh;
       overflow-y: auto;
       padding: 22px;
       border: 5px solid #dfc76e;
       background: #151a15;
-      box-shadow:
-        0 0 0 5px #5d4223,
-        0 20px 60px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 0 5px #5d4223, 0 20px 60px rgba(0,0,0,.8);
     }
 
     .modal-panel h2 {
@@ -165,14 +229,13 @@
       text-align: center;
     }
 
-    .control-row,
-    .artifact-row {
+    .info-row {
       display: grid;
-      grid-template-columns: 150px 1fr;
+      grid-template-columns: 145px 1fr;
       gap: 12px;
       align-items: center;
       padding: 11px 0;
-      border-bottom: 1px solid #384038;
+      border-bottom: 1px solid #394139;
     }
 
     .key {
@@ -183,20 +246,23 @@
       text-align: center;
     }
 
-    .artifact-card {
-      margin-bottom: 12px;
+    .collection-card {
+      margin-bottom: 10px;
       padding: 12px;
       border: 2px solid #685d38;
       background: #232923;
     }
 
-    .artifact-card.locked {
-      opacity: 0.45;
-    }
+    .collection-card.locked { opacity: .43; }
 
-    .artifact-card h3 {
+    .collection-card h3 {
       margin: 0 0 6px;
       color: #ffe879;
+    }
+
+    .collection-card p {
+      margin: 4px 0;
+      line-height: 1.45;
     }
 
     .modal-close {
@@ -207,7 +273,6 @@
     /* =========================================================
        COMMANDES TACTILES
        ========================================================= */
-
     #mobile-controls {
       display: none;
       grid-template-columns: 1fr 1fr;
@@ -228,13 +293,11 @@
     .touch-button {
       border: 3px solid #d9c477;
       background: #293329;
-      color: white;
+      color: #fff;
       font-size: 21px;
-      font-weight: bold;
+      font-weight: 700;
       touch-action: none;
-      box-shadow:
-        inset 3px 3px 0 #526252,
-        inset -3px -3px 0 #131813;
+      box-shadow: inset 3px 3px 0 #526252, inset -3px -3px 0 #131813;
     }
 
     .touch-button.active,
@@ -243,25 +306,10 @@
       transform: translateY(2px);
     }
 
-    #touch-up {
-      grid-column: 2;
-      grid-row: 1;
-    }
-
-    #touch-left {
-      grid-column: 1;
-      grid-row: 2;
-    }
-
-    #touch-down {
-      grid-column: 2;
-      grid-row: 2;
-    }
-
-    #touch-right {
-      grid-column: 3;
-      grid-row: 2;
-    }
+    #touch-up { grid-column: 2; grid-row: 1; }
+    #touch-left { grid-column: 1; grid-row: 2; }
+    #touch-down { grid-column: 2; grid-row: 2; }
+    #touch-right { grid-column: 3; grid-row: 2; }
 
     #action-pad {
       display: flex;
@@ -277,155 +325,172 @@
       font-size: 15px;
     }
 
-    @media (max-width: 700px), (pointer: coarse) {
-      body {
-        padding: 7px;
-      }
-
-      canvas {
-        height: auto;
-      }
-
-      #mobile-controls {
+    @media (max-width: 760px), (pointer: coarse) {
+      body { padding: 7px; }
+      canvas { height: auto; }
+      #mobile-controls { display: grid; }
+      #top-bar { align-items: stretch; flex-direction: column; }
+      #top-buttons { display: grid; grid-template-columns: repeat(3, 1fr); }
+      #character-grid { grid-template-columns: 1fr; }
+      .character-card {
         display: grid;
+        grid-template-columns: 105px 1fr;
+        gap: 12px;
+        align-items: center;
+        text-align: left;
       }
-
-      #game-title {
-        font-size: 11px;
-      }
-
-      #top-bar {
-        align-items: stretch;
-        flex-direction: column;
-      }
-
-      #top-buttons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-      }
+      .character-preview { margin: 0; }
     }
 
-    @media (max-width: 430px) {
+    @media (max-width: 440px) {
+      #top-buttons { grid-template-columns: 1fr; }
       #direction-pad {
         grid-template-columns: repeat(3, 46px);
         grid-template-rows: repeat(3, 46px);
       }
-
-      #touch-attack {
-        width: 80px;
-        height: 80px;
-      }
-
-      .control-row,
-      .artifact-row {
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
+      #touch-attack { width: 80px; height: 80px; }
+      .info-row { grid-template-columns: 1fr; text-align: center; }
     }
   </style>
 </head>
 
 <body>
+  <!-- =======================================================
+       SÉLECTION DU PERSONNAGE
+       ======================================================= -->
+  <section id="character-screen">
+    <div id="character-panel">
+      <h1>CHOISIS TON PERSONNAGE</h1>
+      <p>Le choix modifie réellement la vie, la vitesse, les dégâts, la portée et certains bonus de départ.</p>
+
+      <div id="character-grid">
+        <button class="character-card" data-character="renard" type="button">
+          <div class="character-preview" aria-hidden="true">
+            <span style="position:absolute;left:27px;top:39px;width:38px;height:34px;background:#f28c28"></span>
+            <span style="position:absolute;left:31px;top:19px;width:30px;height:29px;background:#ff9c35"></span>
+            <span style="position:absolute;left:27px;top:10px;width:11px;height:16px;background:#c9651d"></span>
+            <span style="position:absolute;left:54px;top:10px;width:11px;height:16px;background:#c9651d"></span>
+            <span style="position:absolute;left:37px;top:36px;width:18px;height:8px;background:#fff0c8"></span>
+            <span style="position:absolute;left:35px;top:29px;width:4px;height:4px;background:#161616"></span>
+            <span style="position:absolute;left:53px;top:29px;width:4px;height:4px;background:#161616"></span>
+          </div>
+          <div>
+            <h2>RENARD ORANGE</h2>
+            <p>Explorateur agile, rapide et spécialisé dans la collecte des richesses.</p>
+            <ul>
+              <li>Vie : 3 cœurs</li>
+              <li>Vitesse : très élevée</li>
+              <li>Attaque : 1</li>
+              <li>Or gagné : +15 %</li>
+            </ul>
+          </div>
+        </button>
+
+        <button class="character-card" data-character="guerrier" type="button">
+          <div class="character-preview" aria-hidden="true">
+            <span style="position:absolute;left:27px;top:38px;width:38px;height:35px;background:#3175d6"></span>
+            <span style="position:absolute;left:31px;top:20px;width:30px;height:25px;background:#d7a46d"></span>
+            <span style="position:absolute;left:27px;top:12px;width:38px;height:12px;background:#858e99"></span>
+            <span style="position:absolute;left:66px;top:39px;width:7px;height:31px;background:#ffe36d"></span>
+          </div>
+          <div>
+            <h2>GUERRIER</h2>
+            <p>Combattant robuste avec davantage de vie, de dégâts et une défense naturelle.</p>
+            <ul>
+              <li>Vie : 5 cœurs</li>
+              <li>Vitesse : moyenne</li>
+              <li>Attaque : 2</li>
+              <li>Défense de départ : 1</li>
+            </ul>
+          </div>
+        </button>
+
+        <button class="character-card" data-character="mage" type="button">
+          <div class="character-preview" aria-hidden="true">
+            <span style="position:absolute;left:27px;top:38px;width:38px;height:35px;background:#7e46c4"></span>
+            <span style="position:absolute;left:31px;top:20px;width:30px;height:25px;background:#d9ac79"></span>
+            <span style="position:absolute;left:28px;top:6px;width:36px;height:20px;background:#552a8d"></span>
+            <span style="position:absolute;left:70px;top:28px;width:5px;height:44px;background:#b77b3c"></span>
+            <span style="position:absolute;left:65px;top:22px;width:15px;height:15px;background:#65dfff"></span>
+          </div>
+          <div>
+            <h2>MAGE</h2>
+            <p>Personnage technique avec une attaque plus longue et une récupération plus rapide.</p>
+            <ul>
+              <li>Vie : 3 cœurs</li>
+              <li>Vitesse : élevée</li>
+              <li>Portée : supérieure</li>
+              <li>Recharge : rapide</li>
+            </ul>
+          </div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =======================================================
+       JEU
+       ======================================================= -->
   <main id="game-shell">
-
     <header id="top-bar">
-      <div id="game-title">LA QUÊTE DES TROIS ARTÉFACTS</div>
-
+      <div id="game-title">LA QUÊTE DES CINQ ROYAUMES</div>
       <div id="top-buttons">
-        <button id="show-controls" class="ui-button" type="button">
-          COMMANDES
-        </button>
-
-        <button id="show-artifacts" class="ui-button" type="button">
-          ARTÉFACTS
-        </button>
+        <button id="show-controls" class="ui-button" type="button">COMMANDES</button>
+        <button id="show-artifacts" class="ui-button" type="button">ARTÉFACTS</button>
+        <button id="show-equipment" class="ui-button" type="button">ÉQUIPEMENT</button>
       </div>
     </header>
 
     <div id="canvas-container">
-      <canvas
-        id="game"
-        width="512"
-        height="448"
-        tabindex="0"
-        aria-label="Jeu d'aventure rétro"
-      ></canvas>
+      <canvas id="game" width="512" height="448" tabindex="0" aria-label="Jeu d'aventure rétro"></canvas>
     </div>
 
-    <section id="mobile-controls">
+    <section id="mobile-controls" aria-label="Commandes tactiles">
       <div id="direction-pad">
         <button id="touch-up" class="touch-button" type="button">▲</button>
         <button id="touch-left" class="touch-button" type="button">◀</button>
         <button id="touch-down" class="touch-button" type="button">▼</button>
         <button id="touch-right" class="touch-button" type="button">▶</button>
       </div>
-
       <div id="action-pad">
-        <button id="touch-attack" class="touch-button" type="button">
-          ÉPÉE
-        </button>
+        <button id="touch-attack" class="touch-button" type="button">ÉPÉE</button>
       </div>
     </section>
 
     <div id="status-text">
-      Accomplissez la quête affichée en haut de l'écran pour progresser.
+      Élimine les ennemis et accomplis l’objectif du niveau pour ouvrir la porte.
     </div>
   </main>
 
-  <!-- Fenêtre des commandes -->
+  <!-- =======================================================
+       MODALES
+       ======================================================= -->
   <div id="controls-modal" class="modal" role="dialog" aria-modal="true">
     <div class="modal-panel">
       <h2>COMMANDES</h2>
-
-      <div class="control-row">
-        <span class="key">↑ ↓ ← →</span>
-        <span>Déplacer le héros</span>
-      </div>
-
-      <div class="control-row">
-        <span class="key">Z Q S D</span>
-        <span>Déplacement alternatif</span>
-      </div>
-
-      <div class="control-row">
-        <span class="key">ESPACE</span>
-        <span>Attaquer avec l'épée</span>
-      </div>
-
-      <div class="control-row">
-        <span class="key">ENTRÉE</span>
-        <span>Continuer vers le tableau suivant</span>
-      </div>
-
-      <div class="control-row">
-        <span class="key">R</span>
-        <span>Recommencer toute l'aventure</span>
-      </div>
-
-      <button
-        class="ui-button modal-close"
-        data-close-modal="controls-modal"
-        type="button"
-      >
-        RETOUR AU JEU
-      </button>
+      <div class="info-row"><span class="key">↑ ↓ ← →</span><span>Déplacement</span></div>
+      <div class="info-row"><span class="key">Z Q S D</span><span>Déplacement alternatif</span></div>
+      <div class="info-row"><span class="key">ESPACE</span><span>Attaque à l’épée</span></div>
+      <div class="info-row"><span class="key">ENTRÉE</span><span>Continuer après un niveau</span></div>
+      <div class="info-row"><span class="key">R</span><span>Recommencer avec le même personnage</span></div>
+      <div class="info-row"><span class="key">C</span><span>Retour au choix du personnage</span></div>
+      <button class="ui-button modal-close" data-close-modal type="button">RETOUR AU JEU</button>
     </div>
   </div>
 
-  <!-- Fenêtre des artéfacts -->
   <div id="artifacts-modal" class="modal" role="dialog" aria-modal="true">
     <div class="modal-panel">
-      <h2>ARTÉFACTS DU HÉROS</h2>
-
+      <h2>ARTÉFACTS</h2>
       <div id="artifact-list"></div>
+      <button class="ui-button modal-close" data-close-modal type="button">RETOUR AU JEU</button>
+    </div>
+  </div>
 
-      <button
-        class="ui-button modal-close"
-        data-close-modal="artifacts-modal"
-        type="button"
-      >
-        RETOUR AU JEU
-      </button>
+  <div id="equipment-modal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-panel">
+      <h2>ÉQUIPEMENT</h2>
+      <div id="equipment-list"></div>
+      <button class="ui-button modal-close" data-close-modal type="button">RETOUR AU JEU</button>
     </div>
   </div>
 
@@ -433,315 +498,320 @@
     "use strict";
 
     /* =========================================================
-       CONFIGURATION DU CANVAS
+       CANVAS ET CONSTANTES
        ========================================================= */
-
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
-
     ctx.imageSmoothingEnabled = false;
 
-    const LARGEUR_CANVAS = 512;
-    const HAUTEUR_CANVAS = 448;
-    const HAUTEUR_INTERFACE = 96;
-
-    const TAILLE_CASE = 32;
-    const COLONNES = 16;
-    const LIGNES = 11;
+    const W = 512;
+    const H = 448;
+    const HUD = 96;
+    const TILE = 32;
+    const COLS = 16;
+    const ROWS = 11;
 
     const SOL = 0;
     const ARBRE = 1;
     const MUR = 2;
     const EAU = 3;
     const ROCHE = 4;
+    const LAVE = 5;
+    const GLACE = 6;
+    const CRISTAL = 7;
 
     /* =========================================================
-       OUTILS GÉNÉRAUX
+       OUTILS
        ========================================================= */
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-    function limiter(valeur, minimum, maximum) {
-      return Math.max(minimum, Math.min(maximum, valeur));
+    function collisionRect(a, b) {
+      return a.x < b.x + b.w &&
+             a.x + a.w > b.x &&
+             a.y < b.y + b.h &&
+             a.y + a.h > b.y;
     }
 
-    function entierAleatoire(minimum, maximum) {
-      return Math.floor(
-        Math.random() * (maximum - minimum + 1)
-      ) + minimum;
-    }
-
-    function rectanglesSeTouchent(a, b) {
-      return (
-        a.x < b.x + b.largeur &&
-        a.x + a.largeur > b.x &&
-        a.y < b.y + b.hauteur &&
-        a.y + a.hauteur > b.y
-      );
-    }
-
-    function positionDepuisCase(
-      colonne,
-      ligne,
-      largeur = 24,
-      hauteur = 24
-    ) {
+    function positionCase(col, row, w = 24, h = 24) {
       return {
-        x: colonne * TAILLE_CASE + (TAILLE_CASE - largeur) / 2,
-        y:
-          HAUTEUR_INTERFACE +
-          ligne * TAILLE_CASE +
-          (TAILLE_CASE - hauteur) / 2
+        x: col * TILE + (TILE - w) / 2,
+        y: HUD + row * TILE + (TILE - h) / 2
       };
     }
 
+    function afficherMessage(texte, duree = 1.8) {
+      message.texte = texte;
+      message.temps = duree;
+    }
+
     /* =========================================================
-       DÉFINITION DES ARTÉFACTS
+       PERSONNAGES
        ========================================================= */
-
-    /*
-      Chaque artéfact possède :
-      - un identifiant unique;
-      - un nom;
-      - une description;
-      - une fonction appliquant son bonus au joueur.
-    */
-
-    const definitionsArtefacts = {
-      bottesDuVent: {
-        id: "bottesDuVent",
-        nom: "Bottes du Vent",
-        description: "Augmente la vitesse de déplacement de 25 %.",
-        symbole: "B",
-        appliquer() {
-          joueur.multiplicateurVitesse = 1.25;
-        }
+    const personnages = {
+      renard: {
+        id: "renard",
+        nom: "Renard Orange",
+        type: "renard",
+        principale: "#f28c28",
+        secondaire: "#c9651d",
+        visage: "#fff0c8",
+        vie: 3,
+        vitesse: 182,
+        attaque: 1,
+        defense: 0,
+        recharge: .23,
+        portee: 32,
+        or: 1.15
       },
+      guerrier: {
+        id: "guerrier",
+        nom: "Guerrier",
+        type: "humain",
+        principale: "#3175d6",
+        secondaire: "#1d4a90",
+        visage: "#d7a46d",
+        vie: 5,
+        vitesse: 145,
+        attaque: 2,
+        defense: 1,
+        recharge: .30,
+        portee: 30,
+        or: 1
+      },
+      mage: {
+        id: "mage",
+        nom: "Mage",
+        type: "humain",
+        principale: "#7e46c4",
+        secondaire: "#552a8d",
+        visage: "#d9ac79",
+        vie: 3,
+        vitesse: 158,
+        attaque: 1,
+        defense: 0,
+        recharge: .17,
+        portee: 42,
+        or: 1
+      }
+    };
 
+    let personnageSelectionne = null;
+
+    const joueur = {
+      x: 0, y: 0, w: 24, h: 24,
+      nom: "", type: "humain",
+      principale: "#2ea043",
+      secondaire: "#14672c",
+      visage: "#f0bd7a",
+      direction: "bas",
+
+      vie: 3,
+      vieBase: 3,
+      vieMax: 3,
+
+      vitesseBase: 150,
+      attaqueBase: 1,
+      defenseBase: 0,
+      portee: 30,
+      multiplicateurOr: 1,
+
+      bonusVieArtefact: 0,
+      bonusAttaqueArtefact: 0,
+      bonusVitesseArtefact: 0,
+
+      attaqueActive: false,
+      tempsAttaque: 0,
+      dureeAttaque: .18,
+      recharge: 0,
+      rechargeMax: .26,
+      touchesAttaque: new Set(),
+
+      invulnerable: false,
+      tempsInvulnerable: 0,
+      dureeInvulnerable: 1.15,
+
+      equipement: {
+        casque: null,
+        armure: null,
+        bouclier: null
+      }
+    };
+
+    function appliquerPersonnage(id) {
+      const p = personnages[id];
+      personnageSelectionne = id;
+
+      joueur.nom = p.nom;
+      joueur.type = p.type;
+      joueur.principale = p.principale;
+      joueur.secondaire = p.secondaire;
+      joueur.visage = p.visage;
+
+      joueur.vieBase = p.vie;
+      joueur.vitesseBase = p.vitesse;
+      joueur.attaqueBase = p.attaque;
+      joueur.defenseBase = p.defense;
+      joueur.rechargeMax = p.recharge;
+      joueur.portee = p.portee;
+      joueur.multiplicateurOr = p.or;
+
+      joueur.bonusVieArtefact = 0;
+      joueur.bonusAttaqueArtefact = 0;
+      joueur.bonusVitesseArtefact = 0;
+      joueur.equipement = { casque: null, armure: null, bouclier: null };
+
+      recalculerStatistiques(true);
+    }
+
+    /* =========================================================
+       ARTÉFACTS
+       ========================================================= */
+    const artefacts = {
       coeurAncien: {
         id: "coeurAncien",
         nom: "Cœur Ancien",
-        description: "Ajoute un cœur permanent et soigne le héros.",
         symbole: "C",
-        appliquer() {
-          joueur.vieMaximum += 1;
-          joueur.vie = joueur.vieMaximum;
-        }
+        description: "Ajoute un cœur maximum et soigne entièrement."
       },
-
+      bottesDuVent: {
+        id: "bottesDuVent",
+        nom: "Bottes du Vent",
+        symbole: "B",
+        description: "Augmente la vitesse de déplacement de 20 %."
+      },
       emblemeGuerrier: {
         id: "emblemeGuerrier",
         nom: "Emblème du Guerrier",
-        description: "Augmente les dégâts de l'épée de 1.",
         symbole: "E",
-        appliquer() {
-          joueur.degatsEpee += 1;
-        }
+        description: "Ajoute 1 point de dégâts à l’épée."
       }
     };
 
     const artefactsObtenus = new Set();
 
-    function obtenirArtefact(idArtefact) {
-      if (artefactsObtenus.has(idArtefact)) {
-        return;
-      }
+    function obtenirArtefact(id) {
+      if (artefactsObtenus.has(id) || !artefacts[id]) return;
 
-      const artefact = definitionsArtefacts[idArtefact];
+      artefactsObtenus.add(id);
 
-      if (!artefact) {
-        return;
-      }
+      if (id === "coeurAncien") joueur.bonusVieArtefact += 1;
+      if (id === "bottesDuVent") joueur.bonusVitesseArtefact += .20;
+      if (id === "emblemeGuerrier") joueur.bonusAttaqueArtefact += 1;
 
-      artefactsObtenus.add(idArtefact);
-      artefact.appliquer();
-
-      afficherMessage(
-        "ARTÉFACT OBTENU : " + artefact.nom,
-        2.5
-      );
-
-      verifierProgressionQuete();
-      mettreAJourListeArtefacts();
-    }
-
-    function mettreAJourListeArtefacts() {
-      const conteneur = document.getElementById("artifact-list");
-
-      conteneur.innerHTML = "";
-
-      Object.values(definitionsArtefacts).forEach(function (artefact) {
-        const obtenu = artefactsObtenus.has(artefact.id);
-
-        const carte = document.createElement("div");
-        carte.className =
-          "artifact-card" + (obtenu ? "" : " locked");
-
-        const titre = document.createElement("h3");
-        titre.textContent = obtenu
-          ? artefact.nom
-          : "Artéfact inconnu";
-
-        const description = document.createElement("p");
-        description.textContent = obtenu
-          ? artefact.description
-          : "Explorez les différents tableaux pour le découvrir.";
-
-        carte.appendChild(titre);
-        carte.appendChild(description);
-        conteneur.appendChild(carte);
-      });
+      recalculerStatistiques(true);
+      stats.score += 500;
+      afficherMessage("ARTÉFACT OBTENU : " + artefacts[id].nom, 2.4);
+      remplirCollection();
+      verifierObjectif();
     }
 
     /* =========================================================
-       SYSTÈME DE QUÊTES
+       ÉQUIPEMENT
        ========================================================= */
-
-    /*
-      Les quêtes utilisent des conditions vérifiées automatiquement.
-
-      Une quête peut dépendre :
-      - du nombre de trésors ramassés;
-      - d'un artéfact particulier;
-      - du nombre d'ennemis vaincus;
-      - de la progression dans les tableaux.
-    */
-
-    const quetes = [
-      {
-        id: "collecteur",
-        titre: "Les premières richesses",
-        description: "Ramasser 3 trésors.",
-        cible: 3,
-
-        progression() {
-          return statistiques.tresorsRamasses;
-        },
-
-        terminee() {
-          return statistiques.tresorsRamasses >= 3;
-        }
+    const equipements = {
+      casqueFer: {
+        id: "casqueFer",
+        slot: "casque",
+        nom: "Casque de Fer",
+        symbole: "H",
+        description: "+1 défense.",
+        bonus: { defense: 1 }
       },
-
-      {
-        id: "bottes",
-        titre: "Le secret des ruines",
-        description: "Trouver les Bottes du Vent.",
-        cible: 1,
-
-        progression() {
-          return artefactsObtenus.has("bottesDuVent") ? 1 : 0;
-        },
-
-        terminee() {
-          return artefactsObtenus.has("bottesDuVent");
-        }
+      armureAncienne: {
+        id: "armureAncienne",
+        slot: "armure",
+        nom: "Armure Ancienne",
+        symbole: "A",
+        description: "+1 cœur maximum et +1 défense.",
+        bonus: { vie: 1, defense: 1 }
       },
-
-      {
-        id: "guerrier",
-        titre: "Épreuve du guerrier",
-        description: "Vaincre 8 ennemis au total.",
-        cible: 8,
-
-        progression() {
-          return statistiques.ennemisVaincus;
-        },
-
-        terminee() {
-          return statistiques.ennemisVaincus >= 8;
-        }
-      },
-
-      {
-        id: "artefactsFinaux",
-        titre: "Les trois reliques",
-        description: "Rassembler les 3 artéfacts uniques.",
-        cible: 3,
-
-        progression() {
-          return artefactsObtenus.size;
-        },
-
-        terminee() {
-          return artefactsObtenus.size >= 3;
-        }
+      bouclierRoyal: {
+        id: "bouclierRoyal",
+        slot: "bouclier",
+        nom: "Bouclier Royal",
+        symbole: "S",
+        description: "+2 défense et 25 % de chance supplémentaire de bloquer.",
+        bonus: { defense: 2, blocage: .25 }
       }
-    ];
-
-    let indexQueteActuelle = 0;
-
-    function obtenirQueteActuelle() {
-      return quetes[indexQueteActuelle] || null;
-    }
-
-    function verifierProgressionQuete() {
-      const quete = obtenirQueteActuelle();
-
-      if (!quete || !quete.terminee()) {
-        return;
-      }
-
-      afficherMessage(
-        "QUÊTE TERMINÉE : " + quete.titre,
-        2.5
-      );
-
-      indexQueteActuelle += 1;
-
-      /*
-        Lorsqu'une quête est terminée et que tous les ennemis
-        du tableau ont été vaincus, la porte peut s'ouvrir.
-      */
-      verifierOuvertureSortie();
-    }
-
-    function queteNecessairePourTableauTerminee() {
-      /*
-        Tableau 1 : la première quête doit être terminée.
-        Tableau 2 : la deuxième quête doit être terminée.
-        Tableau 3 : la quatrième quête doit être terminée.
-      */
-
-      if (indexTableau === 0) {
-        return indexQueteActuelle >= 1;
-      }
-
-      if (indexTableau === 1) {
-        return indexQueteActuelle >= 2;
-      }
-
-      if (indexTableau === 2) {
-        return indexQueteActuelle >= 4;
-      }
-
-      return false;
-    }
-
-    /* =========================================================
-       STATISTIQUES ET SCORE
-       ========================================================= */
-
-    const statistiques = {
-      score: 0,
-      or: 0,
-      tresorsRamasses: 0,
-      coffresOuverts: 0,
-      ennemisVaincus: 0
     };
 
-    function ajouterScore(points) {
-      statistiques.score += points;
+    const equipementsObtenus = new Set();
+
+    function obtenirEquipement(id) {
+      const item = equipements[id];
+      if (!item || equipementsObtenus.has(id)) return;
+
+      equipementsObtenus.add(id);
+      joueur.equipement[item.slot] = id;
+      recalculerStatistiques(true);
+      stats.score += 350;
+
+      afficherMessage(item.nom.toUpperCase() + " ÉQUIPÉ !", 2.3);
+      remplirCollection();
+      verifierObjectif();
+    }
+
+    function bonusEquipement(cle) {
+      let total = 0;
+      Object.values(joueur.equipement).forEach(id => {
+        if (id && equipements[id] && equipements[id].bonus[cle]) {
+          total += equipements[id].bonus[cle];
+        }
+      });
+      return total;
+    }
+
+    function recalculerStatistiques(soigner = false) {
+      const ancienneVieMax = joueur.vieMax || joueur.vieBase;
+
+      joueur.vieMax =
+        joueur.vieBase +
+        joueur.bonusVieArtefact +
+        bonusEquipement("vie");
+
+      if (soigner) {
+        joueur.vie = joueur.vieMax;
+      } else if (joueur.vieMax > ancienneVieMax) {
+        joueur.vie += joueur.vieMax - ancienneVieMax;
+      }
+
+      joueur.vie = clamp(joueur.vie, 0, joueur.vieMax);
+    }
+
+    function attaqueJoueur() {
+      return joueur.attaqueBase +
+             joueur.bonusAttaqueArtefact +
+             bonusEquipement("attaque");
+    }
+
+    function defenseJoueur() {
+      return joueur.defenseBase + bonusEquipement("defense");
+    }
+
+    function vitesseJoueur() {
+      return joueur.vitesseBase * (1 + joueur.bonusVitesseArtefact + bonusEquipement("vitesse"));
+    }
+
+    function chanceBlocage() {
+      return clamp(defenseJoueur() * .12 + bonusEquipement("blocage"), 0, .78);
     }
 
     /* =========================================================
-       CARTES DES TROIS TABLEAUX
+       NIVEAUX
+       Pour ajouter un niveau 6, copier un objet du tableau
+       NIVEAUX et modifier carte, couleurs et contenu.
        ========================================================= */
-
-    const tableaux = [
+    const NIVEAUX = [
       {
         nom: "FORÊT DES RICHESSES",
-        couleurSol: "#5baa4b",
-        couleurDetail: "#4b9340",
-
+        sol: "#5baa4b",
+        detail: "#4b9340",
+        objectif: {
+          texte: "Ramasser 3 trésors",
+          progression: () => stats.tresorsNiveau,
+          cible: 3
+        },
         carte: [
           [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
           [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -755,39 +825,23 @@
           [1,0,0,0,0,0,1,0,2,2,0,0,0,0,0,1],
           [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         ],
-
-        joueur: {
-          colonne: 1,
-          ligne: 1
-        },
-
-        ennemis: [
-          { colonne: 12, ligne: 1, vie: 2 },
-          { colonne: 3, ligne: 8, vie: 2 },
-          { colonne: 13, ligne: 8, vie: 2 }
-        ],
-
+        depart: [1,1],
+        ennemis: [[12,1,2],[3,8,2],[13,8,2]],
         tresors: [
-          { type: "or", colonne: 4, ligne: 1, valeur: 10 },
-          { type: "or", colonne: 10, ligne: 2, valeur: 10 },
-          { type: "coffre", colonne: 3, ligne: 5, valeur: 40 },
-          { type: "or", colonne: 13, ligne: 5, valeur: 10 }
+          ["or",4,1,10],["or",10,2,10],["coffre",3,5,40],["or",13,5,10]
         ],
-
-        artefacts: [
-          {
-            id: "coeurAncien",
-            colonne: 10,
-            ligne: 8
-          }
-        ]
+        artefacts: [["coeurAncien",10,8]],
+        equipements: []
       },
-
       {
         nom: "RUINES DU VENT",
-        couleurSol: "#88774f",
-        couleurDetail: "#75613e",
-
+        sol: "#88774f",
+        detail: "#75613e",
+        objectif: {
+          texte: "Trouver les Bottes du Vent",
+          progression: () => artefactsObtenus.has("bottesDuVent") ? 1 : 0,
+          cible: 1
+        },
         carte: [
           [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
           [2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,2],
@@ -801,40 +855,21 @@
           [2,0,0,0,0,0,0,4,2,2,0,2,0,0,0,2],
           [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
         ],
-
-        joueur: {
-          colonne: 1,
-          ligne: 1
-        },
-
-        ennemis: [
-          { colonne: 13, ligne: 1, vie: 2 },
-          { colonne: 5, ligne: 5, vie: 2 },
-          { colonne: 9, ligne: 7, vie: 3 },
-          { colonne: 13, ligne: 8, vie: 2 }
-        ],
-
-        tresors: [
-          { type: "or", colonne: 4, ligne: 3, valeur: 15 },
-          { type: "coffre", colonne: 10, ligne: 3, valeur: 50 },
-          { type: "or", colonne: 2, ligne: 7, valeur: 15 },
-          { type: "coffre", colonne: 14, ligne: 7, valeur: 50 }
-        ],
-
-        artefacts: [
-          {
-            id: "bottesDuVent",
-            colonne: 8,
-            ligne: 5
-          }
-        ]
+        depart: [1,1],
+        ennemis: [[13,1,2],[5,5,2],[9,7,3],[13,8,2]],
+        tresors: [["or",4,3,15],["coffre",10,3,50],["or",2,7,15]],
+        artefacts: [["bottesDuVent",8,5]],
+        equipements: []
       },
-
       {
         nom: "FORTERESSE DU GUERRIER",
-        couleurSol: "#684949",
-        couleurDetail: "#553939",
-
+        sol: "#684949",
+        detail: "#553939",
+        objectif: {
+          texte: "Trouver et équiper le Casque de Fer",
+          progression: () => joueur.equipement.casque ? 1 : 0,
+          cible: 1
+        },
         carte: [
           [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
           [2,0,0,0,0,0,2,0,0,0,2,0,0,0,0,2],
@@ -848,606 +883,317 @@
           [2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,2],
           [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
         ],
-
-        joueur: {
-          colonne: 1,
-          ligne: 1
+        depart: [1,1],
+        ennemis: [[13,1,3],[7,3,3],[5,7,3],[13,7,3],[8,9,5]],
+        tresors: [["or",3,3,20],["coffre",10,5,75]],
+        artefacts: [["emblemeGuerrier",8,7]],
+        equipements: [["casqueFer",13,9]]
+      },
+      {
+        nom: "CAVERNE DE GLACE",
+        sol: "#8bc5d6",
+        detail: "#6dacbf",
+        objectif: {
+          texte: "Trouver et équiper l’Armure Ancienne",
+          progression: () => joueur.equipement.armure ? 1 : 0,
+          cible: 1
         },
-
-        ennemis: [
-          { colonne: 13, ligne: 1, vie: 3 },
-          { colonne: 7, ligne: 3, vie: 3 },
-          { colonne: 5, ligne: 7, vie: 3 },
-          { colonne: 13, ligne: 7, vie: 3 },
-          { colonne: 8, ligne: 9, vie: 5 }
+        carte: [
+          [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6],
+          [6,0,0,0,0,0,6,0,0,0,0,0,0,0,0,6],
+          [6,0,6,6,0,0,6,0,6,6,6,0,6,6,0,6],
+          [6,0,0,6,0,7,0,0,0,0,6,0,0,6,0,6],
+          [6,6,0,6,0,7,6,6,0,0,6,6,0,6,0,6],
+          [6,0,0,0,0,0,0,6,0,7,0,0,0,0,0,6],
+          [6,0,6,6,6,0,0,6,0,7,0,6,6,6,0,6],
+          [6,0,0,0,6,0,0,0,0,0,0,6,0,0,0,6],
+          [6,6,6,0,6,6,0,6,6,6,0,6,0,6,0,6],
+          [6,0,0,0,0,0,0,0,0,0,0,0,0,6,0,6],
+          [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]
         ],
-
-        tresors: [
-          { type: "or", colonne: 3, ligne: 3, valeur: 20 },
-          { type: "coffre", colonne: 10, ligne: 5, valeur: 75 },
-          { type: "or", colonne: 3, ligne: 9, valeur: 20 },
-          { type: "coffre", colonne: 13, ligne: 9, valeur: 75 }
+        depart: [1,1],
+        ennemis: [[13,1,3],[4,5,3],[10,7,4],[13,9,4]],
+        tresors: [["or",3,3,25],["coffre",12,5,85]],
+        artefacts: [],
+        equipements: [["armureAncienne",8,9]]
+      },
+      {
+        nom: "VOLCAN DU ROI SOMBRE",
+        sol: "#6a302b",
+        detail: "#4d211f",
+        objectif: {
+          texte: "Trouver le Bouclier Royal",
+          progression: () => joueur.equipement.bouclier ? 1 : 0,
+          cible: 1
+        },
+        carte: [
+          [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
+          [5,0,0,0,0,5,0,0,0,0,0,5,0,0,0,5],
+          [5,0,5,5,0,5,0,5,5,5,0,5,0,5,0,5],
+          [5,0,0,5,0,0,0,0,0,5,0,0,0,5,0,5],
+          [5,5,0,5,5,5,0,5,0,5,5,5,0,5,0,5],
+          [5,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5],
+          [5,0,5,5,5,0,5,5,5,5,0,5,5,5,0,5],
+          [5,0,0,0,5,0,0,0,0,0,0,5,0,0,0,5],
+          [5,5,5,0,5,5,0,5,5,5,0,5,0,5,0,5],
+          [5,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5],
+          [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]
         ],
-
-        artefacts: [
-          {
-            id: "emblemeGuerrier",
-            colonne: 8,
-            ligne: 7
-          }
-        ]
+        depart: [1,1],
+        ennemis: [[13,1,4],[6,3,4],[3,7,4],[9,7,5],[13,9,7]],
+        tresors: [["coffre",3,5,100],["coffre",10,9,120]],
+        artefacts: [],
+        equipements: [["bouclierRoyal",12,7]]
       }
     ];
 
     /* =========================================================
-       JOUEUR
+       ÉTAT GLOBAL
        ========================================================= */
+    const stats = {
+      score: 0,
+      or: 0,
+      tresors: 0,
+      tresorsNiveau: 0,
+      ennemis: 0
+    };
 
-    const joueur = {
-      x: 0,
-      y: 0,
+    const message = { texte: "", temps: 0 };
 
-      largeur: 24,
-      hauteur: 24,
+    let niveauIndex = 0;
+    let niveau = NIVEAUX[0];
+    let ennemisActifs = [];
+    let tresorsActifs = [];
+    let artefactsActifs = [];
+    let equipementsActifs = [];
+    let prochainEnnemiId = 1;
 
-      vitesseBase: 150,
-      multiplicateurVitesse: 1,
+    let sortieOuverte = false;
+    let transition = false;
+    let jeuTermine = false;
+    let victoire = false;
+    let pause = true;
+    let tempsJeu = 0;
+    let ancienTemps = performance.now();
 
-      direction: "bas",
-
-      vie: 3,
-      vieMaximum: 3,
-
-      degatsEpee: 1,
-
-      invulnerable: false,
-      tempsInvulnerabilite: 0,
-      dureeInvulnerabilite: 1.15,
-
-      attaqueActive: false,
-      tempsAttaque: 0,
-      dureeAttaque: 0.18,
-
-      rechargeAttaque: 0,
-      dureeRecharge: 0.26,
-
-      ennemisTouchesPendantAttaque: new Set()
+    const porte = {
+      x: W - TILE,
+      y: HUD + 4 * TILE,
+      w: TILE,
+      h: TILE * 2
     };
 
     /* =========================================================
-       ENNEMIS
+       CRÉATION ET CHARGEMENT
        ========================================================= */
-
-    let ennemis = [];
-    let prochainIdentifiantEnnemi = 1;
-
-    function creerEnnemi(definition) {
-      const position = positionDepuisCase(
-        definition.colonne,
-        definition.ligne
-      );
-
+    function creerEnnemi([col, row, vie]) {
+      const p = positionCase(col, row);
       return {
-        identifiant: prochainIdentifiantEnnemi++,
-
-        x: position.x,
-        y: position.y,
-
-        largeur: 24,
-        hauteur: 24,
-
-        vitesse: entierAleatoire(50, 82),
-
-        vie: definition.vie,
-        vieMaximum: definition.vie,
-
-        directionX: 0,
-        directionY: 0,
-
-        tempsAvantChangementDirection: 0,
-
-        tempsRecul: 0,
+        id: prochainEnnemiId++,
+        x: p.x, y: p.y, w: 24, h: 24,
+        vie, vieMax: vie,
+        vitesse: randInt(48, 82),
+        dx: 0, dy: 0,
+        prochainChoix: 0,
+        recul: 0,
         reculX: 0,
         reculY: 0
       };
     }
 
-    function choisirDirectionEnnemi(ennemi) {
-      const directions = [
-        { x: 1, y: 0 },
-        { x: -1, y: 0 },
-        { x: 0, y: 1 },
-        { x: 0, y: -1 },
-        { x: 0, y: 0 }
-      ];
-
-      const direction =
-        directions[entierAleatoire(0, directions.length - 1)];
-
-      ennemi.directionX = direction.x;
-      ennemi.directionY = direction.y;
-
-      ennemi.tempsAvantChangementDirection =
-        0.5 + Math.random() * 1.5;
+    function creerTresor([type, col, row, valeur], index) {
+      const taille = type === "coffre" ? 24 : 16;
+      const p = positionCase(col, row, taille, taille);
+      return { id: index, type, valeur, x: p.x, y: p.y, w: taille, h: taille, pris: false };
     }
 
-    /* =========================================================
-       TRÉSORS ET ARTÉFACTS PRÉSENTS SUR LA CARTE
-       ========================================================= */
-
-    let tresorsActifs = [];
-    let artefactsActifs = [];
-
-    function creerTresor(definition, index) {
-      const taille = definition.type === "coffre" ? 24 : 16;
-
-      const position = positionDepuisCase(
-        definition.colonne,
-        definition.ligne,
-        taille,
-        taille
-      );
-
-      return {
-        id: index,
-
-        type: definition.type,
-
-        x: position.x,
-        y: position.y,
-
-        largeur: taille,
-        hauteur: taille,
-
-        valeur: definition.valeur,
-
-        ramasse: false
-      };
+    function creerArtefact([id, col, row]) {
+      const p = positionCase(col, row, 22, 22);
+      return { id, x: p.x, y: p.y, w: 22, h: 22, pris: artefactsObtenus.has(id) };
     }
 
-    function creerArtefactCarte(definition) {
-      const position = positionDepuisCase(
-        definition.colonne,
-        definition.ligne,
-        22,
-        22
-      );
-
-      return {
-        id: definition.id,
-
-        x: position.x,
-        y: position.y,
-
-        largeur: 22,
-        hauteur: 22,
-
-        ramasse: artefactsObtenus.has(definition.id)
-      };
+    function creerEquipement([id, col, row]) {
+      const p = positionCase(col, row, 24, 24);
+      return { id, x: p.x, y: p.y, w: 24, h: 24, pris: equipementsObtenus.has(id) };
     }
 
-    function verifierCollectes() {
-      for (const tresor of tresorsActifs) {
-        if (
-          tresor.ramasse ||
-          !rectanglesSeTouchent(joueur, tresor)
-        ) {
-          continue;
-        }
-
-        tresor.ramasse = true;
-
-        statistiques.tresorsRamasses += 1;
-        statistiques.or += tresor.valeur;
-
-        if (tresor.type === "coffre") {
-          statistiques.coffresOuverts += 1;
-          ajouterScore(tresor.valeur * 10);
-
-          afficherMessage(
-            "COFFRE OUVERT : +" + tresor.valeur + " OR",
-            1.8
-          );
-        } else {
-          ajouterScore(tresor.valeur * 5);
-
-          afficherMessage(
-            "+" + tresor.valeur + " OR",
-            1
-          );
-        }
-
-        verifierProgressionQuete();
-      }
-
-      for (const artefact of artefactsActifs) {
-        if (
-          artefact.ramasse ||
-          !rectanglesSeTouchent(joueur, artefact)
-        ) {
-          continue;
-        }
-
-        artefact.ramasse = true;
-
-        ajouterScore(500);
-        obtenirArtefact(artefact.id);
-      }
-    }
-
-    /* =========================================================
-       ÉTAT GLOBAL DU JEU
-       ========================================================= */
-
-    let indexTableau = 0;
-    let tableauActuel = tableaux[0];
-
-    let sortieOuverte = false;
-    let transitionTableau = false;
-
-    let jeuTermine = false;
-    let victoireFinale = false;
-
-    let jeuEnPause = false;
-
-    let tempsEcoule = 0;
-    let ancienTemps = performance.now();
-
-    let messageTemporaire = "";
-    let tempsMessage = 0;
-
-    const porteSortie = {
-      x: LARGEUR_CANVAS - TAILLE_CASE,
-      y: HAUTEUR_INTERFACE + 4 * TAILLE_CASE,
-      largeur: TAILLE_CASE,
-      hauteur: TAILLE_CASE * 2
-    };
-
-    function afficherMessage(message, duree) {
-      messageTemporaire = message;
-      tempsMessage = duree;
-    }
-
-    /* =========================================================
-       CHARGEMENT ET PROGRESSION DES TABLEAUX
-       ========================================================= */
-
-    function chargerTableau(nouvelIndex) {
-      if (nouvelIndex >= tableaux.length) {
+    function chargerNiveau(index) {
+      if (index >= NIVEAUX.length) {
+        transition = false;
         jeuTermine = true;
-        victoireFinale = true;
-        transitionTableau = false;
+        victoire = true;
         return;
       }
 
-      indexTableau = nouvelIndex;
-      tableauActuel = tableaux[indexTableau];
-
+      niveauIndex = index;
+      niveau = NIVEAUX[index];
       sortieOuverte = false;
-      transitionTableau = false;
+      transition = false;
+      stats.tresorsNiveau = 0;
 
-      const depart = positionDepuisCase(
-        tableauActuel.joueur.colonne,
-        tableauActuel.joueur.ligne,
-        joueur.largeur,
-        joueur.hauteur
-      );
-
+      const depart = positionCase(niveau.depart[0], niveau.depart[1], joueur.w, joueur.h);
       joueur.x = depart.x;
       joueur.y = depart.y;
-
       joueur.direction = "bas";
       joueur.invulnerable = false;
-      joueur.tempsInvulnerabilite = 0;
-
+      joueur.tempsInvulnerable = 0;
       joueur.attaqueActive = false;
-      joueur.rechargeAttaque = 0;
-      joueur.ennemisTouchesPendantAttaque.clear();
+      joueur.recharge = 0;
+      joueur.touchesAttaque.clear();
 
-      ennemis = tableauActuel.ennemis.map(creerEnnemi);
+      ennemisActifs = niveau.ennemis.map(creerEnnemi);
+      tresorsActifs = niveau.tresors.map(creerTresor);
+      artefactsActifs = niveau.artefacts.map(creerArtefact);
+      equipementsActifs = niveau.equipements.map(creerEquipement);
 
-      tresorsActifs = tableauActuel.tresors.map(
-        creerTresor
-      );
-
-      artefactsActifs = tableauActuel.artefacts.map(
-        creerArtefactCarte
-      );
-
-      afficherMessage(
-        "TABLEAU " +
-        (indexTableau + 1) +
-        " : " +
-        tableauActuel.nom,
-        2.3
-      );
-
+      afficherMessage("NIVEAU " + (niveauIndex + 1) + " : " + niveau.nom, 2.4);
       ancienTemps = performance.now();
       canvas.focus();
     }
 
-    function verifierOuvertureSortie() {
-      if (
-        ennemis.length === 0 &&
-        queteNecessairePourTableauTerminee() &&
-        !sortieOuverte
-      ) {
-        sortieOuverte = true;
-
-        afficherMessage(
-          "LA SORTIE EST OUVERTE !",
-          2
-        );
-      }
-    }
-
-    function verifierSortie() {
-      if (
-        !sortieOuverte ||
-        transitionTableau ||
-        jeuTermine
-      ) {
-        return;
-      }
-
-      if (
-        joueur.x + joueur.largeur >
-        LARGEUR_CANVAS - 4
-      ) {
-        transitionTableau = true;
-      }
-    }
-
     function recommencerAventure() {
-      statistiques.score = 0;
-      statistiques.or = 0;
-      statistiques.tresorsRamasses = 0;
-      statistiques.coffresOuverts = 0;
-      statistiques.ennemisVaincus = 0;
+      if (!personnageSelectionne) return;
+
+      stats.score = 0;
+      stats.or = 0;
+      stats.tresors = 0;
+      stats.tresorsNiveau = 0;
+      stats.ennemis = 0;
 
       artefactsObtenus.clear();
-      indexQueteActuelle = 0;
+      equipementsObtenus.clear();
 
-      joueur.vieMaximum = 3;
-      joueur.vie = 3;
+      appliquerPersonnage(personnageSelectionne);
 
-      joueur.multiplicateurVitesse = 1;
-      joueur.degatsEpee = 1;
-
-      tempsEcoule = 0;
-
+      tempsJeu = 0;
       jeuTermine = false;
-      victoireFinale = false;
-      transitionTableau = false;
+      victoire = false;
+      transition = false;
 
-      mettreAJourListeArtefacts();
-      chargerTableau(0);
+      remplirCollection();
+      chargerNiveau(0);
+    }
+
+    function verifierObjectif() {
+      const objectifAtteint = niveau.objectif.progression() >= niveau.objectif.cible;
+
+      if (ennemisActifs.length === 0 && objectifAtteint && !sortieOuverte) {
+        sortieOuverte = true;
+        afficherMessage("OBJECTIF TERMINÉ — SORTIE OUVERTE !", 2.2);
+      }
     }
 
     /* =========================================================
        COLLISIONS AVEC LA CARTE
        ========================================================= */
-
-    function obtenirCaseDepuisPosition(x, y) {
+    function caseDepuisPosition(x, y) {
       return {
-        colonne: Math.floor(x / TAILLE_CASE),
-
-        ligne: Math.floor(
-          (y - HAUTEUR_INTERFACE) / TAILLE_CASE
-        )
+        col: Math.floor(x / TILE),
+        row: Math.floor((y - HUD) / TILE)
       };
     }
 
-    function caseEstSolide(colonne, ligne) {
-      if (
-        colonne < 0 ||
-        colonne >= COLONNES ||
-        ligne < 0 ||
-        ligne >= LIGNES
-      ) {
-        return true;
-      }
+    function caseSolide(col, row) {
+      if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return true;
 
-      if (
-        sortieOuverte &&
-        colonne === COLONNES - 1 &&
-        (ligne === 4 || ligne === 5)
-      ) {
+      if (sortieOuverte && col === COLS - 1 && (row === 4 || row === 5)) {
         return false;
       }
 
-      return tableauActuel.carte[ligne][colonne] !== SOL;
+      return niveau.carte[row][col] !== SOL;
     }
 
-    function rectangleToucheCarte(
-      x,
-      y,
-      largeur,
-      hauteur
-    ) {
-      const marge = 2;
-
+    function toucheCarte(x, y, w, h) {
+      const m = 2;
       const points = [
-        { x: x + marge, y: y + marge },
-
-        {
-          x: x + largeur - marge,
-          y: y + marge
-        },
-
-        {
-          x: x + marge,
-          y: y + hauteur - marge
-        },
-
-        {
-          x: x + largeur - marge,
-          y: y + hauteur - marge
-        }
+        [x + m, y + m],
+        [x + w - m, y + m],
+        [x + m, y + h - m],
+        [x + w - m, y + h - m]
       ];
 
-      for (const point of points) {
-        const position =
-          obtenirCaseDepuisPosition(point.x, point.y);
-
-        if (
-          caseEstSolide(
-            position.colonne,
-            position.ligne
-          )
-        ) {
-          return true;
-        }
-      }
-
-      return false;
+      return points.some(([px, py]) => {
+        const c = caseDepuisPosition(px, py);
+        return caseSolide(c.col, c.row);
+      });
     }
 
-    function deplacerAvecCollisions(
-      entite,
-      mouvementX,
-      mouvementY
-    ) {
+    function deplacerAvecCollision(entite, mx, my) {
       let collisionX = false;
       let collisionY = false;
 
-      const futurX = entite.x + mouvementX;
-
-      if (
-        !rectangleToucheCarte(
-          futurX,
-          entite.y,
-          entite.largeur,
-          entite.hauteur
-        )
-      ) {
-        entite.x = futurX;
+      if (!toucheCarte(entite.x + mx, entite.y, entite.w, entite.h)) {
+        entite.x += mx;
       } else {
         collisionX = true;
       }
 
-      const futurY = entite.y + mouvementY;
-
-      if (
-        !rectangleToucheCarte(
-          entite.x,
-          futurY,
-          entite.largeur,
-          entite.hauteur
-        )
-      ) {
-        entite.y = futurY;
+      if (!toucheCarte(entite.x, entite.y + my, entite.w, entite.h)) {
+        entite.y += my;
       } else {
         collisionY = true;
       }
 
-      return {
-        collisionX,
-        collisionY
-      };
+      return { collisionX, collisionY };
     }
 
     /* =========================================================
-       CLAVIER
+       CLAVIER ET COMMANDES
        ========================================================= */
-
     const touches = Object.create(null);
+    const touchesBloquees = new Set(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"]);
 
-    const touchesBloquees = new Set([
-      "ArrowUp",
-      "ArrowDown",
-      "ArrowLeft",
-      "ArrowRight",
-      "Space"
-    ]);
+    window.addEventListener("keydown", event => {
+      if (touchesBloquees.has(event.code)) event.preventDefault();
 
-    window.addEventListener("keydown", function (event) {
-      if (touchesBloquees.has(event.code)) {
-        event.preventDefault();
-      }
-
-      if (jeuEnPause) {
-        if (event.code === "Escape") {
-          fermerToutesLesModales();
-        }
-
+      if (pause) {
+        if (event.code === "Escape") fermerModales();
         return;
       }
 
       touches[event.code] = true;
 
-      if (
-        event.code === "Space" &&
-        !event.repeat
-      ) {
-        if (transitionTableau) {
-          chargerTableau(indexTableau + 1);
-        } else if (jeuTermine) {
-          recommencerAventure();
-        } else {
-          demarrerAttaque();
-        }
+      if (event.code === "Space" && !event.repeat) {
+        if (transition) chargerNiveau(niveauIndex + 1);
+        else if (jeuTermine) recommencerAventure();
+        else demarrerAttaque();
       }
 
-      if (
-        event.code === "Enter" &&
-        transitionTableau &&
-        !event.repeat
-      ) {
-        chargerTableau(indexTableau + 1);
+      if (event.code === "Enter" && transition && !event.repeat) {
+        chargerNiveau(niveauIndex + 1);
       }
 
-      if (
-        event.code === "KeyR" &&
-        !event.repeat
-      ) {
-        recommencerAventure();
-      }
+      if (event.code === "KeyR" && !event.repeat) recommencerAventure();
+      if (event.code === "KeyC" && !event.repeat) afficherSelectionPersonnage();
 
-      if (
-        jeuTermine &&
-        !event.repeat &&
-        event.code !== "KeyR"
-      ) {
+      if (jeuTermine && !event.repeat && !["KeyR","KeyC","Space"].includes(event.code)) {
         recommencerAventure();
       }
     });
 
-    window.addEventListener("keyup", function (event) {
+    window.addEventListener("keyup", event => {
       touches[event.code] = false;
     });
 
-    window.addEventListener("blur", function () {
-      for (const code in touches) {
-        touches[code] = false;
-      }
+    window.addEventListener("blur", () => {
+      Object.keys(touches).forEach(code => touches[code] = false);
     });
 
-    /* =========================================================
-       COMMANDES TACTILES
-       ========================================================= */
+    function connecterDirection(id, code) {
+      const bouton = document.getElementById(id);
 
-    function connecterBoutonDirection(
-      idBouton,
-      codeTouche
-    ) {
-      const bouton = document.getElementById(idBouton);
-
-      function activer(event) {
+      const activer = event => {
         event.preventDefault();
-
-        touches[codeTouche] = true;
+        touches[code] = true;
         bouton.classList.add("active");
-
         canvas.focus();
-      }
+      };
 
-      function desactiver(event) {
+      const desactiver = event => {
         event.preventDefault();
-
-        touches[codeTouche] = false;
+        touches[code] = false;
         bouton.classList.remove("active");
-      }
+      };
 
       bouton.addEventListener("pointerdown", activer);
       bouton.addEventListener("pointerup", desactiver);
@@ -1455,531 +1201,379 @@
       bouton.addEventListener("pointerleave", desactiver);
     }
 
-    connecterBoutonDirection(
-      "touch-up",
-      "ArrowUp"
-    );
+    connecterDirection("touch-up", "ArrowUp");
+    connecterDirection("touch-down", "ArrowDown");
+    connecterDirection("touch-left", "ArrowLeft");
+    connecterDirection("touch-right", "ArrowRight");
 
-    connecterBoutonDirection(
-      "touch-down",
-      "ArrowDown"
-    );
+    const boutonAttaque = document.getElementById("touch-attack");
 
-    connecterBoutonDirection(
-      "touch-left",
-      "ArrowLeft"
-    );
+    boutonAttaque.addEventListener("pointerdown", event => {
+      event.preventDefault();
 
-    connecterBoutonDirection(
-      "touch-right",
-      "ArrowRight"
-    );
+      if (jeuTermine) recommencerAventure();
+      else if (transition) chargerNiveau(niveauIndex + 1);
+      else demarrerAttaque();
 
-    const boutonAttaque =
-      document.getElementById("touch-attack");
+      boutonAttaque.classList.add("active");
+      canvas.focus();
+    });
 
-    boutonAttaque.addEventListener(
-      "pointerdown",
-      function (event) {
-        event.preventDefault();
-
-        if (jeuTermine) {
-          recommencerAventure();
-        } else if (transitionTableau) {
-          chargerTableau(indexTableau + 1);
-        } else {
-          demarrerAttaque();
-        }
-
-        boutonAttaque.classList.add("active");
-        canvas.focus();
-      }
-    );
-
-    boutonAttaque.addEventListener(
-      "pointerup",
-      function () {
-        boutonAttaque.classList.remove("active");
-      }
-    );
+    ["pointerup","pointercancel","pointerleave"].forEach(type => {
+      boutonAttaque.addEventListener(type, () => boutonAttaque.classList.remove("active"));
+    });
 
     /* =========================================================
-       ATTAQUE
+       COMBAT
        ========================================================= */
-
     function demarrerAttaque() {
-      if (
-        jeuEnPause ||
-        jeuTermine ||
-        transitionTableau ||
-        joueur.attaqueActive ||
-        joueur.rechargeAttaque > 0
-      ) {
-        return;
-      }
+      if (pause || jeuTermine || transition || joueur.attaqueActive || joueur.recharge > 0) return;
 
       joueur.attaqueActive = true;
-      joueur.tempsAttaque =
-        joueur.dureeAttaque;
-
-      joueur.rechargeAttaque =
-        joueur.dureeRecharge;
-
-      joueur.ennemisTouchesPendantAttaque.clear();
+      joueur.tempsAttaque = joueur.dureeAttaque;
+      joueur.recharge = joueur.rechargeMax;
+      joueur.touchesAttaque.clear();
     }
 
-    function obtenirRectangleEpee() {
-      const longueur = 30;
+    function rectangleEpee() {
+      const longueur = joueur.portee;
       const epaisseur = 10;
 
       if (joueur.direction === "haut") {
         return {
-          x:
-            joueur.x +
-            joueur.largeur / 2 -
-            epaisseur / 2,
-
+          x: joueur.x + joueur.w / 2 - epaisseur / 2,
           y: joueur.y - longueur,
-
-          largeur: epaisseur,
-          hauteur: longueur
+          w: epaisseur,
+          h: longueur
         };
       }
 
       if (joueur.direction === "bas") {
         return {
-          x:
-            joueur.x +
-            joueur.largeur / 2 -
-            epaisseur / 2,
-
-          y: joueur.y + joueur.hauteur,
-
-          largeur: epaisseur,
-          hauteur: longueur
+          x: joueur.x + joueur.w / 2 - epaisseur / 2,
+          y: joueur.y + joueur.h,
+          w: epaisseur,
+          h: longueur
         };
       }
 
       if (joueur.direction === "gauche") {
         return {
           x: joueur.x - longueur,
-
-          y:
-            joueur.y +
-            joueur.hauteur / 2 -
-            epaisseur / 2,
-
-          largeur: longueur,
-          hauteur: epaisseur
+          y: joueur.y + joueur.h / 2 - epaisseur / 2,
+          w: longueur,
+          h: epaisseur
         };
       }
 
       return {
-        x: joueur.x + joueur.largeur,
-
-        y:
-          joueur.y +
-          joueur.hauteur / 2 -
-          epaisseur / 2,
-
-        largeur: longueur,
-        hauteur: epaisseur
+        x: joueur.x + joueur.w,
+        y: joueur.y + joueur.h / 2 - epaisseur / 2,
+        w: longueur,
+        h: epaisseur
       };
     }
 
-    function verifierCoupsEpee() {
-      if (!joueur.attaqueActive) {
-        return;
-      }
+    function verifierCoups() {
+      if (!joueur.attaqueActive) return;
 
-      const epee = obtenirRectangleEpee();
+      const epee = rectangleEpee();
 
-      for (const ennemi of ennemis) {
-        if (
-          joueur.ennemisTouchesPendantAttaque.has(
-            ennemi.identifiant
-          )
-        ) {
-          continue;
-        }
+      ennemisActifs.forEach(ennemi => {
+        if (joueur.touchesAttaque.has(ennemi.id) || !collisionRect(epee, ennemi)) return;
 
-        if (!rectanglesSeTouchent(epee, ennemi)) {
-          continue;
-        }
+        joueur.touchesAttaque.add(ennemi.id);
+        ennemi.vie -= attaqueJoueur();
+        ennemi.recul = .12;
 
-        joueur.ennemisTouchesPendantAttaque.add(
-          ennemi.identifiant
-        );
-
-        ennemi.vie -= joueur.degatsEpee;
-        ennemi.tempsRecul = 0.12;
-
-        if (joueur.direction === "haut") {
-          ennemi.reculX = 0;
-          ennemi.reculY = -140;
-        }
-
-        if (joueur.direction === "bas") {
-          ennemi.reculX = 0;
-          ennemi.reculY = 140;
-        }
-
-        if (joueur.direction === "gauche") {
-          ennemi.reculX = -140;
-          ennemi.reculY = 0;
-        }
-
-        if (joueur.direction === "droite") {
-          ennemi.reculX = 140;
-          ennemi.reculY = 0;
-        }
-      }
-
-      const nombreAvant = ennemis.length;
-
-      ennemis = ennemis.filter(function (ennemi) {
-        return ennemi.vie > 0;
+        if (joueur.direction === "haut")  { ennemi.reculX = 0; ennemi.reculY = -145; }
+        if (joueur.direction === "bas")   { ennemi.reculX = 0; ennemi.reculY = 145; }
+        if (joueur.direction === "gauche"){ ennemi.reculX = -145; ennemi.reculY = 0; }
+        if (joueur.direction === "droite"){ ennemi.reculX = 145; ennemi.reculY = 0; }
       });
 
-      const ennemisElimines =
-        nombreAvant - ennemis.length;
+      const avant = ennemisActifs.length;
+      ennemisActifs = ennemisActifs.filter(e => e.vie > 0);
+      const tues = avant - ennemisActifs.length;
 
-      if (ennemisElimines > 0) {
-        statistiques.ennemisVaincus +=
-          ennemisElimines;
-
-        ajouterScore(ennemisElimines * 100);
-
-        verifierProgressionQuete();
-        verifierOuvertureSortie();
+      if (tues > 0) {
+        stats.ennemis += tues;
+        stats.score += tues * 100;
+        verifierObjectif();
       }
     }
 
-    /* =========================================================
-       MISE À JOUR DU JOUEUR
-       ========================================================= */
+    function verifierDegats() {
+      if (joueur.invulnerable || transition || jeuTermine) return;
 
-    function mettreAJourJoueur(deltaTime) {
-      let directionX = 0;
-      let directionY = 0;
+      for (const ennemi of ennemisActifs) {
+        if (!collisionRect(joueur, ennemi)) continue;
 
-      const haut =
-        touches.ArrowUp ||
-        touches.KeyZ ||
-        touches.KeyW;
-
-      const bas =
-        touches.ArrowDown ||
-        touches.KeyS;
-
-      const gauche =
-        touches.ArrowLeft ||
-        touches.KeyQ ||
-        touches.KeyA;
-
-      const droite =
-        touches.ArrowRight ||
-        touches.KeyD;
-
-      if (haut) directionY -= 1;
-      if (bas) directionY += 1;
-      if (gauche) directionX -= 1;
-      if (droite) directionX += 1;
-
-      if (
-        directionX !== 0 &&
-        directionY !== 0
-      ) {
-        directionX *= Math.SQRT1_2;
-        directionY *= Math.SQRT1_2;
-      }
-
-      if (
-        Math.abs(directionX) >
-        Math.abs(directionY)
-      ) {
-        if (directionX < 0) {
-          joueur.direction = "gauche";
+        if (Math.random() < chanceBlocage()) {
+          afficherMessage("ATTAQUE BLOQUÉE !", .8);
+        } else {
+          joueur.vie -= 1;
         }
-
-        if (directionX > 0) {
-          joueur.direction = "droite";
-        }
-      } else if (directionY !== 0) {
-        if (directionY < 0) {
-          joueur.direction = "haut";
-        }
-
-        if (directionY > 0) {
-          joueur.direction = "bas";
-        }
-      }
-
-      const vitesse =
-        joueur.vitesseBase *
-        joueur.multiplicateurVitesse *
-        (joueur.attaqueActive ? 0.7 : 1);
-
-      deplacerAvecCollisions(
-        joueur,
-        directionX * vitesse * deltaTime,
-        directionY * vitesse * deltaTime
-      );
-
-      if (joueur.attaqueActive) {
-        joueur.tempsAttaque -= deltaTime;
-
-        if (joueur.tempsAttaque <= 0) {
-          joueur.attaqueActive = false;
-        }
-      }
-
-      if (joueur.rechargeAttaque > 0) {
-        joueur.rechargeAttaque -= deltaTime;
-
-        joueur.rechargeAttaque = Math.max(
-          0,
-          joueur.rechargeAttaque
-        );
-      }
-
-      if (joueur.invulnerable) {
-        joueur.tempsInvulnerabilite -= deltaTime;
-
-        if (joueur.tempsInvulnerabilite <= 0) {
-          joueur.invulnerable = false;
-        }
-      }
-    }
-
-    /* =========================================================
-       MISE À JOUR DES ENNEMIS
-       ========================================================= */
-
-    function mettreAJourEnnemis(deltaTime) {
-      for (const ennemi of ennemis) {
-        if (ennemi.tempsRecul > 0) {
-          ennemi.tempsRecul -= deltaTime;
-
-          deplacerAvecCollisions(
-            ennemi,
-            ennemi.reculX * deltaTime,
-            ennemi.reculY * deltaTime
-          );
-
-          continue;
-        }
-
-        ennemi.tempsAvantChangementDirection -=
-          deltaTime;
-
-        if (
-          ennemi.tempsAvantChangementDirection <= 0
-        ) {
-          choisirDirectionEnnemi(ennemi);
-        }
-
-        const collisions = deplacerAvecCollisions(
-          ennemi,
-
-          ennemi.directionX *
-          ennemi.vitesse *
-          deltaTime,
-
-          ennemi.directionY *
-          ennemi.vitesse *
-          deltaTime
-        );
-
-        if (
-          collisions.collisionX ||
-          collisions.collisionY
-        ) {
-          choisirDirectionEnnemi(ennemi);
-        }
-      }
-    }
-
-    function verifierDegatsJoueur() {
-      if (
-        joueur.invulnerable ||
-        jeuTermine ||
-        transitionTableau
-      ) {
-        return;
-      }
-
-      for (const ennemi of ennemis) {
-        if (
-          !rectanglesSeTouchent(joueur, ennemi)
-        ) {
-          continue;
-        }
-
-        joueur.vie -= 1;
 
         joueur.invulnerable = true;
+        joueur.tempsInvulnerable = joueur.dureeInvulnerable;
 
-        joueur.tempsInvulnerabilite =
-          joueur.dureeInvulnerabilite;
+        const jx = joueur.x + joueur.w / 2;
+        const jy = joueur.y + joueur.h / 2;
+        const ex = ennemi.x + ennemi.w / 2;
+        const ey = ennemi.y + ennemi.h / 2;
+        const longueur = Math.hypot(jx - ex, jy - ey) || 1;
+
+        deplacerAvecCollision(
+          joueur,
+          ((jx - ex) / longueur) * 25,
+          ((jy - ey) / longueur) * 25
+        );
 
         if (joueur.vie <= 0) {
           joueur.vie = 0;
-
           jeuTermine = true;
-          victoireFinale = false;
+          victoire = false;
         }
-
         break;
       }
     }
 
     /* =========================================================
-       MISE À JOUR PRINCIPALE
+       COLLECTE
        ========================================================= */
+    function verifierCollectes() {
+      tresorsActifs.forEach(tresor => {
+        if (tresor.pris || !collisionRect(joueur, tresor)) return;
 
-    function update(deltaTime) {
-      if (
-        jeuEnPause ||
-        jeuTermine ||
-        transitionTableau
-      ) {
-        return;
+        tresor.pris = true;
+        stats.tresors += 1;
+        stats.tresorsNiveau += 1;
+
+        const valeur = Math.round(tresor.valeur * joueur.multiplicateurOr);
+        stats.or += valeur;
+        stats.score += tresor.type === "coffre" ? valeur * 10 : valeur * 5;
+
+        afficherMessage(
+          tresor.type === "coffre" ? "COFFRE OUVERT : +" + valeur + " OR" : "+" + valeur + " OR",
+          1.4
+        );
+
+        verifierObjectif();
+      });
+
+      artefactsActifs.forEach(objet => {
+        if (objet.pris || !collisionRect(joueur, objet)) return;
+        objet.pris = true;
+        obtenirArtefact(objet.id);
+      });
+
+      equipementsActifs.forEach(objet => {
+        if (objet.pris || !collisionRect(joueur, objet)) return;
+        objet.pris = true;
+        obtenirEquipement(objet.id);
+      });
+    }
+
+    /* =========================================================
+       MISE À JOUR
+       ========================================================= */
+    function choisirDirection(ennemi) {
+      const directions = [[1,0],[-1,0],[0,1],[0,-1],[0,0]];
+      const choix = directions[randInt(0, directions.length - 1)];
+      ennemi.dx = choix[0];
+      ennemi.dy = choix[1];
+      ennemi.prochainChoix = .45 + Math.random() * 1.55;
+    }
+
+    function mettreAJourJoueur(dt) {
+      let dx = 0;
+      let dy = 0;
+
+      if (touches.ArrowUp || touches.KeyZ || touches.KeyW) dy -= 1;
+      if (touches.ArrowDown || touches.KeyS) dy += 1;
+      if (touches.ArrowLeft || touches.KeyQ || touches.KeyA) dx -= 1;
+      if (touches.ArrowRight || touches.KeyD) dx += 1;
+
+      if (dx && dy) {
+        dx *= Math.SQRT1_2;
+        dy *= Math.SQRT1_2;
       }
 
-      tempsEcoule += deltaTime;
-
-      if (tempsMessage > 0) {
-        tempsMessage -= deltaTime;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) joueur.direction = "gauche";
+        if (dx > 0) joueur.direction = "droite";
+      } else if (dy) {
+        joueur.direction = dy < 0 ? "haut" : "bas";
       }
 
-      mettreAJourJoueur(deltaTime);
-      mettreAJourEnnemis(deltaTime);
+      const vitesse = vitesseJoueur() * (joueur.attaqueActive ? .72 : 1);
+      deplacerAvecCollision(joueur, dx * vitesse * dt, dy * vitesse * dt);
 
-      verifierCoupsEpee();
-      verifierDegatsJoueur();
+      if (joueur.attaqueActive) {
+        joueur.tempsAttaque -= dt;
+        if (joueur.tempsAttaque <= 0) joueur.attaqueActive = false;
+      }
+
+      joueur.recharge = Math.max(0, joueur.recharge - dt);
+
+      if (joueur.invulnerable) {
+        joueur.tempsInvulnerable -= dt;
+        if (joueur.tempsInvulnerable <= 0) joueur.invulnerable = false;
+      }
+    }
+
+    function mettreAJourEnnemis(dt) {
+      ennemisActifs.forEach(ennemi => {
+        if (ennemi.recul > 0) {
+          ennemi.recul -= dt;
+          deplacerAvecCollision(ennemi, ennemi.reculX * dt, ennemi.reculY * dt);
+          return;
+        }
+
+        ennemi.prochainChoix -= dt;
+        if (ennemi.prochainChoix <= 0) choisirDirection(ennemi);
+
+        const collisions = deplacerAvecCollision(
+          ennemi,
+          ennemi.dx * ennemi.vitesse * dt,
+          ennemi.dy * ennemi.vitesse * dt
+        );
+
+        if (collisions.collisionX || collisions.collisionY) choisirDirection(ennemi);
+      });
+    }
+
+    function verifierSortie() {
+      if (!sortieOuverte || transition || jeuTermine) return;
+
+      if (joueur.x + joueur.w > W - 4) {
+        transition = true;
+      }
+    }
+
+    function update(dt) {
+      if (pause || jeuTermine || transition || !personnageSelectionne) return;
+
+      tempsJeu += dt;
+      message.temps = Math.max(0, message.temps - dt);
+
+      mettreAJourJoueur(dt);
+      mettreAJourEnnemis(dt);
+      verifierCoups();
+      verifierDegats();
       verifierCollectes();
-      verifierOuvertureSortie();
+      verifierObjectif();
       verifierSortie();
     }
 
     /* =========================================================
-       DESSIN DE LA CARTE
+       DESSIN DU TERRAIN
        ========================================================= */
+    function dessinerSol(x, y, col, row) {
+      ctx.fillStyle = niveau.sol;
+      ctx.fillRect(x, y, TILE, TILE);
 
-    function dessinerSol(x, y, colonne, ligne) {
-      ctx.fillStyle =
-        tableauActuel.couleurSol;
-
-      ctx.fillRect(
-        x,
-        y,
-        TAILLE_CASE,
-        TAILLE_CASE
-      );
-
-      ctx.fillStyle =
-        tableauActuel.couleurDetail;
-
-      const motif =
-        (colonne * 7 + ligne * 11) % 5;
-
+      ctx.fillStyle = niveau.detail;
+      const motif = (col * 7 + row * 11) % 5;
       if (motif === 0) {
         ctx.fillRect(x + 5, y + 7, 3, 3);
         ctx.fillRect(x + 22, y + 20, 4, 3);
-      }
-
-      if (motif === 1) {
+      } else if (motif === 1) {
         ctx.fillRect(x + 16, y + 6, 3, 5);
-      }
-
-      if (motif === 2) {
+      } else if (motif === 2) {
         ctx.fillRect(x + 8, y + 22, 6, 2);
       }
     }
 
-    function dessinerArbre(x, y) {
-      ctx.fillStyle = "#70442a";
-      ctx.fillRect(x + 12, y + 18, 8, 12);
+    function dessinerObstacle(type, x, y, col, row) {
+      if (type === ARBRE) {
+        ctx.fillStyle = "#70442a";
+        ctx.fillRect(x + 12, y + 18, 8, 12);
+        ctx.fillStyle = "#174f2b";
+        ctx.fillRect(x + 5, y + 4, 22, 18);
+        ctx.fillRect(x + 2, y + 9, 28, 10);
+        ctx.fillRect(x + 8, y + 1, 16, 24);
+        ctx.fillStyle = "#347f43";
+        ctx.fillRect(x + 8, y + 5, 6, 5);
+      }
 
-      ctx.fillStyle = "#174f2b";
-      ctx.fillRect(x + 5, y + 4, 22, 18);
-      ctx.fillRect(x + 2, y + 9, 28, 10);
-      ctx.fillRect(x + 8, y + 1, 16, 24);
+      if (type === MUR) {
+        ctx.fillStyle = "#735235";
+        ctx.fillRect(x, y, 32, 32);
+        ctx.fillStyle = "#3e2c21";
+        ctx.fillRect(x, y + 14, 32, 3);
+        ctx.fillRect(x + 14, y, 3, 14);
+        ctx.fillRect(x + 6, y + 17, 3, 15);
+        ctx.fillRect(x + 23, y + 17, 3, 15);
+      }
 
-      ctx.fillStyle = "#347f43";
-      ctx.fillRect(x + 8, y + 5, 6, 5);
-      ctx.fillRect(x + 18, y + 10, 5, 6);
-    }
+      if (type === EAU) {
+        ctx.fillStyle = "#286f9d";
+        ctx.fillRect(x, y, 32, 32);
+        const d = Math.floor(tempsJeu * 12 + col * 3 + row * 5) % 16;
+        ctx.fillStyle = "#5db5cf";
+        ctx.fillRect(x + d, y + 8, 10, 3);
+        ctx.fillRect(x + 5, y + 22, 10, 3);
+      }
 
-    function dessinerMur(x, y) {
-      ctx.fillStyle = "#735235";
-      ctx.fillRect(x, y, 32, 32);
+      if (type === ROCHE) {
+        ctx.fillStyle = "#303638";
+        ctx.fillRect(x + 4, y + 8, 24, 20);
+        ctx.fillRect(x + 8, y + 4, 16, 24);
+        ctx.fillStyle = "#626c70";
+        ctx.fillRect(x + 9, y + 7, 8, 5);
+      }
 
-      ctx.fillStyle = "#3e2c21";
-      ctx.fillRect(x, y + 14, 32, 3);
-      ctx.fillRect(x + 14, y, 3, 14);
-      ctx.fillRect(x + 6, y + 17, 3, 15);
-      ctx.fillRect(x + 23, y + 17, 3, 15);
+      if (type === LAVE) {
+        ctx.fillStyle = "#7d241f";
+        ctx.fillRect(x, y, 32, 32);
+        const d = Math.floor(tempsJeu * 14 + col * 5 + row * 3) % 16;
+        ctx.fillStyle = "#ff6b22";
+        ctx.fillRect(x + d, y + 8, 12, 4);
+        ctx.fillStyle = "#ffd04a";
+        ctx.fillRect(x + 5, y + 22, 10, 3);
+      }
 
-      ctx.fillStyle = "#9b7651";
-      ctx.fillRect(x + 3, y + 3, 9, 3);
-    }
+      if (type === GLACE) {
+        ctx.fillStyle = "#8ed4e5";
+        ctx.fillRect(x, y, 32, 32);
+        ctx.fillStyle = "#d8f7ff";
+        ctx.fillRect(x + 4, y + 4, 14, 3);
+        ctx.fillRect(x + 7, y + 8, 3, 10);
+        ctx.fillStyle = "#5aa7bd";
+        ctx.fillRect(x + 20, y + 18, 8, 3);
+      }
 
-    function dessinerEau(
-      x,
-      y,
-      colonne,
-      ligne
-    ) {
-      ctx.fillStyle = "#286f9d";
-      ctx.fillRect(x, y, 32, 32);
-
-      const decalage =
-        Math.floor(
-          tempsEcoule * 12 +
-          colonne * 3 +
-          ligne * 5
-        ) % 16;
-
-      ctx.fillStyle = "#5db5cf";
-      ctx.fillRect(x + decalage, y + 8, 10, 3);
-      ctx.fillRect(x + 5, y + 22, 10, 3);
-    }
-
-    function dessinerRoche(x, y) {
-      ctx.fillStyle = "#303638";
-      ctx.fillRect(x + 4, y + 8, 24, 20);
-      ctx.fillRect(x + 8, y + 4, 16, 24);
-
-      ctx.fillStyle = "#626c70";
-      ctx.fillRect(x + 9, y + 7, 8, 5);
+      if (type === CRISTAL) {
+        ctx.fillStyle = "#2d6e83";
+        ctx.fillRect(x + 10, y + 4, 12, 24);
+        ctx.fillStyle = "#8ff0ff";
+        ctx.fillRect(x + 13, y + 2, 6, 26);
+        ctx.fillStyle = "#d8fbff";
+        ctx.fillRect(x + 15, y + 4, 3, 12);
+      }
     }
 
     function dessinerPorte() {
-      const x = porteSortie.x;
-      const y = porteSortie.y;
+      const x = porte.x;
+      const y = porte.y;
 
       if (sortieOuverte) {
         ctx.fillStyle = "#101010";
         ctx.fillRect(x, y, 32, 64);
-
         ctx.fillStyle = "#7de0ff";
         ctx.fillRect(x + 15, y + 8, 8, 48);
-
         ctx.fillStyle = "#fff178";
         ctx.fillRect(x + 6, y + 9, 5, 5);
         ctx.fillRect(x + 6, y + 49, 5, 5);
       } else {
         ctx.fillStyle = "#5e371f";
         ctx.fillRect(x, y, 32, 64);
-
         ctx.fillStyle = "#a46935";
         ctx.fillRect(x + 4, y + 4, 24, 56);
-
         ctx.fillStyle = "#372015";
         ctx.fillRect(x + 14, y + 4, 4, 56);
-
         ctx.fillStyle = "#d9b04c";
         ctx.fillRect(x + 6, y + 15, 20, 4);
         ctx.fillRect(x + 6, y + 44, 20, 4);
@@ -1987,61 +1581,16 @@
     }
 
     function dessinerCarte() {
-      for (
-        let ligne = 0;
-        ligne < LIGNES;
-        ligne++
-      ) {
-        for (
-          let colonne = 0;
-          colonne < COLONNES;
-          colonne++
-        ) {
-          const x =
-            colonne * TAILLE_CASE;
+      for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+          const x = col * TILE;
+          const y = HUD + row * TILE;
+          const type = niveau.carte[row][col];
 
-          const y =
-            HAUTEUR_INTERFACE +
-            ligne * TAILLE_CASE;
+          dessinerSol(x, y, col, row);
 
-          const typeCase =
-            tableauActuel.carte[ligne][colonne];
-
-          dessinerSol(
-            x,
-            y,
-            colonne,
-            ligne
-          );
-
-          const emplacementPorte =
-            colonne === COLONNES - 1 &&
-            (ligne === 4 || ligne === 5);
-
-          if (emplacementPorte) {
-            continue;
-          }
-
-          if (typeCase === ARBRE) {
-            dessinerArbre(x, y);
-          }
-
-          if (typeCase === MUR) {
-            dessinerMur(x, y);
-          }
-
-          if (typeCase === EAU) {
-            dessinerEau(
-              x,
-              y,
-              colonne,
-              ligne
-            );
-          }
-
-          if (typeCase === ROCHE) {
-            dessinerRoche(x, y);
-          }
+          if (col === COLS - 1 && (row === 4 || row === 5)) continue;
+          if (type !== SOL) dessinerObstacle(type, x, y, col, row);
         }
       }
 
@@ -2049,333 +1598,208 @@
     }
 
     /* =========================================================
-       DESSIN DES TRÉSORS
+       DESSIN DES OBJETS
        ========================================================= */
-
     function dessinerTresors() {
-      for (const tresor of tresorsActifs) {
-        if (tresor.ramasse) {
-          continue;
-        }
+      tresorsActifs.forEach(t => {
+        if (t.pris) return;
+        const x = Math.round(t.x);
+        const y = Math.round(t.y);
 
-        const x = Math.round(tresor.x);
-        const y = Math.round(tresor.y);
-
-        if (tresor.type === "or") {
+        if (t.type === "or") {
           ctx.fillStyle = "#fff17a";
-
-          ctx.fillRect(
-            x + 3,
-            y,
-            tresor.largeur - 6,
-            tresor.hauteur
-          );
-
-          ctx.fillRect(
-            x,
-            y + 3,
-            tresor.largeur,
-            tresor.hauteur - 6
-          );
-
+          ctx.fillRect(x + 3, y, t.w - 6, t.h);
+          ctx.fillRect(x, y + 3, t.w, t.h - 6);
           ctx.fillStyle = "#c68d24";
-
-          ctx.fillRect(
-            x + 6,
-            y + 4,
-            4,
-            8
-          );
+          ctx.fillRect(x + 6, y + 4, 4, 8);
         } else {
           ctx.fillStyle = "#56311d";
-          ctx.fillRect(
-            x,
-            y,
-            tresor.largeur,
-            tresor.hauteur
-          );
-
+          ctx.fillRect(x, y, t.w, t.h);
           ctx.fillStyle = "#a7672d";
-          ctx.fillRect(
-            x + 2,
-            y + 3,
-            tresor.largeur - 4,
-            8
-          );
-
+          ctx.fillRect(x + 2, y + 3, t.w - 4, 8);
           ctx.fillStyle = "#e7c34f";
-          ctx.fillRect(
-            x + 10,
-            y + 8,
-            5,
-            10
-          );
-
-          ctx.fillRect(
-            x,
-            y + 11,
-            tresor.largeur,
-            3
-          );
+          ctx.fillRect(x + 10, y + 8, 5, 10);
+          ctx.fillRect(x, y + 11, t.w, 3);
         }
-      }
+      });
     }
 
     function dessinerArtefacts() {
-      for (const artefact of artefactsActifs) {
-        if (artefact.ramasse) {
-          continue;
-        }
+      artefactsActifs.forEach(a => {
+        if (a.pris) return;
+        const def = artefacts[a.id];
+        const x = Math.round(a.x);
+        const y = Math.round(a.y);
 
-        const definition =
-          definitionsArtefacts[artefact.id];
-
-        const x = Math.round(artefact.x);
-        const y = Math.round(artefact.y);
-
-        /*
-          Halo autour de l'artéfact.
-        */
-        const pulsation =
-          Math.floor(tempsEcoule * 8) % 2;
-
-        ctx.fillStyle =
-          pulsation === 0
-            ? "#fff19a"
-            : "#ffbc45";
-
-        ctx.fillRect(
-          x - 3,
-          y - 3,
-          artefact.largeur + 6,
-          artefact.hauteur + 6
-        );
-
+        ctx.fillStyle = Math.floor(tempsJeu * 8) % 2 ? "#ffbc45" : "#fff19a";
+        ctx.fillRect(x - 3, y - 3, a.w + 6, a.h + 6);
         ctx.fillStyle = "#713e91";
-
-        ctx.fillRect(
-          x,
-          y,
-          artefact.largeur,
-          artefact.hauteur
-        );
-
-        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(x, y, a.w, a.h);
+        ctx.fillStyle = "#fff";
         ctx.font = "bold 14px monospace";
         ctx.textAlign = "center";
-
-        ctx.fillText(
-          definition.symbole,
-          x + artefact.largeur / 2,
-          y + 16
-        );
-
+        ctx.fillText(def.symbole, x + a.w / 2, y + 16);
         ctx.textAlign = "left";
-      }
+      });
+    }
+
+    function dessinerEquipements() {
+      equipementsActifs.forEach(objet => {
+        if (objet.pris) return;
+
+        const def = equipements[objet.id];
+        const x = Math.round(objet.x);
+        const y = Math.round(objet.y);
+
+        ctx.fillStyle = Math.floor(tempsJeu * 7) % 2 ? "#ffe882" : "#fff6b9";
+        ctx.fillRect(x - 3, y - 3, 30, 30);
+
+        if (def.slot === "casque") {
+          ctx.fillStyle = "#8a939e";
+          ctx.fillRect(x + 4, y + 3, 16, 7);
+          ctx.fillRect(x + 2, y + 9, 20, 8);
+          ctx.fillStyle = "#4f5964";
+          ctx.fillRect(x + 5, y + 16, 4, 6);
+          ctx.fillRect(x + 15, y + 16, 4, 6);
+        }
+
+        if (def.slot === "armure") {
+          ctx.fillStyle = "#8f754a";
+          ctx.fillRect(x + 4, y + 3, 16, 18);
+          ctx.fillStyle = "#d7bd78";
+          ctx.fillRect(x + 8, y + 5, 8, 14);
+        }
+
+        if (def.slot === "bouclier") {
+          ctx.fillStyle = "#4672b6";
+          ctx.fillRect(x + 3, y + 2, 18, 18);
+          ctx.fillStyle = "#f0cf58";
+          ctx.fillRect(x + 10, y + 4, 4, 14);
+          ctx.fillRect(x + 6, y + 9, 12, 4);
+        }
+      });
     }
 
     /* =========================================================
-       DESSIN DES ENNEMIS
+       DESSIN DES PERSONNAGES
        ========================================================= */
-
     function dessinerEnnemis() {
-      for (const ennemi of ennemis) {
-        const x = Math.round(ennemi.x);
-        const y = Math.round(ennemi.y);
+      ennemisActifs.forEach(e => {
+        const x = Math.round(e.x);
+        const y = Math.round(e.y);
 
-        ctx.fillStyle =
-          "rgba(0, 0, 0, 0.25)";
+        ctx.fillStyle = "rgba(0,0,0,.25)";
+        ctx.fillRect(x + 3, y + e.h - 1, e.w, 5);
 
-        ctx.fillRect(
-          x + 3,
-          y + ennemi.hauteur - 1,
-          ennemi.largeur,
-          5
-        );
-
-        ctx.fillStyle =
-          ennemi.vieMaximum >= 5
-            ? "#822029"
-            : "#c9333e";
-
-        ctx.fillRect(
-          x,
-          y,
-          ennemi.largeur,
-          ennemi.hauteur
-        );
-
+        ctx.fillStyle = e.vieMax >= 6 ? "#7f1625" : "#c9333e";
+        ctx.fillRect(x, y, e.w, e.h);
         ctx.fillStyle = "#7c1f28";
+        ctx.fillRect(x, y + e.h - 7, e.w, 7);
 
-        ctx.fillRect(
-          x,
-          y + ennemi.hauteur - 7,
-          ennemi.largeur,
-          7
-        );
-
-        ctx.fillStyle = "#ffffff";
-
+        ctx.fillStyle = "#fff";
         ctx.fillRect(x + 5, y + 7, 5, 5);
         ctx.fillRect(x + 14, y + 7, 5, 5);
-
-        ctx.fillStyle = "#111111";
-
+        ctx.fillStyle = "#111";
         ctx.fillRect(x + 7, y + 8, 2, 3);
         ctx.fillRect(x + 15, y + 8, 2, 3);
 
-        const ratioVie =
-          ennemi.vie / ennemi.vieMaximum;
-
         ctx.fillStyle = "#35171a";
-
-        ctx.fillRect(
-          x,
-          y - 8,
-          ennemi.largeur,
-          4
-        );
-
+        ctx.fillRect(x, y - 8, e.w, 4);
         ctx.fillStyle = "#ff765d";
+        ctx.fillRect(x, y - 8, Math.floor(e.w * e.vie / e.vieMax), 4);
+      });
+    }
 
-        ctx.fillRect(
-          x,
-          y - 8,
-          Math.floor(
-            ennemi.largeur * ratioVie
-          ),
-          4
-        );
+    function dessinerEquipementJoueur(x, y) {
+      if (joueur.equipement.casque) {
+        ctx.fillStyle = "#949da8";
+        ctx.fillRect(x + 3, y - 3, 18, 5);
+        ctx.fillRect(x + 1, y + 1, 22, 4);
+      }
+
+      if (joueur.equipement.armure) {
+        ctx.fillStyle = "#b08b4e";
+        ctx.fillRect(x + 3, y + 13, 18, 8);
+      }
+
+      if (joueur.equipement.bouclier) {
+        const bx = joueur.direction === "gauche" ? x + 17 : x - 5;
+        ctx.fillStyle = "#376eae";
+        ctx.fillRect(bx, y + 8, 8, 13);
+        ctx.fillStyle = "#f1d45a";
+        ctx.fillRect(bx + 3, y + 10, 2, 9);
       }
     }
 
-    /* =========================================================
-       DESSIN DU JOUEUR ET DE L'ÉPÉE
-       ========================================================= */
-
     function dessinerJoueur() {
-      if (joueur.invulnerable) {
-        const visible =
-          Math.floor(
-            joueur.tempsInvulnerabilite * 14
-          ) % 2 === 0;
-
-        if (!visible) {
-          return;
-        }
-      }
+      if (joueur.invulnerable && Math.floor(joueur.tempsInvulnerable * 14) % 2) return;
 
       const x = Math.round(joueur.x);
       const y = Math.round(joueur.y);
 
-      ctx.fillStyle =
-        "rgba(0, 0, 0, 0.28)";
+      ctx.fillStyle = "rgba(0,0,0,.28)";
+      ctx.fillRect(x + 3, y + joueur.h - 1, joueur.w, 5);
 
-      ctx.fillRect(
-        x + 3,
-        y + joueur.hauteur - 1,
-        joueur.largeur,
-        5
-      );
+      if (joueur.type === "renard") {
+        ctx.fillStyle = joueur.principale;
+        ctx.fillRect(x, y + 5, joueur.w, joueur.h - 5);
+        ctx.fillRect(x + 3, y, 18, 14);
 
-      ctx.fillStyle = "#2ea043";
+        ctx.fillStyle = joueur.secondaire;
+        ctx.fillRect(x + 2, y - 5, 7, 8);
+        ctx.fillRect(x + 15, y - 5, 7, 8);
 
-      ctx.fillRect(
-        x,
-        y,
-        joueur.largeur,
-        joueur.hauteur
-      );
+        ctx.fillStyle = joueur.visage;
+        ctx.fillRect(x + 6, y + 7, 12, 6);
 
-      ctx.fillStyle = "#14672c";
+        ctx.fillStyle = "#161616";
+        ctx.fillRect(x + 6, y + 5, 3, 3);
+        ctx.fillRect(x + 15, y + 5, 3, 3);
 
-      ctx.fillRect(
-        x,
-        y + joueur.hauteur - 7,
-        joueur.largeur,
-        7
-      );
-
-      ctx.fillStyle = "#f0bd7a";
-
-      ctx.fillRect(
-        x + 5,
-        y + 5,
-        14,
-        10
-      );
-
-      ctx.fillStyle = "#17682d";
-
-      if (joueur.direction === "gauche") {
-        ctx.fillRect(x - 5, y + 1, 14, 8);
-      } else if (
-        joueur.direction === "droite"
-      ) {
-        ctx.fillRect(x + 15, y + 1, 14, 8);
+        ctx.fillStyle = joueur.secondaire;
+        const queueX = joueur.direction === "gauche" ? x + joueur.w : x - 10;
+        ctx.fillRect(queueX, y + 11, 10, 7);
       } else {
+        ctx.fillStyle = joueur.principale;
+        ctx.fillRect(x, y, joueur.w, joueur.h);
+
+        ctx.fillStyle = joueur.secondaire;
+        ctx.fillRect(x, y + joueur.h - 7, joueur.w, 7);
+
+        ctx.fillStyle = joueur.visage;
+        ctx.fillRect(x + 5, y + 5, 14, 10);
+
+        ctx.fillStyle = joueur.secondaire;
         ctx.fillRect(x + 3, y, 18, 7);
+
+        ctx.fillStyle = "#171717";
+        ctx.fillRect(x + 8, y + 8, 3, 3);
+        ctx.fillRect(x + 14, y + 8, 3, 3);
       }
 
-      ctx.fillStyle = "#171717";
-
-      ctx.fillRect(x + 8, y + 8, 3, 3);
-      ctx.fillRect(x + 14, y + 8, 3, 3);
+      dessinerEquipementJoueur(x, y);
     }
 
     function dessinerEpee() {
-      if (!joueur.attaqueActive) {
-        return;
-      }
+      if (!joueur.attaqueActive) return;
 
-      const epee =
-        obtenirRectangleEpee();
-
+      const e = rectangleEpee();
       ctx.fillStyle = "#ffe45e";
-
-      ctx.fillRect(
-        Math.round(epee.x),
-        Math.round(epee.y),
-        epee.largeur,
-        epee.hauteur
-      );
+      ctx.fillRect(Math.round(e.x), Math.round(e.y), e.w, e.h);
 
       ctx.fillStyle = "#fff6b0";
-
-      if (
-        joueur.direction === "haut" ||
-        joueur.direction === "bas"
-      ) {
-        ctx.fillRect(
-          Math.round(epee.x + 2),
-          Math.round(epee.y + 2),
-          3,
-          Math.max(
-            2,
-            epee.hauteur - 4
-          )
-        );
+      if (joueur.direction === "haut" || joueur.direction === "bas") {
+        ctx.fillRect(Math.round(e.x + 2), Math.round(e.y + 2), 3, Math.max(2, e.h - 4));
       } else {
-        ctx.fillRect(
-          Math.round(epee.x + 2),
-          Math.round(epee.y + 2),
-          Math.max(
-            2,
-            epee.largeur - 4
-          ),
-          3
-        );
+        ctx.fillRect(Math.round(e.x + 2), Math.round(e.y + 2), Math.max(2, e.w - 4), 3);
       }
     }
 
     /* =========================================================
-       INTERFACE DU JEU
+       HUD ET ÉCRANS
        ========================================================= */
-
-    function dessinerCoeur(x, y, rempli) {
-      ctx.fillStyle =
-        rempli ? "#e53b44" : "#4d2729";
-
+    function dessinerCoeur(x, y, plein) {
+      ctx.fillStyle = plein ? "#e53b44" : "#4d2729";
       ctx.fillRect(x + 4, y, 8, 4);
       ctx.fillRect(x + 16, y, 8, 4);
       ctx.fillRect(x, y + 4, 28, 10);
@@ -2383,451 +1807,242 @@
       ctx.fillRect(x + 8, y + 21, 12, 4);
     }
 
-    function dessinerInterface() {
+    function dessinerHUD() {
       ctx.fillStyle = "#171b1b";
-
-      ctx.fillRect(
-        0,
-        0,
-        LARGEUR_CANVAS,
-        HAUTEUR_INTERFACE
-      );
-
+      ctx.fillRect(0, 0, W, HUD);
       ctx.fillStyle = "#d7ba62";
-
-      ctx.fillRect(
-        0,
-        HAUTEUR_INTERFACE - 4,
-        LARGEUR_CANVAS,
-        4
-      );
+      ctx.fillRect(0, HUD - 4, W, 4);
 
       ctx.fillStyle = "#f4e6a4";
       ctx.font = "bold 12px monospace";
       ctx.textAlign = "left";
+      ctx.fillText(joueur.nom || "PERSONNAGE", 14, 16);
+      ctx.fillText("NIVEAU " + (niveauIndex + 1) + "/" + NIVEAUX.length, 14, 34);
 
-      ctx.fillText(
-        "TABLEAU " +
-        (indexTableau + 1) +
-        "/3",
-        14,
-        17
-      );
-
-      for (
-        let i = 0;
-        i < joueur.vieMaximum;
-        i++
-      ) {
-        dessinerCoeur(
-          15 + i * 31,
-          27,
-          i < joueur.vie
-        );
+      for (let i = 0; i < joueur.vieMax; i++) {
+        dessinerCoeur(14 + i * 30, 43, i < joueur.vie);
       }
 
       ctx.fillStyle = "#ffe878";
-      ctx.font = "bold 13px monospace";
-
-      ctx.fillText(
-        "OR : " + statistiques.or,
-        14,
-        76
-      );
-
-      ctx.fillStyle = "#ffffff";
-
-      ctx.fillText(
-        "SCORE : " + statistiques.score,
-        135,
-        76
-      );
+      ctx.fillText("OR : " + stats.or, 14, 84);
+      ctx.fillStyle = "#fff";
+      ctx.fillText("SCORE : " + stats.score, 116, 84);
 
       ctx.textAlign = "right";
-
+      ctx.fillText("ENNEMIS : " + ennemisActifs.length, W - 14, 17);
+      ctx.fillText("ATQ : " + attaqueJoueur() + "  DEF : " + defenseJoueur(), W - 14, 35);
       ctx.fillText(
-        "ENNEMIS : " + ennemis.length,
-        LARGEUR_CANVAS - 14,
-        18
+        "ART : " + artefactsObtenus.size + "/3  ÉQ : " + equipementsObtenus.size + "/3",
+        W - 14,
+        52
       );
 
-      ctx.fillText(
-        "ARTÉFACTS : " +
-        artefactsObtenus.size +
-        "/3",
-        LARGEUR_CANVAS - 14,
-        39
-      );
-
-      const quete = obtenirQueteActuelle();
-
+      const p = Math.min(niveau.objectif.progression(), niveau.objectif.cible);
       ctx.fillStyle = "#9cefa4";
-      ctx.font = "bold 11px monospace";
+      ctx.font = "bold 10px monospace";
+      ctx.fillText(niveau.objectif.texte + " [" + p + "/" + niveau.objectif.cible + "]", W - 14, 69);
 
-      if (quete) {
-        const progression = Math.min(
-          quete.progression(),
-          quete.cible
-        );
-
-        ctx.fillText(
-          "QUÊTE : " +
-          quete.description +
-          " [" +
-          progression +
-          "/" +
-          quete.cible +
-          "]",
-          LARGEUR_CANVAS - 14,
-          60
-        );
-      } else {
-        ctx.fillText(
-          "TOUTES LES QUÊTES SONT TERMINÉES",
-          LARGEUR_CANVAS - 14,
-          60
-        );
-      }
-
-      ctx.fillStyle =
-        sortieOuverte
-          ? "#7fff9b"
-          : "#c9c9c9";
-
-      ctx.fillText(
-        sortieOuverte
-          ? "SORTIE OUVERTE"
-          : "SORTIE VERROUILLÉE",
-        LARGEUR_CANVAS - 14,
-        81
-      );
-
+      ctx.fillStyle = sortieOuverte ? "#7fff9b" : "#c9c9c9";
+      ctx.fillText(sortieOuverte ? "SORTIE OUVERTE" : "SORTIE VERROUILLÉE", W - 14, 86);
       ctx.textAlign = "left";
     }
 
-    /* =========================================================
-       MESSAGES ET ÉCRANS
-       ========================================================= */
+    function dessinerMessage() {
+      if (message.temps <= 0 || !message.texte) return;
 
-    function dessinerMessageTemporaire() {
-      if (
-        tempsMessage <= 0 ||
-        !messageTemporaire
-      ) {
-        return;
-      }
-
-      ctx.fillStyle =
-        "rgba(10, 14, 10, 0.92)";
-
-      ctx.fillRect(
-        54,
-        111,
-        404,
-        50
-      );
-
+      ctx.fillStyle = "rgba(10,14,10,.92)";
+      ctx.fillRect(43, 111, 426, 52);
       ctx.fillStyle = "#dfc96f";
-
-      ctx.fillRect(
-        54,
-        111,
-        404,
-        4
-      );
-
-      ctx.fillRect(
-        54,
-        157,
-        404,
-        4
-      );
-
-      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(43, 111, 426, 4);
+      ctx.fillRect(43, 159, 426, 4);
+      ctx.fillStyle = "#fff";
       ctx.font = "bold 14px monospace";
       ctx.textAlign = "center";
-
-      ctx.fillText(
-        messageTemporaire,
-        LARGEUR_CANVAS / 2,
-        142
-      );
-
+      ctx.fillText(message.texte, W / 2, 143);
       ctx.textAlign = "left";
     }
 
     function dessinerTransition() {
-      if (!transitionTableau) {
-        return;
-      }
+      if (!transition) return;
 
-      ctx.fillStyle =
-        "rgba(5, 8, 5, 0.9)";
-
-      ctx.fillRect(
-        0,
-        0,
-        LARGEUR_CANVAS,
-        HAUTEUR_CANVAS
-      );
-
+      ctx.fillStyle = "rgba(5,8,5,.91)";
+      ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#d8c16b";
-      ctx.fillRect(70, 125, 372, 200);
-
+      ctx.fillRect(68, 120, 376, 210);
       ctx.fillStyle = "#151915";
-      ctx.fillRect(77, 132, 358, 186);
+      ctx.fillRect(75, 127, 362, 196);
 
       ctx.textAlign = "center";
-
       ctx.fillStyle = "#82f39d";
-      ctx.font = "bold 26px monospace";
-
-      ctx.fillText(
-        "TABLEAU TERMINÉ",
-        LARGEUR_CANVAS / 2,
-        185
-      );
+      ctx.font = "bold 25px monospace";
+      ctx.fillText("NIVEAU TERMINÉ", W / 2, 178);
 
       ctx.fillStyle = "#f1e5b5";
       ctx.font = "14px monospace";
+      ctx.fillText(niveau.nom, W / 2, 212);
+      ctx.fillText("Score : " + stats.score, W / 2, 240);
+      ctx.fillText("Équipement : " + equipementsObtenus.size + "/3", W / 2, 265);
 
-      ctx.fillText(
-        "Trésors : " +
-        statistiques.tresorsRamasses,
-        LARGEUR_CANVAS / 2,
-        224
-      );
-
-      ctx.fillText(
-        "Score : " +
-        statistiques.score,
-        LARGEUR_CANVAS / 2,
-        248
-      );
-
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#fff";
       ctx.font = "bold 13px monospace";
-
-      ctx.fillText(
-        "ENTRÉE OU ESPACE POUR CONTINUER",
-        LARGEUR_CANVAS / 2,
-        289
-      );
-
+      ctx.fillText("ENTRÉE OU ESPACE POUR CONTINUER", W / 2, 302);
       ctx.textAlign = "left";
     }
 
-    function dessinerEcranFin() {
-      if (!jeuTermine) {
-        return;
-      }
+    function dessinerFin() {
+      if (!jeuTermine) return;
 
-      ctx.fillStyle =
-        "rgba(5, 7, 7, 0.92)";
-
-      ctx.fillRect(
-        0,
-        0,
-        LARGEUR_CANVAS,
-        HAUTEUR_CANVAS
-      );
-
-      ctx.fillStyle =
-        victoireFinale
-          ? "#1f6b3a"
-          : "#6b1f28";
-
-      ctx.fillRect(55, 98, 402, 260);
-
+      ctx.fillStyle = "rgba(5,7,7,.93)";
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = victoire ? "#1f6b3a" : "#6b1f28";
+      ctx.fillRect(52, 88, 408, 280);
       ctx.fillStyle = "#e9cf76";
-      ctx.fillRect(62, 105, 388, 246);
-
+      ctx.fillRect(59, 95, 394, 266);
       ctx.fillStyle = "#151818";
-      ctx.fillRect(70, 113, 372, 230);
+      ctx.fillRect(67, 103, 378, 250);
 
       ctx.textAlign = "center";
-
-      ctx.fillStyle =
-        victoireFinale
-          ? "#7ff09b"
-          : "#ff6571";
-
-      ctx.font = "bold 27px monospace";
-
-      ctx.fillText(
-        victoireFinale
-          ? "AVENTURE TERMINÉE !"
-          : "GAME OVER",
-        LARGEUR_CANVAS / 2,
-        158
-      );
+      ctx.fillStyle = victoire ? "#7ff09b" : "#ff6571";
+      ctx.font = "bold 25px monospace";
+      ctx.fillText(victoire ? "LES CINQ ROYAUMES SONT LIBRES !" : "GAME OVER", W / 2, 150);
 
       ctx.fillStyle = "#f3e8bb";
       ctx.font = "14px monospace";
 
-      if (victoireFinale) {
-        ctx.fillText(
-          "Les trois artéfacts sont réunis.",
-          LARGEUR_CANVAS / 2,
-          195
-        );
-
-        ctx.fillText(
-          "Score final : " +
-          statistiques.score,
-          LARGEUR_CANVAS / 2,
-          224
-        );
-
-        ctx.fillText(
-          "Or : " +
-          statistiques.or +
-          "   Trésors : " +
-          statistiques.tresorsRamasses,
-          LARGEUR_CANVAS / 2,
-          250
-        );
-
-        ctx.fillText(
-          "Temps : " +
-          Math.floor(tempsEcoule) +
-          " secondes",
-          LARGEUR_CANVAS / 2,
-          276
-        );
+      if (victoire) {
+        ctx.fillText(joueur.nom + " termine l’aventure.", W / 2, 188);
+        ctx.fillText("Score final : " + stats.score, W / 2, 218);
+        ctx.fillText("Or : " + stats.or, W / 2, 244);
+        ctx.fillText("Artéfacts : " + artefactsObtenus.size + "/3", W / 2, 270);
+        ctx.fillText("Équipements : " + equipementsObtenus.size + "/3", W / 2, 296);
       } else {
-        ctx.fillText(
-          "Le héros a perdu tous ses cœurs.",
-          LARGEUR_CANVAS / 2,
-          218
-        );
+        ctx.fillText(joueur.nom + " a perdu tous ses cœurs.", W / 2, 220);
       }
 
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#fff";
       ctx.font = "bold 13px monospace";
-
-      ctx.fillText(
-        "APPUYEZ SUR UNE TOUCHE",
-        LARGEUR_CANVAS / 2,
-        316
-      );
-
+      ctx.fillText("APPUYEZ SUR UNE TOUCHE POUR REJOUER", W / 2, 333);
       ctx.textAlign = "left";
     }
 
-    /* =========================================================
-       FENÊTRES HTML
-       ========================================================= */
-
-    function ouvrirModale(idModale) {
-      document
-        .getElementById(idModale)
-        .classList.add("visible");
-
-      jeuEnPause = true;
-    }
-
-    function fermerToutesLesModales() {
-      document
-        .querySelectorAll(".modal")
-        .forEach(function (modale) {
-          modale.classList.remove("visible");
-        });
-
-      jeuEnPause = false;
-      canvas.focus();
-    }
-
-    document
-      .getElementById("show-controls")
-      .addEventListener("click", function () {
-        ouvrirModale("controls-modal");
-      });
-
-    document
-      .getElementById("show-artifacts")
-      .addEventListener("click", function () {
-        mettreAJourListeArtefacts();
-        ouvrirModale("artifacts-modal");
-      });
-
-    document
-      .querySelectorAll("[data-close-modal]")
-      .forEach(function (bouton) {
-        bouton.addEventListener(
-          "click",
-          fermerToutesLesModales
-        );
-      });
-
-    document
-      .querySelectorAll(".modal")
-      .forEach(function (modale) {
-        modale.addEventListener(
-          "click",
-          function (event) {
-            if (event.target === modale) {
-              fermerToutesLesModales();
-            }
-          }
-        );
-      });
-
-    /* =========================================================
-       RENDU
-       ========================================================= */
-
     function render() {
-      ctx.clearRect(
-        0,
-        0,
-        LARGEUR_CANVAS,
-        HAUTEUR_CANVAS
-      );
+      ctx.clearRect(0, 0, W, H);
+
+      if (!personnageSelectionne) {
+        ctx.fillStyle = "#101510";
+        ctx.fillRect(0, 0, W, H);
+        return;
+      }
 
       dessinerCarte();
       dessinerTresors();
       dessinerArtefacts();
+      dessinerEquipements();
       dessinerEnnemis();
       dessinerEpee();
       dessinerJoueur();
-
-      dessinerInterface();
-      dessinerMessageTemporaire();
+      dessinerHUD();
+      dessinerMessage();
       dessinerTransition();
-      dessinerEcranFin();
+      dessinerFin();
     }
+
+    /* =========================================================
+       COLLECTIONS ET MODALES
+       ========================================================= */
+    function remplirCollection() {
+      const listeArtefacts = document.getElementById("artifact-list");
+      const listeEquipements = document.getElementById("equipment-list");
+
+      listeArtefacts.innerHTML = "";
+      listeEquipements.innerHTML = "";
+
+      Object.values(artefacts).forEach(item => {
+        const obtenu = artefactsObtenus.has(item.id);
+        const carte = document.createElement("div");
+        carte.className = "collection-card" + (obtenu ? "" : " locked");
+        carte.innerHTML =
+          "<h3>" + (obtenu ? item.nom : "Artéfact inconnu") + "</h3>" +
+          "<p>" + (obtenu ? item.description : "Explore les différents niveaux pour le découvrir.") + "</p>";
+        listeArtefacts.appendChild(carte);
+      });
+
+      Object.values(equipements).forEach(item => {
+        const obtenu = equipementsObtenus.has(item.id);
+        const equipe = joueur.equipement[item.slot] === item.id;
+        const carte = document.createElement("div");
+        carte.className = "collection-card" + (obtenu ? "" : " locked");
+        carte.innerHTML =
+          "<h3>" + (obtenu ? item.nom + (equipe ? " — ÉQUIPÉ" : "") : "Équipement inconnu") + "</h3>" +
+          "<p>" + (obtenu ? item.description : "Cet équipement se trouve dans un niveau avancé.") + "</p>";
+        listeEquipements.appendChild(carte);
+      });
+    }
+
+    function ouvrirModale(id) {
+      document.getElementById(id).classList.add("visible");
+      pause = true;
+    }
+
+    function fermerModales() {
+      document.querySelectorAll(".modal").forEach(m => m.classList.remove("visible"));
+
+      if (document.getElementById("character-screen").classList.contains("hidden")) {
+        pause = false;
+      }
+
+      canvas.focus();
+    }
+
+    document.getElementById("show-controls").addEventListener("click", () => ouvrirModale("controls-modal"));
+    document.getElementById("show-artifacts").addEventListener("click", () => {
+      remplirCollection();
+      ouvrirModale("artifacts-modal");
+    });
+    document.getElementById("show-equipment").addEventListener("click", () => {
+      remplirCollection();
+      ouvrirModale("equipment-modal");
+    });
+
+    document.querySelectorAll("[data-close-modal]").forEach(b => {
+      b.addEventListener("click", fermerModales);
+    });
+
+    document.querySelectorAll(".modal").forEach(m => {
+      m.addEventListener("click", event => {
+        if (event.target === m) fermerModales();
+      });
+    });
+
+    function afficherSelectionPersonnage() {
+      pause = true;
+      document.getElementById("character-screen").classList.remove("hidden");
+    }
+
+    document.querySelectorAll("[data-character]").forEach(bouton => {
+      bouton.addEventListener("click", () => {
+        appliquerPersonnage(bouton.dataset.character);
+        document.getElementById("character-screen").classList.add("hidden");
+        pause = false;
+        recommencerAventure();
+      });
+    });
 
     /* =========================================================
        BOUCLE PRINCIPALE
        ========================================================= */
-
-    function boucleJeu(tempsActuel) {
-      let deltaTime =
-        (tempsActuel - ancienTemps) / 1000;
-
+    function boucle(tempsActuel) {
+      let dt = (tempsActuel - ancienTemps) / 1000;
       ancienTemps = tempsActuel;
+      dt = clamp(dt, 0, .05);
 
-      deltaTime = limiter(
-        deltaTime,
-        0,
-        0.05
-      );
-
-      update(deltaTime);
+      update(dt);
       render();
-
-      requestAnimationFrame(boucleJeu);
+      requestAnimationFrame(boucle);
     }
 
-    /* =========================================================
-       DÉMARRAGE
-       ========================================================= */
-
-    mettreAJourListeArtefacts();
-    recommencerAventure();
-
-    requestAnimationFrame(boucleJeu);
+    remplirCollection();
+    requestAnimationFrame(boucle);
   </script>
 </body>
 </html>
