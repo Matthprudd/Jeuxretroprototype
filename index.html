@@ -85,16 +85,95 @@ canvas{width:100%;height:auto;max-width:512px;margin:0 auto;border-width:4px}
 .interactbtn{grid-column:1/-1;width:100%;height:52px;border-radius:16px;background:linear-gradient(#d18b2f,#87511c);font-weight:bold;font-size:15px;animation:talkPulse 1.1s infinite}
 .interactbtn[hidden]{display:block!important;visibility:hidden;opacity:0;pointer-events:none;animation:none}.mobileUtility{display:none}.utilityBtn{border:2px solid #d8c37a;background:#263326;color:#fff;padding:8px 6px;font:inherit;font-size:10px;cursor:pointer;min-width:0;box-shadow:inset 1px 1px #536653,inset -1px -1px #1118}
 @keyframes talkPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+
+/* V6.1 — LISIBILITÉ UX */
+html,body{font-size:16px;line-height:1.5}
+.shell{width:960px}
+.top{padding:13px 14px;min-height:68px}
+.title{font-size:18px;letter-spacing:.5px}
+.menuToggle{font-size:15px;padding:10px 13px}
+.layout{grid-template-columns:512px minmax(250px,1fr);gap:16px}
+.inventory{gap:11px}
+.invbox{padding:13px}
+.invbox h3,.invbox summary{font-size:15px;line-height:1.35}
+.line{margin:7px 0;font-size:14px;line-height:1.5}
+.token{padding:4px 6px;font-size:13px;line-height:1.35}
+.status{font-size:14px;line-height:1.45}
+.panel{width:min(900px,96vw);padding:26px;font-size:16px;line-height:1.55}
+.panel h1{font-size:28px;line-height:1.2;margin:4px 0 18px}
+.panel h2{font-size:24px;line-height:1.25;margin:4px 0 18px}
+.panel h3{font-size:18px}
+.row{padding:12px 2px;font-size:16px;line-height:1.5}
+.item{padding:14px;margin:11px 0;font-size:15px;line-height:1.5}
+.item b{font-size:16px}
+.btn{font-size:14px;padding:10px 13px;line-height:1.2}
+.card{font-size:15px;line-height:1.45}
+.card h3{font-size:17px}.card ul{font-size:14px}
+.shopitem,.forgeitem,.questitem{padding:16px;font-size:15px;line-height:1.5}
+.shopitem h3,.forgeitem h3,.questitem h3{font-size:18px}
+.recipe,.smallnote{font-size:13px;line-height:1.5}
+.merchantHead{padding:15px;font-size:16px;line-height:1.5}
+.playerDash{padding:13px}
+.dashStat{padding:9px}.dashStat b{font-size:15px}.dashStat span{font-size:12px}
+.dashSkill{font-size:14px}.dashSkills{gap:7px}.skillChip{font-size:12px;padding:5px 7px}
+.dashMats{font-size:13px;line-height:1.45}
+.infoBubblePanel{width:min(760px,100%);max-height:84vh}
+.infoBubbleHead{padding:14px 16px;font-size:19px}
+.infoTab{font-size:13px;padding:11px 7px;line-height:1.2}
+.infoBubbleBody{max-height:65vh;padding:14px}
+.newsHistory{gap:10px}
+.newsItem{padding:12px;font-size:14px;line-height:1.5}
+.newsItem .newsMeta{font-size:11px;margin-top:6px}
+.newsEmpty{font-size:14px}
+.storageRow{padding:12px;font-size:15px}
+.storageRow span{font-size:13px}.storageBtn{font-size:12px!important;padding:8px 10px!important}
+.drawerHead{font-size:19px}
+.drawerButtons .btn{font-size:15px;padding:13px 12px}
+.infoBubbleBtn{font-size:14px;padding:11px 15px}
+
+@media(max-width:790px),(pointer:coarse){
+  html,body{font-size:16px}
+  .top{padding:9px 8px;min-height:60px}
+  .title{font-size:14px;line-height:1.2}
+  .menuToggle{font-size:12px;padding:9px 10px}
+  .panel{width:96vw;max-height:90vh;padding:17px 14px;font-size:16px}
+  .panel h1{font-size:23px}.panel h2{font-size:21px}.panel h3{font-size:18px}
+  .row{font-size:15px;padding:11px 0}
+  .item{font-size:15px;line-height:1.5;padding:12px}
+  .item b{font-size:16px}
+  .btn{font-size:14px;padding:10px 9px}
+  .smallnote,.recipe{font-size:13px}
+  .infoBubblePanel{max-height:88vh}
+  .infoBubbleHead{font-size:18px;padding:12px 14px}
+  .infoTab{font-size:12px;padding:10px 5px}
+  .infoBubbleBody{max-height:68vh;padding:12px}
+  .newsItem{font-size:14px;line-height:1.5;padding:11px}
+  .newsItem .newsMeta{font-size:11px}
+  .dashStat b{font-size:14px}.dashStat span{font-size:11px}
+  .dashSkill{font-size:13px}.skillChip{font-size:11px}.dashMats{font-size:12px}
+  .utilityBtn{font-size:10px}
+  /* Les commandes restent géométriquement verrouillées. */
+  .tbtn{line-height:1.1}
+  #touchInteract{font-size:9px}
+}
+@media(max-width:540px){
+  .title{font-size:13px}
+  .menuToggle{font-size:11px}
+  .panel{padding:15px 12px}
+  .panel h2{font-size:20px}
+  .infoTabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
 </style>
 </head>
 <body>
-<section id="intro"><div class="introCard"><div class="heroFox"><i class="body"></i><i class="head"></i><i class="ear1"></i><i class="ear2"></i><i class="muzzle"></i><i class="eye1"></i><i class="eye2"></i><i class="tail"></i><i class="tailTip"></i></div><div class="introTitle">LA QUÊTE DES<br>SEPT ROYAUMES</div><div class="introSub">V6.0 · Cabane · Monde ouvert · Villages · Maisons · Aventure</div><div class="introBtns"><button id="startGame" class="introBtn">COMMENCER</button><button id="continueGame" class="introBtn">CONTINUER</button></div><div class="smallnote" style="margin-top:15px">Réveille-toi dans ta cabane · traverse la forêt · découvre les villages · libère les sept royaumes.</div></div></section>
+<section id="intro"><div class="introCard"><div class="heroFox"><i class="body"></i><i class="head"></i><i class="ear1"></i><i class="ear2"></i><i class="muzzle"></i><i class="eye1"></i><i class="eye2"></i><i class="tail"></i><i class="tailTip"></i></div><div class="introTitle">LA QUÊTE DES<br>SEPT ROYAUMES</div><div class="introSub">V6.1 · Lisibilité · Monde ouvert · Villages · Maisons · Aventure</div><div class="introBtns"><button id="startGame" class="introBtn">COMMENCER</button><button id="continueGame" class="introBtn">CONTINUER</button></div><div class="smallnote" style="margin-top:15px">Réveille-toi dans ta cabane · traverse la forêt · découvre les villages · libère les sept royaumes.</div></div></section>
 <section id="select" class="overlay hidden"><div class="panel"><h1>CHOISIS TON HÉROS</h1><div class="cards">
 <button class="card" data-char="fox"><div class="preview"><i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#f28c28"></i><i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#ff9c35"></i><i style="position:absolute;left:24px;top:8px;width:11px;height:16px;background:#c9651d"></i><i style="position:absolute;left:51px;top:8px;width:11px;height:16px;background:#c9651d"></i></div><h3>🦊 RENARD ORANGE</h3><ul><li>Vie 3</li><li>Vitesse très élevée</li><li>+15 % d'or</li><li>Skill initial : Esquive</li></ul></button>
 <button class="card" data-char="warrior"><div class="preview"><i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#3175d6"></i><i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#d7a46d"></i><i style="position:absolute;left:24px;top:9px;width:38px;height:12px;background:#858e99"></i></div><h3>🥷 GUERRIER</h3><ul><li>Vie 5</li><li>Attaque 2</li><li>Défense 1</li><li>Skill initial : Coup puissant</li></ul></button>
 <button class="card" data-char="mage"><div class="preview"><i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#7e46c4"></i><i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#d9ac79"></i><i style="position:absolute;left:25px;top:4px;width:36px;height:20px;background:#552a8d"></i></div><h3>🧙 MAGE</h3><ul><li>Vie 3</li><li>Portée accrue</li><li>Recharge rapide</li><li>Skill initial : Onde magique</li></ul></button>
 </div></div></section>
-<main class="shell"><header class="top compactTop"><button id="leftMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau jeu">☰ JEU</button><div class="title">SEPT ROYAUMES · V6.0</div><button id="rightMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau aventure">AVENTURE ☰</button></header>
+<main class="shell"><header class="top compactTop"><button id="leftMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau jeu">☰ JEU</button><div class="title">SEPT ROYAUMES · V6.1</div><button id="rightMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau aventure">AVENTURE ☰</button></header>
 <div id="drawerShade" class="drawerShade"></div>
 <aside id="leftDrawer" class="gameDrawer leftDrawer" aria-hidden="true"><div class="drawerHead"><b>MENU JEU</b><button class="drawerClose" data-close-drawer>×</button></div><div class="drawerButtons"><button id="controlsBtn" class="btn">COMMANDES</button><button id="inventoryBtn" class="btn">INVENTAIRE</button><button id="saveBtn" class="btn">SAUVER</button><button id="loadBtn" class="btn">CHARGER</button><button id="audioBtn" class="btn">SON ON</button><button id="pauseBtn" class="btn">PAUSE</button><button id="fullBtn" class="btn">PLEIN ÉCRAN</button><button id="changeBtn" class="btn">PERSONNAGE</button></div></aside>
 <aside id="rightDrawer" class="gameDrawer rightDrawer" aria-hidden="true"><div class="drawerHead"><b>AVENTURE</b><button class="drawerClose" data-close-drawer>×</button></div><div class="drawerButtons"><button id="journalBtn" class="btn">JOURNAL</button><button id="questsBtn" class="btn">QUÊTES</button><button id="worldReturnBtn" class="btn">CARTE / MONDE</button><button id="homesBtn" class="btn">MES MAISONS</button></div><button id="shopBtn" hidden></button><button id="forgeBtn" hidden></button></aside><div class="layout"><div><canvas id="game" width="512" height="448"></canvas><div class="touch"><div class="pad"><button class="tbtn up" data-key="ArrowUp">▲</button><button class="tbtn left" data-key="ArrowLeft">◀</button><button class="tbtn down" data-key="ArrowDown">▼</button><button class="tbtn right" data-key="ArrowRight">▶</button></div><div class="action"><button id="touchAttack" class="tbtn attack">ÉPÉE</button><button id="touchSkill" class="tbtn skillbtn">SKILL</button><button id="touchMagic" class="tbtn skillbtn">MAGIE</button><button id="touchJet" class="tbtn skillbtn">JET</button><button id="touchInteract" class="tbtn interactbtn" hidden>PARLER</button></div></div><div class="mobileUtility"><button id="quickGameMenu" class="utilityBtn">☰ JEU</button><button id="quickAdventureMenu" class="utilityBtn">★ AVENTURE</button><button id="quickSave" class="utilityBtn">💾 SAUVE</button><button id="quickPause" class="utilityBtn">Ⅱ PAUSE</button></div></div><aside class="inventory"><details class="invbox" id="resBox" open><summary>RESSOURCES</summary><div id="res"></div></details><details class="invbox" id="gearBox"><summary>ÉQUIPEMENT ACTIF</summary><div id="gear"></div></details><details class="invbox" id="keysBox"><summary>ARTÉFACTS & SKILLS</summary><div id="keys"></div></details></aside></div><div class="status">Porte droite : avancer · Porte gauche : revenir · ESPACE : épée · F : skill · Niveau aquatique : nage en vue de côté</div></main>
@@ -693,9 +772,9 @@ function executeMouseInteraction(t){
 }
 
 function interactNPC(){const wo=nearestWorldObject();if(wo){interactWorldObject(wo);return}const n=nearestNPC();if(!n){message("RIEN À INTERAGIR À PROXIMITÉ");return}const wasPlaying=!paused&&!pausedByUser;paused=true;message(n.name+" : "+n.line);modalResumeOnClose=wasPlaying;if(n.role==="shop"){renderShop();openModal("shopModal")}else if(n.role==="forge"){renderForge();openModal("forgeModal")}else{renderQuests();openModal("questsModal")}}
-function drawNPCSprite(n){const x=Math.round(n.x),y=Math.round(n.y),bob=Math.round(Math.sin(time*3+n.c)*1);ctx.fillStyle="#0006";ctx.fillRect(x+4,y+22,16,3);if(n.icon==="merchant"){ctx.fillStyle="#6b4d2d";ctx.fillRect(x+5,y+9+bob,14,12);ctx.fillStyle="#b8895f";ctx.fillRect(x+7,y+2+bob,10,9);ctx.fillStyle="#3a2416";ctx.fillRect(x+5,y+bob,14,4);ctx.fillStyle="#d8bd68";ctx.fillRect(x+18,y+13+bob,5,7)}else if(n.icon==="smith"){ctx.fillStyle="#5a5a5a";ctx.fillRect(x+4,y+8+bob,16,14);ctx.fillStyle="#d9a36c";ctx.fillRect(x+7,y+1+bob,10,9);ctx.fillStyle="#1d1d1d";ctx.fillRect(x+6,y-2+bob,12,5);ctx.fillStyle="#ff7a35";ctx.fillRect(x+19,y+12+bob,4,8)}else{ctx.fillStyle="#435a78";ctx.fillRect(x+5,y+9+bob,14,13);ctx.fillStyle="#d5b58c";ctx.fillRect(x+7,y+2+bob,10,9);ctx.fillStyle="#d8d8d8";ctx.fillRect(x+8,y+9+bob,8,6);ctx.fillStyle="#8dc7ff";ctx.fillRect(x+19,y+5+bob,3,17)}ctx.fillStyle="#1a1a1a";ctx.fillRect(x+9,y+5+bob,2,2);ctx.fillRect(x+13,y+5+bob,2,2);ctx.fillStyle="#fff3bd";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(n.name,x+12,y-7+bob);ctx.textAlign="left"}
+function drawNPCSprite(n){const x=Math.round(n.x),y=Math.round(n.y),bob=Math.round(Math.sin(time*3+n.c)*1);ctx.fillStyle="#0006";ctx.fillRect(x+4,y+22,16,3);if(n.icon==="merchant"){ctx.fillStyle="#6b4d2d";ctx.fillRect(x+5,y+9+bob,14,12);ctx.fillStyle="#b8895f";ctx.fillRect(x+7,y+2+bob,10,9);ctx.fillStyle="#3a2416";ctx.fillRect(x+5,y+bob,14,4);ctx.fillStyle="#d8bd68";ctx.fillRect(x+18,y+13+bob,5,7)}else if(n.icon==="smith"){ctx.fillStyle="#5a5a5a";ctx.fillRect(x+4,y+8+bob,16,14);ctx.fillStyle="#d9a36c";ctx.fillRect(x+7,y+1+bob,10,9);ctx.fillStyle="#1d1d1d";ctx.fillRect(x+6,y-2+bob,12,5);ctx.fillStyle="#ff7a35";ctx.fillRect(x+19,y+12+bob,4,8)}else{ctx.fillStyle="#435a78";ctx.fillRect(x+5,y+9+bob,14,13);ctx.fillStyle="#d5b58c";ctx.fillRect(x+7,y+2+bob,10,9);ctx.fillStyle="#d8d8d8";ctx.fillRect(x+8,y+9+bob,8,6);ctx.fillStyle="#8dc7ff";ctx.fillRect(x+19,y+5+bob,3,17)}ctx.fillStyle="#1a1a1a";ctx.fillRect(x+9,y+5+bob,2,2);ctx.fillRect(x+13,y+5+bob,2,2);ctx.fillStyle="#fff3bd";ctx.font="bold 9px monospace";ctx.textAlign="center";ctx.fillText(n.name,x+12,y-7+bob);ctx.textAlign="left"}
 function buildingLabel(text,x,y,w,bg="#19150f",fg="#fff0a6"){
- ctx.fillStyle=bg;ctx.fillRect(x,y,w,12);ctx.strokeStyle="#e2c86a";ctx.strokeRect(x+.5,y+.5,w-1,11);ctx.fillStyle=fg;ctx.font="bold 7px monospace";ctx.textAlign="center";ctx.fillText(text,x+w/2,y+9);ctx.textAlign="left"
+ ctx.fillStyle=bg;ctx.fillRect(x,y,w,12);ctx.strokeStyle="#e2c86a";ctx.strokeRect(x+.5,y+.5,w-1,11);ctx.fillStyle=fg;ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(text,x+w/2,y+9);ctx.textAlign="left"
 }
 function drawBaseHouse(o,wall="#805235",roof="#bd6a34",door="#332116"){
  const x=Math.round(o.x),y=Math.round(o.y);
@@ -730,7 +809,7 @@ function drawForgeSprite(o){
 function drawRealtorSprite(o){
  const x=Math.round(o.x),y=Math.round(o.y);drawBaseHouse(o,"#74604b","#6d587e","#30241f");
  ctx.fillStyle="#e7d8ae";ctx.fillRect(x+8,y+18,o.w-16,11);ctx.strokeStyle="#5a432b";ctx.strokeRect(x+8.5,y+18.5,o.w-17,10);
- ctx.fillStyle="#4c3425";ctx.font="bold 6px monospace";ctx.textAlign="center";ctx.fillText("MAISONS",x+o.w/2,y+26);ctx.textAlign="left";
+ ctx.fillStyle="#4c3425";ctx.font="bold 7px monospace";ctx.textAlign="center";ctx.fillText("MAISONS",x+o.w/2,y+26);ctx.textAlign="left";
  ctx.fillStyle="#6a4429";ctx.fillRect(x-4,y+31,5,13);ctx.fillStyle="#e7d06e";ctx.fillRect(x-10,y+29,16,9);
  buildingLabel("PROPRIÉTÉS",x-5,y+o.h-3,o.w+10,"#453652","#fff1b0")
 }
@@ -744,7 +823,7 @@ function drawPlayerHomeSprite(o){
 }
 function drawSaleHomeSprite(o){
  const x=Math.round(o.x),y=Math.round(o.y);drawBaseHouse(o,"#77705f","#7b6751","#30251c");
- ctx.fillStyle="#714728";ctx.fillRect(x+o.w-4,y+22,4,20);ctx.fillStyle="#efe0a3";ctx.fillRect(x+o.w-12,y+19,18,10);ctx.fillStyle="#5b3624";ctx.font="bold 6px monospace";ctx.textAlign="center";ctx.fillText("À VENDRE",x+o.w-3,y+26);ctx.textAlign="left";
+ ctx.fillStyle="#714728";ctx.fillRect(x+o.w-4,y+22,4,20);ctx.fillStyle="#efe0a3";ctx.fillRect(x+o.w-12,y+19,18,10);ctx.fillStyle="#5b3624";ctx.font="bold 7px monospace";ctx.textAlign="center";ctx.fillText("À VENDRE",x+o.w-3,y+26);ctx.textAlign="left";
  buildingLabel("À VENDRE",x-2,y+o.h-3,o.w+4,"#5b5142","#fff1b3")
 }
 function drawHouseSprite(o){
@@ -1291,23 +1370,44 @@ function drawMiniMap(){
 }
 function hud(){
   ctx.fillStyle="#171b1b";ctx.fillRect(0,0,W,HUD);ctx.fillStyle="#d7ba62";ctx.fillRect(0,HUD-4,W,4);
-  ctx.fillStyle="#f4e6a4";ctx.font="bold 11px monospace";ctx.fillText(player.name+" · "+(isHome()?"TA CABANE":isWorld()?"MONDE OUVERT":"ROYAUME "+(levelIndex+1)+"/7")+" · RANG "+stats.rank,12,14);
-  for(let i=0;i<player.maxHp;i++)heart(12+i*30,23,i<player.hp);
-  const xpW=110;
-  ctx.fillStyle="#302a1a";ctx.fillRect(12,52,xpW,8);
-  ctx.fillStyle="#e0bc55";ctx.fillRect(12,52,xpW*Math.min(1,stats.xp/xpNeed()),8);
-  ctx.fillStyle="#fff";ctx.font="8px monospace";ctx.fillText("XP "+stats.xp+"/"+xpNeed(),14,59);
-  const objOK=objectiveDone(), repOK=!level.repair||state().repairDone, enemyOK=enemiesRequirementDone();
-  ctx.fillStyle=objOK?"#93f7a7":"#d8c77c";
-  ctx.fillText((objOK?"✓ ":"○ ")+level.objective[0],128,53);
-  if(level.repair){const have=stats.parts[level.repair.part]||0;ctx.fillStyle=repOK?"#93f7a7":"#ffd17d";ctx.fillText((repOK?"✓ ":"○ ")+level.repair.name+" "+(repOK?"OK":have+"/"+level.repair.need),128,63);}
-  if(hasJetpack()){ctx.fillStyle="#303540";ctx.fillRect(128,16,100,8);ctx.fillStyle=jetActive?"#ff9b57":"#8fd9ff";ctx.fillRect(128,16,jetFuel,8);ctx.fillStyle="#fff";ctx.font="8px monospace";ctx.fillText("JETPACK "+Math.round(jetFuel)+"%",131,23)}
+
+  const zone=isHome()?"CABANE":isWorld()?"MONDE OUVERT":"R"+(levelIndex+1)+"/7";
+  ctx.textAlign="left";ctx.fillStyle="#f7e9aa";ctx.font="bold 12px monospace";
+  ctx.fillText(player.name+" · "+zone+" · RG "+stats.rank,10,15);
+
+  for(let i=0;i<player.maxHp;i++)heart(11+i*29,23,i<player.hp);
+
+  ctx.textAlign="right";ctx.fillStyle="#fff4c7";ctx.font="bold 12px monospace";
+  ctx.fillText("OR "+stats.gold+" · "+stats.score+" PTS",356,15);
+  ctx.fillStyle="#e5e8e5";ctx.font="bold 11px monospace";
+  ctx.fillText("ATQ "+atk()+" · DEF "+def()+" · "+ELEMENTS[activeElement()].name,356,31);
+
+  const xpW=108;
+  ctx.fillStyle="#302a1a";ctx.fillRect(11,53,xpW,10);
+  ctx.fillStyle="#e0bc55";ctx.fillRect(11,53,xpW*Math.min(1,stats.xp/xpNeed()),10);
+  ctx.fillStyle="#fff";ctx.font="bold 9px monospace";ctx.textAlign="left";ctx.fillText("XP "+stats.xp+"/"+xpNeed(),14,62);
+
+  if(hasJetpack()){
+    ctx.fillStyle="#303540";ctx.fillRect(132,22,88,9);
+    ctx.fillStyle=jetActive?"#ff9b57":"#8fd9ff";ctx.fillRect(132,22,88*(jetFuel/100),9);
+    ctx.fillStyle="#fff";ctx.font="bold 9px monospace";ctx.fillText("JET "+Math.round(jetFuel)+"%",135,30);
+  }
+
+  const objOK=objectiveDone(),enemyOK=enemiesRequirementDone();
+  ctx.font="bold 11px monospace";ctx.fillStyle=objOK?"#91f6a5":"#ffe08a";
+  const objective=(objOK?"✓ ":"○ ")+level.objective[0];
+  const shortObj=objective.length>29?objective.slice(0,28)+"…":objective;
+  ctx.fillText(shortObj,130,59);
+
   drawMiniMap();
-  ctx.textAlign="right";ctx.fillStyle="#fff";ctx.font="bold 10px monospace";
-  ctx.fillText("OR "+stats.gold+" · SCORE "+stats.score,355,14);
-  ctx.fillText("ATQ "+atk()+" · DEF "+def()+" · "+ELEMENTS[activeElement()].name,355,31);
-  if(stats.combo>1){ctx.fillStyle="#ffe26e";ctx.fillText("COMBO x"+stats.combo,355,45)}
-  if(exitOpen()){ctx.fillStyle="#7fff9b";ctx.fillText("SORTIE OUVERTE →",355,61);}else if(level.clearEnemies&&!enemyOK){ctx.fillStyle="#ffb28a";ctx.fillText("ENNEMIS "+enemies.length+" · PORTE FERMÉE",355,61);}else if(level.mode==="sideWater"){ctx.fillStyle="#8fe8ff";ctx.fillText("O2 "+Math.round(player.oxygen??100)+"% · PORTE FERMÉE",355,61);}else if(hasJetpack()){ctx.fillStyle=jetActive?"#ffcf72":"#e0a4ff";ctx.fillText(jetActive?"JETPACK ACTIF · G pour couper":"PORTE FERMÉE · G = JETPACK",355,61);}else{ctx.fillStyle="#e0a4ff";ctx.fillText("PORTE FERMÉE · J = JOURNAL",355,61);}ctx.textAlign="left"
+
+  ctx.textAlign="right";ctx.font="bold 11px monospace";
+  if(stats.combo>1){ctx.fillStyle="#ffe26e";ctx.fillText("COMBO x"+stats.combo,356,44)}
+  if(exitOpen()){ctx.fillStyle="#7fff9b";ctx.fillText("SORTIE OUVERTE →",356,69)}
+  else if(level.clearEnemies&&!enemyOK){ctx.fillStyle="#ffb28a";ctx.fillText("ENNEMIS "+enemies.length+" · FERMÉ",356,69)}
+  else if(level.mode==="sideWater"){ctx.fillStyle="#8fe8ff";ctx.fillText("O2 "+Math.round(player.oxygen??100)+"% · FERMÉ",356,69)}
+  else{ctx.fillStyle="#e0a4ff";ctx.fillText("PASSAGE FERMÉ",356,69)}
+  ctx.textAlign="left"
 }
 function wrapCanvasText(text,maxWidth){
   const words=String(text).split(/\s+/),lines=[];let line="";
@@ -1322,11 +1422,11 @@ function wrapCanvasText(text,maxWidth){
 function overlays(){
   if(msg.time>0){
     const alpha=Math.min(.72,.38+Math.min(1,msg.time/.45)*.34);
-    const boxW=226,pad=10,x=W-boxW-10,y=HUD+10;
+    const boxW=270,pad=12,x=W-boxW-10,y=HUD+10;
     ctx.save();
-    ctx.font="bold 10px monospace";
+    ctx.font="bold 12px monospace";
     const lines=wrapCanvasText(msg.text,boxW-pad*2);
-    const boxH=Math.max(34,18+lines.length*13);
+    const boxH=Math.max(42,20+lines.length*16);
     ctx.globalAlpha=alpha;
     ctx.fillStyle="#071007";
     ctx.fillRect(x,y,boxW,boxH);
@@ -1336,7 +1436,7 @@ function overlays(){
     ctx.strokeRect(x+.5,y+.5,boxW-1,boxH-1);
     ctx.fillStyle="#fff";
     ctx.textAlign="left";
-    lines.forEach((line,i)=>ctx.fillText(line,x+pad,y+18+i*13));
+    lines.forEach((line,i)=>ctx.fillText(line,x+pad,y+20+i*16));
     ctx.restore();
   }
   if(gameOver){
