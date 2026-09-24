@@ -1132,6 +1132,7 @@ function doors(){
     const finished=levelIndex;completedKingdoms.add(finished);
     startTransition(()=>{loadLevel(WORLD_INDEX,"start",false);message("ROYAUME LIBÉRÉ : "+LEVELS[finished].name);if(completedKingdoms.size>=KINGDOM_COUNT){victory=true;message("LES SEPT ROYAUMES SONT LIBRES !")}},"x",1)
   }
+}
 function lockedDoorMessage(){
   if(exitOpen())return;
   const zone={x:W-82,y:HUD+4*T-10,w:82,h:84};
