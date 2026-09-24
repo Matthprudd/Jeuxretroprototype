@@ -80,7 +80,7 @@ canvas{width:100%;height:auto;max-width:512px;margin:0 auto;border-width:4px}
 </style>
 </head>
 <body>
-<section id="intro"><div class="introCard"><div class="heroFox"><i class="body"></i><i class="head"></i><i class="ear1"></i><i class="ear2"></i><i class="muzzle"></i><i class="eye1"></i><i class="eye2"></i><i class="tail"></i><i class="tailTip"></i></div><div class="introTitle">LA QUÊTE DES<br>SEPT ROYAUMES</div><div class="introSub">V6.0 · Monde ouvert · Villages · Maisons · Commerce · Sept Royaumes</div><div class="introBtns"><button id="startGame" class="introBtn">COMMENCER</button><button id="continueGame" class="introBtn">CONTINUER</button></div><div class="smallnote" style="margin-top:15px">Explore · fabrique · échange · accomplis les quêtes · libère les sept royaumes.</div></div></section>
+<section id="intro"><div class="introCard"><div class="heroFox"><i class="body"></i><i class="head"></i><i class="ear1"></i><i class="ear2"></i><i class="muzzle"></i><i class="eye1"></i><i class="eye2"></i><i class="tail"></i><i class="tailTip"></i></div><div class="introTitle">LA QUÊTE DES<br>SEPT ROYAUMES</div><div class="introSub">V6.0 · Cabane · Monde ouvert · Villages · Maisons · Aventure</div><div class="introBtns"><button id="startGame" class="introBtn">COMMENCER</button><button id="continueGame" class="introBtn">CONTINUER</button></div><div class="smallnote" style="margin-top:15px">Réveille-toi dans ta cabane · traverse la forêt · découvre les villages · libère les sept royaumes.</div></div></section>
 <section id="select" class="overlay hidden"><div class="panel"><h1>CHOISIS TON HÉROS</h1><div class="cards">
 <button class="card" data-char="fox"><div class="preview"><i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#f28c28"></i><i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#ff9c35"></i><i style="position:absolute;left:24px;top:8px;width:11px;height:16px;background:#c9651d"></i><i style="position:absolute;left:51px;top:8px;width:11px;height:16px;background:#c9651d"></i></div><h3>🦊 RENARD ORANGE</h3><ul><li>Vie 3</li><li>Vitesse très élevée</li><li>+15 % d'or</li><li>Skill initial : Esquive</li></ul></button>
 <button class="card" data-char="warrior"><div class="preview"><i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#3175d6"></i><i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#d7a46d"></i><i style="position:absolute;left:24px;top:9px;width:38px;height:12px;background:#858e99"></i></div><h3>🥷 GUERRIER</h3><ul><li>Vie 5</li><li>Attaque 2</li><li>Défense 1</li><li>Skill initial : Coup puissant</li></ul></button>
@@ -153,7 +153,7 @@ const NPCS=[
 const ENEMY_TYPES={brute:{name:"Brutal",color:"#d13c3c",behavior:"chase",speed:58},hunter:{name:"Chasseur",color:"#d06b35",behavior:"chase",speed:88},guardian:{name:"Gardien",color:"#8f4ab7",behavior:"guard",speed:45},coward:{name:"Prudent",color:"#4f91c9",behavior:"flee",speed:65},mystic:{name:"Mystique",color:"#c85ab1",behavior:"orbit",speed:70},berserk:{name:"Berserker",color:"#8b1720",behavior:"chase",speed:62}};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));const hit=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;const pos=(c,r,w=24,h=24)=>({x:c*T+(T-w)/2,y:HUD+r*T+(T-h)/2});const map=s=>s.map(r=>[...r].map(Number));
 const LEVELS=[{"name":"FORÊT DES RICHESSES","mode":"top","repair":{"id":"bridge","name":"PONT ANCIEN","part":"wood","need":2,"c":14,"r":3},"repairParts":[["wood",2,1],["wood",6,5]],"floor":"#5baa4b","detail":"#4b9340","objective":["Trouver le Cœur Ancien","artifact","heart"],"req":[],"map":[[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,1,1,0,0,0,1,1,0,0,0,1,1,0,1],[1,0,0,0,0,3,3,3,3,3,0,0,0,0,0,1],[1,0,1,0,0,3,3,3,3,3,0,1,0,1,0,1],[1,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1],[1,0,0,0,0,0,2,2,0,0,0,0,0,2,0,1],[1,0,2,0,1,0,2,0,0,1,1,0,0,2,0,1],[1,0,2,0,1,0,0,0,0,0,0,0,1,1,0,1],[1,0,0,0,0,0,1,0,2,2,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]],"start":[1,1],"enemies":[[12,1,2,"brute","earth"],[3,8,2,"coward","water"],[14,8,2,"hunter","wind"]],"loot":[["coin",4,1,10],["coin",10,2,10],["chest",3,5,40],["coin",13,5,10]],"arts":[["heart",10,8]],"gear":[],"grass":[["g1",4,2],["g2",9,1],["g3",12,5]],"hidden":[["h1","tree","2,2","coin",30],["h2","grass","g2","chest",55]],"locked":[["m1",14,2,["heart"],60,1]],"skill":null,"clearEnemies":false,"progressionHelp":"Trouve le Cœur Ancien, récupère 2 Bois anciens et répare le Pont Ancien."},{"name":"RUINES DU VENT","mode":"top","repair":{"id":"mill","name":"MÉCANISME DU VENT","part":"gear","need":2,"c":14,"r":3},"repairParts":[["gear",3,1],["gear",13,4]],"floor":"#88774f","detail":"#75613e","objective":["Trouver les Bottes du Vent","artifact","boots"],"req":["heart"],"map":[[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],[2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,2],[2,0,2,2,0,4,0,2,0,2,2,2,0,4,0,2],[2,0,0,2,0,4,0,0,0,2,0,0,0,4,0,2],[2,4,0,2,0,0,0,2,2,2,0,4,0,0,0,2],[2,0,0,0,0,2,0,0,0,0,0,4,0,2,0,2],[2,0,2,2,0,2,2,2,0,4,0,0,0,2,0,2],[2,0,0,2,0,0,0,0,0,4,2,2,0,0,0,2],[2,4,0,2,2,2,0,4,0,0,0,2,0,4,0,2],[2,0,0,0,0,0,0,4,2,2,0,2,0,0,0,2],[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]],"start":[1,1],"enemies":[[13,1,2,"hunter","water"],[4,5,2,"guardian","earth"],[8,7,3,"mystic","wind"]],"loot":[["coin",4,3,15],["chest",10,3,50]],"arts":[["boots",8,5]],"gear":[],"grass":[["g1",4,1],["g2",8,3],["g3",12,4]],"hidden":[["h1","grass","g1","coin",35],["h2","grass","g3","chest",65]],"locked":[["m1",12,8,["heart","boots"],90,1]],"skill":"spin","clearEnemies":true,"progressionHelp":"Avec le Cœur Ancien : trouve les Bottes du Vent, récupère 2 Engrenages et répare le Mécanisme du Vent."},{"name":"ROYAUME DES MARÉES","mode":"sideWater","repair":{"id":"pump","name":"POMPE HYDRAULIQUE","part":"valve","need":2,"c":14,"r":3},"repairParts":[["valve",3,3],["valve",10,7]],"floor":"#17658a","detail":"#0d4868","objective":["Trouver l’Emblème des Marées","artifact","emblem"],"req":["heart","boots"],"map":[[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],[2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],[2,0,0,0,2,0,0,0,0,2,0,0,0,0,0,2],[2,0,0,0,2,0,4,0,0,2,0,0,0,0,0,2],[2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],[2,0,0,4,0,0,0,0,0,0,0,4,0,0,0,2],[2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,2],[2,0,0,0,4,0,0,2,0,0,0,4,0,0,0,2],[2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],[2,0,0,0,0,0,4,0,0,0,0,0,0,0,0,2],[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]],"start":[1,5],"enemies":[[12,2,3,"mystic","water"],[6,5,3,"hunter","water"],[4,8,3,"coward","water"],[11,8,4,"guardian","water"]],"loot":[["coin",3,2,20],["chest",9,4,75],["coin",12,7,25]],"arts":[["emblem",8,7]],"gear":[["waterHelmet",13,9],["waterSword",3,9]],"grass":[],"hidden":[],"locked":[["m1",12,8,["heart","boots","emblem"],120,1]],"skill":"heal","clearEnemies":false,"progressionHelp":"Avec Cœur + Bottes : nage jusqu’à l’Emblème des Marées, récupère 2 Valves et répare la Pompe hydraulique."},{"name":"FORTERESSE DU GUERRIER","mode":"top","repair":{"id":"lift","name":"ASCENSEUR","part":"gear","need":2,"c":14,"r":3},"repairParts":[["gear",3,1],["gear",11,5]],"floor":"#8bc5d6","detail":"#6dacbf","objective":["Trouver l’Armure Ancienne","gear","armor"],"req":["heart","boots","emblem"],"map":[[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6],[6,0,0,0,0,0,6,0,0,0,0,0,0,0,0,6],[6,0,6,6,0,0,6,0,6,6,6,0,6,6,0,6],[6,0,0,6,0,7,0,0,0,0,6,0,0,6,0,6],[6,6,0,6,0,7,6,6,0,0,6,6,0,6,0,6],[6,0,0,0,0,0,0,6,0,7,0,0,0,0,0,6],[6,0,6,6,6,0,0,6,0,7,0,6,6,6,0,6],[6,0,0,0,6,0,0,0,0,0,0,6,0,0,0,6],[6,6,6,0,6,6,0,6,6,6,0,6,0,6,0,6],[6,0,0,0,0,0,0,0,0,0,0,0,0,6,0,6],[6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]],"start":[1,1],"enemies":[[13,1,3,"mystic","water"],[4,5,3,"guardian","water"],[10,7,4,"hunter","wind"]],"loot":[["coin",2,3,25],["chest",12,5,85]],"arts":[],"gear":[["armor",8,9],["helmet",3,9]],"grass":[["g1",4,2],["g2",8,5],["g3",13,7]],"hidden":[["h1","grass","g1","coin",55],["h2","grass","g3","chest",95]],"locked":[["m1",12,7,["heart","boots","emblem"],150,2]],"skill":null,"clearEnemies":true,"progressionHelp":"Avec les 3 artéfacts : trouve l’Armure Ancienne, récupère 2 Engrenages, répare l’Ascenseur et sécurise la forteresse."},{"name":"VOLCAN DU ROI SOMBRE","mode":"top","repair":{"id":"cooler","name":"REFROIDISSEUR","part":"crystal","need":2,"c":14,"r":3},"repairParts":[["crystal",2,3],["crystal",11,5]],"floor":"#6a302b","detail":"#4d211f","objective":["Trouver le Bouclier Royal","gear","shield"],"req":["heart","boots","emblem"],"map":[[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],[5,0,0,0,0,5,0,0,0,0,0,5,0,0,0,5],[5,0,5,5,0,5,0,5,5,5,0,5,0,5,0,5],[5,0,0,5,0,0,0,0,0,5,0,0,0,5,0,5],[5,5,0,5,5,5,0,5,0,5,5,5,0,5,0,5],[5,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5],[5,0,5,5,5,0,5,5,5,5,0,5,5,5,0,5],[5,0,0,0,5,0,0,0,0,0,0,5,0,0,0,5],[5,5,5,0,5,5,0,5,5,5,0,5,0,5,0,5],[5,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5],[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]],"start":[1,1],"enemies":[[13,1,4,"brute","fire"],[6,3,4,"hunter","fire"],[3,7,4,"guardian","earth"],[9,7,5,"mystic","fire"],[12,9,7,"berserk","earth"]],"loot":[["chest",3,5,100],["chest",10,9,120]],"arts":[],"gear":[["shield",12,7],["fireArmor",3,1],["fireSword",12,5]],"grass":[["g1",2,1],["g2",8,3],["g3",13,5]],"hidden":[["h1","grass","g1","coin",70],["h2","grass","g3","chest",120]],"locked":[["m1",8,5,["heart","boots","emblem"],220,2]],"skill":"blast","clearEnemies":true,"progressionHelp":"Trouve le Bouclier Royal, récupère 2 Cristaux, répare le Refroidisseur et élimine les gardiens."},{"name":"LABYRINTHE ÉLÉMENTAIRE","mode":"top","repair":{"id":"relay","name":"RELAIS ÉLÉMENTAIRE","part":"gear","need":2,"c":14,"r":3},"repairParts":[["gear",3,1],["gear",12,7]],"floor":"#33465a","detail":"#273746","objective":["Équiper Terre et Vent","elements",["earth","wind"]],"req":["heart","boots","emblem"],"map":[[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],[2,0,0,0,0,0,2,0,0,0,0,0,0,0,0,2],[2,0,2,2,2,0,2,0,2,2,2,2,2,2,0,2],[2,0,0,0,2,0,0,0,0,0,0,0,0,2,0,2],[2,2,2,0,2,0,2,2,2,2,2,0,0,2,0,2],[2,0,0,0,2,0,2,0,0,0,2,0,0,0,0,2],[2,0,2,2,2,0,2,0,2,0,2,0,2,2,2,2],[2,0,0,0,0,0,0,0,2,0,2,0,0,0,0,2],[2,0,2,2,2,2,2,2,2,0,2,0,2,2,0,2],[2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]],"start":[1,1],"enemies":[[13,1,4,"hunter","water"],[3,3,4,"guardian","wind"],[9,5,5,"mystic","earth"],[5,7,5,"coward","fire"],[13,9,6,"berserk","wind"]],"loot":[["coin",4,1,60],["chest",10,3,150]],"arts":[],"gear":[["earthHelmet",3,9],["earthSword",7,5],["windArmor",10,9],["windSword",13,7]],"grass":[["g1",3,5],["g2",8,1],["g3",12,9]],"hidden":[["h1","grass","g1","chest",140],["h2","grass","g2","coin",80]],"locked":[["m1",12,3,["boots","emblem"],240,3]],"skill":"quake","clearEnemies":true,"progressionHelp":"Équipe au moins un élément Terre ET un élément Vent, récupère 2 Engrenages, répare le Relais et sécurise le labyrinthe."},{"name":"LABYRINTHE DES QUATRE SCEAUX","mode":"top","repair":{"id":"gate","name":"PORTE DES SCEAUX","part":"crystal","need":2,"c":14,"r":3},"repairParts":[["crystal",3,1],["crystal",12,7]],"floor":"#3b2f4f","detail":"#2b2239","objective":["Obtenir le Prisme Élémentaire","artifact","prism"],"req":["heart","boots","emblem"],"map":[[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],[2,0,0,0,2,0,0,0,0,0,2,0,0,0,0,2],[2,0,2,0,2,0,2,2,2,0,2,0,2,2,0,2],[2,0,2,0,0,0,2,0,2,0,0,0,0,2,0,2],[2,0,2,2,2,0,2,0,2,2,2,2,0,2,0,2],[2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],[2,2,2,0,2,2,2,2,2,0,2,0,2,2,2,2],[2,0,0,0,2,0,0,0,0,0,2,0,0,0,0,2],[2,0,2,0,2,0,2,2,2,0,2,0,2,2,0,2],[2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]],"start":[1,1],"enemies":[[13,1,6,"mystic","water"],[3,3,6,"guardian","earth"],[7,5,7,"berserk","fire"],[13,7,6,"hunter","wind"],[4,9,8,"berserk","water"],[11,9,10,"mystic","fire"]],"loot":[["chest",5,5,180],["chest",13,9,220]],"arts":[["prism",8,9]],"gear":[["windHelmet",2,1],["earthArmor",12,1],["waterArmor",3,7],["fireHelmet",11,7]],"grass":[["g1",4,3],["g2",8,7],["g3",12,3]],"hidden":[["h1","grass","g1","chest",180],["h2","grass","g2","coin",100]],"locked":[["m1",8,5,["heart","boots","emblem","prism"],400,5]],"skill":"tornado","clearEnemies":true,"progressionHelp":"Obtiens le Prisme Élémentaire, récupère 2 Cristaux, répare la Porte des Sceaux, élimine les gardiens puis vaincs le boss final."}];
-const KINGDOM_COUNT=7,FINAL_KINGDOM=6,WORLD_INDEX=7;
+const KINGDOM_COUNT=7,FINAL_KINGDOM=6,WORLD_INDEX=7,HOME_INDEX=8;
 const WORLD_LEVEL={
  name:"CARREFOUR DES SEPT ROYAUMES",mode:"top",repair:null,repairParts:[],floor:"#58a94d",detail:"#438a3b",
  objective:["Explorer le monde","none",null],req:[],
@@ -173,22 +173,43 @@ const WORLD_LEVEL={
  progressionHelp:"Visite les villages, achète des maisons et emprunte les sentiers vers les sept royaumes."
 };
 LEVELS.push(WORLD_LEVEL);
+const HOME_LEVEL={
+ name:"TA PETITE CABANE",mode:"top",repair:null,repairParts:[],floor:"#8a633f",detail:"#6b482e",
+ objective:["Quitter la cabane et rejoindre le premier village","none",null],req:[],
+ map:[
+ [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+ [2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+ [2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+ [2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+ [2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+ [2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+ [2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+ [2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+ [2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+ [2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2],
+ [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
+ ],start:[8,6],enemies:[],loot:[],arts:[],gear:[],grass:[],hidden:[],locked:[],skill:null,clearEnemies:false,
+ progressionHelp:"Tu n’as presque rien. Sors de ta cabane, suis le sentier et rejoins le village de Clairbois."
+};
+LEVELS.push(HOME_LEVEL);
 const WORLD_GATES=[
- {level:0,name:"Forêt des Richesses",c:2,r:2},
- {level:1,name:"Ruines du Vent",c:5,r:2},
- {level:2,name:"Royaume des Marées",c:8,r:2},
- {level:3,name:"Forteresse du Guerrier",c:11,r:2},
- {level:4,name:"Volcan du Roi Sombre",c:13,r:4},
+ {level:0,name:"Forêt des Richesses",c:2,r:5},
+ {level:1,name:"Ruines du Vent",c:4,r:1},
+ {level:2,name:"Royaume des Marées",c:7,r:1},
+ {level:3,name:"Forteresse du Guerrier",c:10,r:1},
+ {level:4,name:"Volcan du Roi Sombre",c:14,r:4},
  {level:5,name:"Labyrinthe Élémentaire",c:12,r:8},
- {level:6,name:"Quatre Sceaux",c:5,r:8}
+ {level:6,name:"Quatre Sceaux",c:3,r:8}
 ];
 const WORLD_BUILDINGS=[
- {id:"world_shop",type:"shop",name:"Boutique de Brik",c:2,r:7,w:48,h:44},
- {id:"world_forge",type:"forge",name:"Forge de Cendre",c:4,r:7,w:48,h:44},
- {id:"world_realtor",type:"realtor",name:"Bureau des Propriétés",c:13,r:7,w:48,h:44},
- {id:"world_home",type:"house",propertyId:"crossroads",name:"Maison du Carrefour",c:8,r:7,w:48,h:44}
+ {id:"village_sign",type:"sign",name:"Village de Clairbois",c:8,r:6,w:28,h:28},
+ {id:"world_shop",type:"shop",name:"Boutique de Brik",c:5,r:3,w:48,h:44},
+ {id:"world_forge",type:"forge",name:"Forge de Cendre",c:8,r:3,w:48,h:44},
+ {id:"world_realtor",type:"realtor",name:"Bureau des Propriétés",c:11,r:3,w:48,h:44},
+ {id:"world_home",type:"house",propertyId:"crossroads",name:"Maison de Clairbois",c:13,r:6,w:48,h:44}
 ];
 const PROPERTIES=[
+ {id:"starter_cabin",level:HOME_INDEX,name:"Ta cabane du bois",village:"Bois de Clairbois",cost:0,c:8,r:6},
  {id:"crossroads",level:WORLD_INDEX,name:"Maison du Carrefour",village:"Carrefour",cost:250,c:8,r:7},
  {id:"forest_home",level:0,name:"Cabane du Renard",village:"Forêt des Richesses",cost:300,c:12,r:5},
  {id:"wind_home",level:1,name:"Maison du Moulin",village:"Ruines du Vent",cost:375,c:10,r:1},
@@ -248,7 +269,7 @@ function paletteForLevel(){
     {shadow:"#38100f",light:"#ff8d4e",accent:"#ffe066"},
     {shadow:"#132435",light:"#9ae7ff",accent:"#f3fbff"},
     {shadow:"#20172c",light:"#d49cff",accent:"#ffe7ff"}
-  ][levelIndex]||{shadow:"#222",light:"#ddd",accent:"#fff"};
+  ][levelIndex]||(isHome()?{shadow:"#3d281b",light:"#d6b77e",accent:"#ffcf74"}:{shadow:"#222",light:"#ddd",accent:"#fff"});
 }
 function addAmbientParticle(kind){
   const p=paletteForLevel();
@@ -267,7 +288,7 @@ function updateAmbient(dt){
   weatherPhase+=dt;
   if(ambient.length<18 && Math.random()<dt*5){
     const kinds=["leaf","dust","bubble","ember","snow","spark"];
-    const kind=level.mode==="sideWater"?"bubble":((levelIndex===0||levelIndex===WORLD_INDEX)?"leaf":levelIndex===4?"ember":levelIndex===5?"snow":levelIndex===6?"spark":"dust");
+    const kind=isHome()?"dust":level.mode==="sideWater"?"bubble":((levelIndex===0||levelIndex===WORLD_INDEX)?"leaf":levelIndex===4?"ember":levelIndex===5?"snow":levelIndex===6?"spark":"dust");
     addAmbientParticle(kind);
   }
   ambient.forEach(a=>{
@@ -441,7 +462,7 @@ function drawProjectiles(){
   });
 }
 
-function roomName(){return isWorld()?"MONDE · "+level.name:`${levelIndex+1}. ${level.name}`}
+function roomName(){return isHome()?"MAISON · "+level.name:isWorld()?"MONDE · "+level.name:`${levelIndex+1}. ${level.name}`}
 function near(a,b,d=26){return Math.hypot((a.x+a.w/2)-(b.x+b.w/2),(a.y+a.h/2)-(b.y+b.h/2))<=d}
 function startTransition(nextFn){
   if(transition.active)return;
@@ -514,9 +535,38 @@ function drawPickups(){
     }
   })
 }
+function noteHz(m){return 440*Math.pow(2,(m-69)/12)}
+function playMusicVoice(freq,type,gain,dur,when=0){
+  const now=audioCtx.currentTime+when,o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type=type;o.frequency.setValueAtTime(freq,now);
+  g.gain.setValueAtTime(gain,now);g.gain.exponentialRampToValueAtTime(.001,now+dur);
+  o.connect(g);g.connect(audioCtx.destination);o.start(now);o.stop(now+dur+.02)
+}
 function synthMusic(dt){
-  if(!audioEnabled||paused||gameOver)return;musicTimer-=dt;if(musicTimer>0)return;musicTimer=.34;
-  try{audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state!=="running")return;const roots=[[196,247,294,330],[174,220,261,330],[147,196,247,294],[220,261,330,392],[130,164,196,261],[165,220,277,330],[146,196,233,293]][levelIndex]||[196,247,294,330];const root=roots[musicStep%roots.length];const now=audioCtx.currentTime;[1,1.5].forEach((mul,j)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=j?"triangle":"square";o.frequency.value=root*mul;g.gain.setValueAtTime(j?.006:.009,now);g.gain.exponentialRampToValueAtTime(.001,now+.22);o.connect(g);g.connect(audioCtx.destination);o.start(now);o.stop(now+.23)});musicStep++}catch(e){}
+  if(!audioEnabled||paused||gameOver)return;
+  musicTimer-=dt;if(musicTimer>0)return;
+  const stepDur=isHome()?.46:isWorld()?.32:.34;musicTimer=stepDur;
+  try{
+    audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state!=="running")return;
+    const homeMel=[64,67,71,67,62,66,69,66,64,67,72,71,67,66,62,null];
+    const worldMel=[64,67,69,71,72,71,69,67,64,67,71,74,72,71,67,69];
+    const themes=[
+      [64,67,69,72,71,69,67,64,66,69,71,74,72,71,69,66],
+      [62,66,69,71,69,66,64,62,66,69,74,71,69,67,66,64],
+      [60,64,67,69,67,64,62,60,64,67,72,69,67,65,64,62],
+      [65,69,72,74,72,69,67,65,69,72,77,74,72,70,69,67],
+      [57,60,64,65,64,60,59,57,60,64,69,67,64,62,60,59],
+      [62,65,69,72,69,65,64,62,65,69,74,72,69,67,65,64],
+      [59,62,66,69,71,69,66,62,59,64,67,71,69,67,66,64]
+    ];
+    const melody=isHome()?homeMel:isWorld()?worldMel:(themes[levelIndex]||worldMel);
+    const roots=isHome()?[48,55,52,55]:isWorld()?[48,55,57,52]:[[48,55,57,52],[50,57,54,57],[48,55,53,55],[53,60,57,60],[45,52,48,52],[50,57,53,57],[47,54,50,54]][levelIndex]||[48,55,57,52];
+    const i=musicStep%melody.length,n=melody[i],bar=Math.floor(i/4)%roots.length,root=roots[bar];
+    if(n!=null){playMusicVoice(noteHz(n),"triangle",isHome()?.013:.016,stepDur*.88);if(i%4===0)playMusicVoice(noteHz(n+12),"sine",.004,stepDur*.65,.03)}
+    if(i%2===0)playMusicVoice(noteHz(root),"triangle",.007,stepDur*1.7);
+    if(i%4===0){playMusicVoice(noteHz(root+7),"sine",.0045,stepDur*3.1,.02);playMusicVoice(noteHz(root+12),"sine",.0035,stepDur*3.0,.04)}
+    musicStep++;
+  }catch(e){}
 }
 function serializeState(s){
   return {trees:[...s.trees],grass:[...s.grass],loot:[...s.loot],hiddenShown:[...s.hiddenShown],hiddenTaken:[...s.hiddenTaken],dead:[...s.dead],locked:[...s.locked],skills:[...s.skills],repairParts:[...s.repairParts],repairDone:s.repairDone,bossSpawned:!!s.bossSpawned,bossDead:!!s.bossDead}
@@ -541,17 +591,23 @@ function loadGame(){
     states=(d.states||[]).map(deserializeState);while(states.length<LEVELS.length)states.push(createStates()[states.length]);
     arts.clear();(d.arts||[]).forEach(x=>arts.add(x));ownedGear.clear();(d.ownedGear||[]).forEach(x=>ownedGear.add(x));skills.clear();(d.skills||[]).forEach(x=>skills.add(x));
     Object.keys(gearLevels).forEach(k=>delete gearLevels[k]);Object.assign(gearLevels,d.gearLevels||{});crafted.clear();(d.crafted||[]).forEach(x=>crafted.add(x));claimedQuests.clear();(d.claimedQuests||[]).forEach(x=>claimedQuests.add(x));
-    Object.assign(stats,d.stats||{});stats.parts ||= {wood:0,gear:0,valve:0,crystal:0};ownedHomes.clear();(d.ownedHomes||[]).forEach(x=>ownedHomes.add(x));completedKingdoms.clear();(d.completedKingdoms||[]).forEach(x=>completedKingdoms.add(x));Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0},d.homeStorage||{});
+    Object.assign(stats,d.stats||{});stats.parts ||= {wood:0,gear:0,valve:0,crystal:0};ownedHomes.clear();(d.ownedHomes||[]).forEach(x=>ownedHomes.add(x));ownedHomes.add("starter_cabin");completedKingdoms.clear();(d.completedKingdoms||[]).forEach(x=>completedKingdoms.add(x));Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0},d.homeStorage||{});
     jetFuel=d.jetpack?.fuel ?? (crafted.has("jetpackCore")?100:0);jetActive=false;
     player.artHp=d.player?.artHp||0;player.artAtk=d.player?.artAtk||0;player.artSpeed=d.player?.artSpeed||0;player.gear={helmet:null,armor:null,sword:null,shield:null,...(d.player?.gear||{})};player.activeSkill=d.player?.activeSkill||[...skills][0];
     recalc(true);player.hp=Math.min(player.maxHp,d.player?.hp??player.maxHp);gameOver=victory=false;paused=false;document.getElementById("select").classList.add("hidden");loadLevel(clamp(d.levelIndex||0,0,LEVELS.length-1),"start");if(Number.isFinite(d.player?.x)&&Number.isFinite(d.player?.y)&&!hitsMap(d.player.x,d.player.y,player.w,player.h,false)){player.x=d.player.x;player.y=d.player.y}if(d.player?.dir)player.dir=d.player.dir;player.oxygen=d.player?.oxygen??100;message("PARTIE CHARGÉE — POSITION RESTAURÉE",1.8);sfx("level");
   }catch(e){console.error(e);message("SAUVEGARDE INCOMPATIBLE",2)}
 }
 function isWorld(){return levelIndex===WORLD_INDEX}
+function isHome(){return levelIndex===HOME_INDEX}
 function propertyForLevel(){return PROPERTIES.find(p=>p.level===levelIndex)}
 function worldObjects(){
   const arr=[];
-  if(isWorld()){
+  if(isHome()){
+    const door=pos(8,9,32,22),chest=pos(3,3,34,28),bed=pos(12,3,34,46);
+    arr.push({id:"starter_exit",type:"homeExit",name:"Sortir vers la forêt",x:door.x,y:door.y,w:32,h:22});
+    arr.push({id:"starter_chest",type:"starterChest",propertyId:"starter_cabin",name:"Petit coffre",x:chest.x,y:chest.y,w:34,h:28});
+    arr.push({id:"starter_bed",type:"bed",propertyId:"starter_cabin",name:"Paillasse",x:bed.x,y:bed.y,w:34,h:46});
+  }else if(isWorld()){
     WORLD_GATES.forEach(g=>{const p=pos(g.c,g.r,26,30);arr.push({...g,id:"gate_"+g.level,type:"gate",x:p.x,y:p.y,w:26,h:30})});
     WORLD_BUILDINGS.forEach(b=>{const p=pos(b.c,b.r,b.w,b.h);arr.push({...b,x:p.x,y:p.y})});
   }else{
@@ -588,8 +644,12 @@ function interactWorldObject(o){
     startTransition(()=>{loadLevel(o.level,"start");message("TU ENTRE DANS : "+LEVELS[o.level].name)})
   }else if(o.type==="shop"){renderShop();openModal("shopModal")}
   else if(o.type==="forge"){renderForge();openModal("forgeModal")}
-  else if(o.type==="realtor"){activePropertyId=PROPERTIES.find(p=>!ownedHomes.has(p.id))?.id||PROPERTIES[0].id;renderHouseModal(activePropertyId);openModal("houseModal")}
+  else if(o.type==="realtor"){activePropertyId=PROPERTIES.find(p=>p.cost>0&&!ownedHomes.has(p.id))?.id||"crossroads";renderHouseModal(activePropertyId);openModal("houseModal")}
   else if(o.type==="house"){openHouse(o.propertyId)}
+  else if(o.type==="homeExit"){startTransition(()=>{loadLevel(WORLD_INDEX,"start");message("TU QUITTES TA CABANE · SUIS LE SENTIER VERS CLAIRBOIS")})}
+  else if(o.type==="starterChest"){openHouse("starter_cabin")}
+  else if(o.type==="bed"){player.hp=player.maxHp;saveGame();message("TU TE REPOSES · VIE RESTAURÉE ET PARTIE SAUVEGARDÉE")}
+  else if(o.type==="sign"){message("PANNEAU : VILLAGE DE CLAIRBOIS ↑ · BOUTIQUE · FORGE · PROPRIÉTÉS")}
 }
 function npcsForLevel(){return NPCS.filter(n=>n.levels.includes(levelIndex)).map((n,i)=>({...n,...pos(n.c,n.r,24,24),id:n.role+"_"+i}))}
 function nearestNPC(){let best=null,bd=999;for(const n of npcsForLevel()){const d=Math.hypot((player.x+12)-(n.x+12),(player.y+12)-(n.y+12));if(d<bd){best=n;bd=d}}return bd<64?best:null}
@@ -598,17 +658,29 @@ function drawNPCSprite(n){const x=Math.round(n.x),y=Math.round(n.y),bob=Math.rou
 function drawHouseSprite(o){
  const x=Math.round(o.x),y=Math.round(o.y);ctx.fillStyle="#4d321f";ctx.fillRect(x,y+12,o.w,o.h-12);ctx.fillStyle="#7b4e2c";ctx.fillRect(x+4,y+16,o.w-8,o.h-18);ctx.fillStyle="#b66a38";ctx.fillRect(x-3,y+8,o.w+6,8);ctx.fillStyle="#d08b45";ctx.fillRect(x+4,y+4,o.w-8,8);ctx.fillStyle="#2a1a12";ctx.fillRect(x+18,y+27,12,17);ctx.fillStyle="#78c8e8";ctx.fillRect(x+6,y+22,8,8);ctx.fillStyle="#f2d26c";ctx.font="bold 7px monospace";ctx.textAlign="center";ctx.fillText(ownedHomes.has(o.propertyId)?"CHEZ TOI":"À VENDRE",x+o.w/2,y+42);ctx.textAlign="left"
 }
+function drawHomeDecor(){
+ if(!isHome())return;
+ ctx.fillStyle="rgba(52,29,17,.24)";ctx.fillRect(32,HUD+32,W-64,H-HUD-64);
+ ctx.fillStyle="#4e301e";ctx.fillRect(6*T,HUD+2*T,4*T,3);
+ ctx.fillStyle="#d37a35";ctx.fillRect(7*T+10,HUD+4*T+10,28,18);ctx.fillStyle="#ffbd58";ctx.fillRect(7*T+17,HUD+4*T+5,14,23);
+ ctx.fillStyle="#6e4b2c";ctx.fillRect(5*T,HUD+7*T,52,20);ctx.fillStyle="#c9a467";ctx.fillRect(5*T+4,HUD+7*T+4,44,4);
+ ctx.fillStyle="#b7aa86";ctx.font="bold 8px monospace";ctx.fillText("TA CABANE",7*T,HUD+T+10);
+}
 function drawWorldObjects(){
  worldObjects().forEach(o=>{
    if(o.type==="gate"){const unlocked=gateUnlocked(o);ctx.fillStyle=unlocked?"#d9c76e":"#4c4c4c";ctx.fillRect(o.x,o.y+5,o.w,o.h-5);ctx.fillStyle=unlocked?"#7952a7":"#252525";ctx.fillRect(o.x+5,o.y+10,o.w-10,o.h-12);ctx.fillStyle="#fff";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(String(o.level+1),o.x+o.w/2,o.y+24);ctx.fillStyle="#fff3bd";ctx.font="7px monospace";ctx.fillText(o.name.split(" ")[0],o.x+o.w/2,o.y-2);ctx.textAlign="left"}
    else if(o.type==="shop"||o.type==="forge"||o.type==="realtor"){drawHouseSprite({...o,propertyId:null});ctx.fillStyle="#fff3bd";ctx.font="bold 7px monospace";ctx.textAlign="center";ctx.fillText(o.type==="shop"?"BOUTIQUE":o.type==="forge"?"FORGE":"PROPRIÉTÉS",o.x+o.w/2,o.y+10);ctx.textAlign="left"}
    else if(o.type==="house")drawHouseSprite(o)
+   else if(o.type==="sign"){ctx.fillStyle="#65401f";ctx.fillRect(o.x+11,o.y+12,6,18);ctx.fillStyle="#b17a3d";ctx.fillRect(o.x,o.y,28,16);ctx.fillStyle="#fff0aa";ctx.font="bold 6px monospace";ctx.fillText("CLAIRBOIS",o.x+2,o.y+10)}
+   else if(o.type==="homeExit"){ctx.fillStyle="#3a2418";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#9a6031";ctx.fillRect(o.x+4,o.y+2,o.w-8,o.h-4);ctx.fillStyle="#e1c169";ctx.fillRect(o.x+23,o.y+10,3,3)}
+   else if(o.type==="starterChest"){ctx.fillStyle="#5b351c";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#9b622d";ctx.fillRect(o.x+2,o.y+3,o.w-4,8);ctx.fillStyle="#e5c363";ctx.fillRect(o.x+14,o.y+9,6,9)}
+   else if(o.type==="bed"){ctx.fillStyle="#5a3926";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#b9a476";ctx.fillRect(o.x+3,o.y+4,o.w-6,o.h-8);ctx.fillStyle="#ddd0a7";ctx.fillRect(o.x+5,o.y+5,o.w-10,12)}
  });
  const o=nearestWorldObject();if(o){ctx.fillStyle="#0a0d0acc";ctx.fillRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.strokeStyle="#d8c37a";ctx.strokeRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.fillStyle="#fff3bd";ctx.font="bold 7px monospace";ctx.fillText(window.matchMedia("(pointer:coarse)").matches?"INTERAGIR":"H : INTERAGIR",Math.max(8,o.x-5),Math.max(HUD+12,o.y-12))}
 }
 function drawNPCs(){npcsForLevel().forEach(drawNPCSprite);const n=nearestNPC();if(n){ctx.fillStyle="#0a0d0acc";ctx.fillRect(n.x-18,n.y-25,60,14);ctx.strokeStyle="#d8c37a";ctx.strokeRect(n.x-18,n.y-25,60,14);ctx.fillStyle="#fff3bd";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(window.matchMedia("(pointer:coarse)").matches?"PARLER":"H : PARLER",n.x+12,n.y-15);ctx.textAlign="left"}}
 function journalHTML(){
-  if(isWorld()){return `<div class="item"><b>MONDE OUVERT DES SEPT ROYAUMES</b><div>Royaumes libérés : ${completedKingdoms.size}/7.</div></div><div class="item"><b>PROPRIÉTÉS</b><div>${ownedHomes.size} maison(s) possédée(s). Visite les villages pour acheter des refuges et accéder à ton coffre partagé.</div></div><div class="item"><b>EXPLORATION</b><div>Les sentiers forestiers relient les sept royaumes. Certains passages exigent les artéfacts trouvés dans les royaumes précédents.</div></div>`}
+  if(isHome()){return `<div class="item"><b>TA PREMIÈRE CABANE</b><div>Un refuge très simple dans le bois. Tu possèdes déjà cette cabane.</div></div><div class="item"><b>PROCHAINE ÉTAPE</b><div>Sors par la porte du bas et suis le sentier jusqu’au village de Clairbois.</div></div><div class="item"><b>COFFRE</b><div>Le petit coffre donne accès à ton stockage partagé.</div></div>`} if(isWorld()){return `<div class="item"><b>MONDE OUVERT DES SEPT ROYAUMES</b><div>Royaumes libérés : ${completedKingdoms.size}/7.</div></div><div class="item"><b>PROPRIÉTÉS</b><div>${ownedHomes.size} maison(s) possédée(s). Visite les villages pour acheter des refuges et accéder à ton coffre partagé.</div></div><div class="item"><b>EXPLORATION</b><div>Les sentiers forestiers relient les sept royaumes. Certains passages exigent les artéfacts trouvés dans les royaumes précédents.</div></div>`}
   const o=level.objective,repair=level.repair,reqMissing=missing(level.req);
   const enemyDone=enemiesRequirementDone();
   const q=SIDE_QUESTS[levelIndex];
@@ -672,7 +744,7 @@ function useSkill(){if(paused||gameOver||player.skillCool>0||!player.activeSkill
 function elementsOwned(){return new Set([...ownedGear].map(id=>GEAR[id].element).filter(e=>e&&e!=="none")).size}
 function equippedElements(){return new Set(Object.values(player.gear).filter(Boolean).map(id=>GEAR[id]?.element).filter(e=>e&&e!=="none"))}
 function objectiveDone(){
-  if(isWorld())return true;
+  if(isWorld()||isHome())return true;
   const o=level.objective;
   if(o[1]==="treasures")return state().loot.size+state().hiddenTaken.size>=o[2];
   if(o[1]==="artifact")return arts.has(o[2]);
@@ -687,12 +759,12 @@ function objectiveDone(){
 function enemiesRequirementDone(){return !level.clearEnemies||enemies.length===0}
 function exitOpen(){
   const base=enemiesRequirementDone()&&objectiveDone()&&hasAll(level.req)&&(!level.repair||state().repairDone);
-  return isWorld()?true:base&&(levelIndex!==FINAL_KINGDOM||state().bossDead)
+  return (isWorld()||isHome())?true:base&&(levelIndex!==FINAL_KINGDOM||state().bossDead)
 }
 function spawn(side){if(side==="start")return pos(level.start[0],level.start[1],player.w,player.h);const c=side==="right"?14:1;for(const r of [5,4,6,3,7,2,8,1,9])if(level.map[r][c]===GROUND)return pos(c,r,player.w,player.h);return pos(level.start[0],level.start[1],player.w,player.h)}
 function loadLevel(index,side="start"){if(index<0)return;pickups=[];projectiles=[];enemyProjectiles=[];ambient=[];musicStep=0;musicTimer=.15;if(index>=LEVELS.length){victory=gameOver=true;return}levelIndex=index;level=LEVELS[index];const p=spawn(side);player.x=p.x;player.y=p.y;player.dir=side==="right"?"left":"right";player.attack=false;player.cool=0;player.inv=0;enemies=level.enemies.map(createEnemy).filter(e=>!state().dead.has(e.id));loot=level.loot.map(createLoot);artItems=level.arts.map(createArt);gearItems=level.gear.map(createGear);grass=level.grass.map(createGrass);hidden=level.hidden.map(createHidden);lockedChests=level.locked.map(createLocked);repairParts=(level.repairParts||[]).map(createRepairPart);player.oxygen=100;jetActive=false;if(hasJetpack())jetFuel=Math.max(jetFuel,Math.min(100,70+levelIndex*5));if(level.skill&&!skills.has(level.skill))unlockSkill(level.skill);if(index===WORLD_INDEX){message("MONDE OUVERT · EXPLORE LES SENTIERS ET LES VILLAGES")}else{message("ROYAUME "+(index+1)+" : "+level.name)}
 updateInventory()}
-function restart(){stats.gold=stats.score=stats.treasures=stats.fragments=stats.kills=0;stats.xp=0;stats.rank=1;stats.combo=0;stats.bestCombo=0;stats.damageDone=0;stats.treesCut=0;stats.grassCut=0;stats.parts={wood:0,gear:0,valve:0,crystal:0};particles=[];floatTexts=[];shake=0;flash=0;arts.clear();ownedGear.clear();skills.clear();crafted.clear();claimedQuests.clear();ownedHomes.clear();completedKingdoms.clear();Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0});Object.keys(gearLevels).forEach(id=>delete gearLevels[id]);states=createStates();chooseHero(selected);jetFuel=100;jetActive=false;gameOver=victory=false;time=0;loadLevel(WORLD_INDEX,"start")}
+function restart(){stats.gold=stats.score=stats.treasures=stats.fragments=stats.kills=0;stats.xp=0;stats.rank=1;stats.combo=0;stats.bestCombo=0;stats.damageDone=0;stats.treesCut=0;stats.grassCut=0;stats.parts={wood:0,gear:0,valve:0,crystal:0};particles=[];floatTexts=[];shake=0;flash=0;arts.clear();ownedGear.clear();skills.clear();crafted.clear();claimedQuests.clear();ownedHomes.clear();ownedHomes.add("starter_cabin");completedKingdoms.clear();Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0});Object.keys(gearLevels).forEach(id=>delete gearLevels[id]);states=createStates();chooseHero(selected);jetFuel=100;jetActive=false;gameOver=victory=false;time=0;loadLevel(HOME_INDEX,"start");message("TU TE RÉVEILLES DANS TA PETITE CABANE · REJOINS LE VILLAGE DE CLAIRBOIS")}
 function safeTile(c,r){
   const ok=(cc,rr)=>{
     if(cc<1||cc>14||rr<1||rr>9)return false;
@@ -717,8 +789,8 @@ function createHidden([id,source,sourceId,type,value]){let c=0,r=0;if(source==="
 function tileAt(x,y){return{c:Math.floor(x/T),r:Math.floor((y-HUD)/T)}}
 function solid(c,r,air=false){
   if(c<0||c>=COLS||r<0||r>=ROWS)return true;
-  if(levelIndex>0&&!isWorld()&&c===0&&(r===4||r===5))return false;
-  if(!isWorld()&&exitOpen()&&c===15&&(r===4||r===5))return false;
+  if(levelIndex>0&&!isWorld()&&!isHome()&&c===0&&(r===4||r===5))return false;
+  if(!isWorld()&&!isHome()&&exitOpen()&&c===15&&(r===4||r===5))return false;
   const tile=level.map[r][c];
   if(level.mode==="sideWater")return tile===WALL||tile===ROCK;
   if(tile===TREE&&state().trees.has(c+","+r))return false;
@@ -816,7 +888,7 @@ function updatePlayer(dt){
 }
 function updateEnemies(dt){enemies.forEach(e=>{e.flash=Math.max(0,(e.flash||0)-dt);if(e.stun>0){e.stun-=dt;return}if(e.recoil>0){e.recoil-=dt;move(e,e.rx*dt,e.ry*dt);return}const px=player.x-e.x,py=player.y-e.y,d=Math.hypot(px,py)||1;if(e.type==="berserk"&&e.hp<e.max/2)e.speed=105;if(e.behavior==="chase"){e.dx=px/d;e.dy=py/d}else if(e.behavior==="flee"){e.dx=-px/d;e.dy=-py/d}else if(e.behavior==="guard"){const hd=Math.hypot(e.homeX-e.x,e.homeY-e.y);if(d<120){e.dx=px/d;e.dy=py/d}else if(hd>12){e.dx=(e.homeX-e.x)/hd;e.dy=(e.homeY-e.y)/hd}else{e.dx=e.dy=0}}else if(e.behavior==="orbit"){e.dx=-py/d;e.dy=px/d}move(e,e.dx*e.speed*dt,e.dy*e.speed*dt)})}
 function doors(){
-  if(transition.active||isWorld())return;
+  if(transition.active||isWorld()||isHome())return;
   const y=HUD+4*T,leftDoor={x:0,y,w:T+14,h:T*2},rightDoor={x:W-T-14,y,w:T+14,h:T*2};
   if(hit(player,leftDoor)||player.x<8){
     startTransition(()=>{loadLevel(WORLD_INDEX,"start");message("RETOUR AU CARREFOUR")});return
@@ -940,7 +1012,7 @@ function drawDoor(x,open,back=false){
       for(let i=0;i<7;i++)ctx.fillRect((i*70+time*3)%W,HUD+14+(i%3)*7,16,2);
     }
   }
-  if(!isWorld()){drawDoor(0,true,true);drawDoor(W-T,exitOpen());}
+  if(!isWorld()&&!isHome()){drawDoor(0,true,true);drawDoor(W-T,exitOpen());}
 }
 function drawGrass(){
   grass.forEach(g=>{
@@ -1116,7 +1188,7 @@ function drawMiniMap(){
 }
 function hud(){
   ctx.fillStyle="#171b1b";ctx.fillRect(0,0,W,HUD);ctx.fillStyle="#d7ba62";ctx.fillRect(0,HUD-4,W,4);
-  ctx.fillStyle="#f4e6a4";ctx.font="bold 11px monospace";ctx.fillText(player.name+" · "+(isWorld()?"MONDE OUVERT":"ROYAUME "+(levelIndex+1)+"/7")+" · RANG "+stats.rank,12,14);
+  ctx.fillStyle="#f4e6a4";ctx.font="bold 11px monospace";ctx.fillText(player.name+" · "+(isHome()?"TA CABANE":isWorld()?"MONDE OUVERT":"ROYAUME "+(levelIndex+1)+"/7")+" · RANG "+stats.rank,12,14);
   for(let i=0;i<player.maxHp;i++)heart(12+i*30,23,i<player.hp);
   const xpW=110;
   ctx.fillStyle="#302a1a";ctx.fillRect(12,52,xpW,8);
@@ -1176,7 +1248,7 @@ function render(){
   ctx.clearRect(0,0,W,H);if(!selected)return;
   ctx.save();
   if(shake>0){ctx.translate((Math.random()-.5)*8,(Math.random()-.5)*8)}
-  drawMap();drawAmbient();drawWorldObjects();drawGrass();drawObjects();drawNPCs();drawPickups();drawEnemies();drawProjectiles();drawSword();drawPlayer();drawEffects();
+  drawMap();drawHomeDecor();drawAmbient();drawWorldObjects();drawGrass();drawObjects();drawNPCs();drawPickups();drawEnemies();drawProjectiles();drawSword();drawPlayer();drawEffects();
   ctx.restore();
   vignette();hud();overlays();drawTransition();
   if(flash>0){ctx.fillStyle="rgba(255,255,255,.12)";ctx.fillRect(0,HUD,W,H-HUD)}
