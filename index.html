@@ -175,7 +175,7 @@ const WORLD_LEVEL={
  [1,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
- ],start:[8,9],enemies:[[5,6,2,"hunter","wind"],[11,6,2,"coward","earth"]],loot:[["coin",7,6,12],["coin",9,7,12]],arts:[],gear:[],grass:[["wg1",3,6],["wg2",12,6],["wg3",5,8]],hidden:[],locked:[],skill:null,clearEnemies:false,
+ ],start:[8,8],enemies:[[5,6,2,"hunter","wind"],[11,6,2,"coward","earth"]],loot:[["coin",7,6,12],["coin",9,7,12]],arts:[],gear:[],grass:[["wg1",3,6],["wg2",12,6],["wg3",5,8]],hidden:[],locked:[],skill:null,clearEnemies:false,
  progressionHelp:"Visite les villages, achète des maisons et emprunte les sentiers vers les sept royaumes."
 };
 LEVELS.push(WORLD_LEVEL);
@@ -212,7 +212,8 @@ const WORLD_BUILDINGS=[
  {id:"world_shop",type:"shop",name:"Boutique de Brik",c:5,r:3,w:48,h:44},
  {id:"world_forge",type:"forge",name:"Forge de Cendre",c:8,r:3,w:48,h:44},
  {id:"world_realtor",type:"realtor",name:"Bureau des Propriétés",c:11,r:3,w:48,h:44},
- {id:"world_home",type:"house",propertyId:"crossroads",name:"Maison de Clairbois",c:13,r:6,w:48,h:44}
+ {id:"world_home",type:"house",propertyId:"crossroads",name:"Maison de Clairbois",c:13,r:6,w:48,h:44},
+ {id:"starter_home_outside",type:"starterHome",propertyId:"starter_cabin",name:"Ta cabane",c:8,r:9,w:54,h:48}
 ];
 const PROPERTIES=[
  {id:"starter_cabin",level:HOME_INDEX,name:"Ta cabane du bois",village:"Bois de Clairbois",cost:0,c:8,r:6},
@@ -661,6 +662,7 @@ function interactWorldObject(o){
   else if(o.type==="forge"){renderForge();openModal("forgeModal")}
   else if(o.type==="realtor"){activePropertyId=PROPERTIES.find(p=>p.cost>0&&!ownedHomes.has(p.id))?.id||"crossroads";renderHouseModal(activePropertyId);openModal("houseModal")}
   else if(o.type==="house"){openHouse(o.propertyId)}
+  else if(o.type==="starterHome"){startTransition(()=>{loadLevel(HOME_INDEX,"start");message("TU RENTRES CHEZ TOI · TA CABANE")},"y",1)}
   else if(o.type==="homeExit"){startTransition(()=>{loadLevel(WORLD_INDEX,"start");message("TU QUITTES TA CABANE · SUIS LE SENTIER VERS CLAIRBOIS")},"y",-1)}
   else if(o.type==="starterChest"){openHouse("starter_cabin")}
   else if(o.type==="bed"){player.hp=player.maxHp;saveGame();message("TU TE REPOSES · VIE RESTAURÉE ET PARTIE SAUVEGARDÉE")}
@@ -689,8 +691,61 @@ function executeMouseInteraction(t){
 
 function interactNPC(){const wo=nearestWorldObject();if(wo){interactWorldObject(wo);return}const n=nearestNPC();if(!n){message("RIEN À INTERAGIR À PROXIMITÉ");return}const wasPlaying=!paused&&!pausedByUser;paused=true;message(n.name+" : "+n.line);modalResumeOnClose=wasPlaying;if(n.role==="shop"){renderShop();openModal("shopModal")}else if(n.role==="forge"){renderForge();openModal("forgeModal")}else{renderQuests();openModal("questsModal")}}
 function drawNPCSprite(n){const x=Math.round(n.x),y=Math.round(n.y),bob=Math.round(Math.sin(time*3+n.c)*1);ctx.fillStyle="#0006";ctx.fillRect(x+4,y+22,16,3);if(n.icon==="merchant"){ctx.fillStyle="#6b4d2d";ctx.fillRect(x+5,y+9+bob,14,12);ctx.fillStyle="#b8895f";ctx.fillRect(x+7,y+2+bob,10,9);ctx.fillStyle="#3a2416";ctx.fillRect(x+5,y+bob,14,4);ctx.fillStyle="#d8bd68";ctx.fillRect(x+18,y+13+bob,5,7)}else if(n.icon==="smith"){ctx.fillStyle="#5a5a5a";ctx.fillRect(x+4,y+8+bob,16,14);ctx.fillStyle="#d9a36c";ctx.fillRect(x+7,y+1+bob,10,9);ctx.fillStyle="#1d1d1d";ctx.fillRect(x+6,y-2+bob,12,5);ctx.fillStyle="#ff7a35";ctx.fillRect(x+19,y+12+bob,4,8)}else{ctx.fillStyle="#435a78";ctx.fillRect(x+5,y+9+bob,14,13);ctx.fillStyle="#d5b58c";ctx.fillRect(x+7,y+2+bob,10,9);ctx.fillStyle="#d8d8d8";ctx.fillRect(x+8,y+9+bob,8,6);ctx.fillStyle="#8dc7ff";ctx.fillRect(x+19,y+5+bob,3,17)}ctx.fillStyle="#1a1a1a";ctx.fillRect(x+9,y+5+bob,2,2);ctx.fillRect(x+13,y+5+bob,2,2);ctx.fillStyle="#fff3bd";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(n.name,x+12,y-7+bob);ctx.textAlign="left"}
+function buildingLabel(text,x,y,w,bg="#19150f",fg="#fff0a6"){
+ ctx.fillStyle=bg;ctx.fillRect(x,y,w,12);ctx.strokeStyle="#e2c86a";ctx.strokeRect(x+.5,y+.5,w-1,11);ctx.fillStyle=fg;ctx.font="bold 7px monospace";ctx.textAlign="center";ctx.fillText(text,x+w/2,y+9);ctx.textAlign="left"
+}
+function drawBaseHouse(o,wall="#805235",roof="#bd6a34",door="#332116"){
+ const x=Math.round(o.x),y=Math.round(o.y);
+ ctx.fillStyle="#3a2619";ctx.fillRect(x+2,y+12,o.w-4,o.h-12);
+ ctx.fillStyle=wall;ctx.fillRect(x+5,y+16,o.w-10,o.h-18);
+ ctx.fillStyle=roof;ctx.fillRect(x-4,y+7,o.w+8,8);ctx.fillRect(x+3,y+2,o.w-6,7);
+ ctx.fillStyle=door;ctx.fillRect(x+Math.floor(o.w/2)-6,y+27,12,17);
+ ctx.fillStyle="#91d6e9";ctx.fillRect(x+7,y+22,8,8);ctx.fillRect(x+o.w-15,y+22,8,8);
+ ctx.fillStyle="#e9d385";ctx.fillRect(x+9,y+24,4,2);ctx.fillRect(x+o.w-13,y+24,4,2);
+}
+function drawShopSprite(o){
+ const x=Math.round(o.x),y=Math.round(o.y);drawBaseHouse(o,"#876338","#486f38","#3a2516");
+ // striped awning
+ for(let i=0;i<5;i++){ctx.fillStyle=i%2?"#f0d769":"#497c45";ctx.fillRect(x+3+i*9,y+14,9,8)}
+ ctx.fillStyle="#5b351f";ctx.fillRect(x-6,y+30,10,12);ctx.fillRect(x+o.w-4,y+30,10,12);
+ ctx.fillStyle="#d9b85a";ctx.fillRect(x-7,y+29,12,3);ctx.fillRect(x+o.w-5,y+29,12,3);
+ // hanging coin sign
+ ctx.fillStyle="#4a2d1a";ctx.fillRect(x+o.w/2-2,y-7,4,9);ctx.fillStyle="#f1c84b";ctx.fillRect(x+o.w/2-7,y-13,14,9);ctx.fillStyle="#fff1a0";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText("$",x+o.w/2,y-6);ctx.textAlign="left";
+ buildingLabel("BOUTIQUE",x-2,y+o.h-3,o.w+4,"#244628","#fff6a8")
+}
+function drawForgeSprite(o){
+ const x=Math.round(o.x),y=Math.round(o.y);drawBaseHouse(o,"#625c55","#613527","#241b17");
+ // chimney + animated smoke
+ ctx.fillStyle="#3a302c";ctx.fillRect(x+o.w-12,y-8,8,18);
+ const puff=Math.sin(time*2)*2;ctx.fillStyle="rgba(190,190,190,.42)";ctx.fillRect(x+o.w-15+puff,y-16,8,6);ctx.fillRect(x+o.w-10-puff,y-23,7,6);
+ // forge glow
+ ctx.fillStyle="#9f3d20";ctx.fillRect(x+4,y+31,12,10);ctx.fillStyle="#ff8a32";ctx.fillRect(x+7,y+29,7,9);ctx.fillStyle="#ffd067";ctx.fillRect(x+9,y+29,3,5);
+ // anvil outside
+ ctx.fillStyle="#343b3f";ctx.fillRect(x-7,y+33,14,4);ctx.fillRect(x-3,y+37,7,5);ctx.fillStyle="#69737a";ctx.fillRect(x-10,y+30,18,4);
+ buildingLabel("⚒ FORGE",x-2,y+o.h-3,o.w+4,"#4b251d","#ffd38a")
+}
+function drawRealtorSprite(o){
+ const x=Math.round(o.x),y=Math.round(o.y);drawBaseHouse(o,"#74604b","#6d587e","#30241f");
+ ctx.fillStyle="#e7d8ae";ctx.fillRect(x+8,y+18,o.w-16,11);ctx.strokeStyle="#5a432b";ctx.strokeRect(x+8.5,y+18.5,o.w-17,10);
+ ctx.fillStyle="#4c3425";ctx.font="bold 6px monospace";ctx.textAlign="center";ctx.fillText("MAISONS",x+o.w/2,y+26);ctx.textAlign="left";
+ ctx.fillStyle="#6a4429";ctx.fillRect(x-4,y+31,5,13);ctx.fillStyle="#e7d06e";ctx.fillRect(x-10,y+29,16,9);
+ buildingLabel("PROPRIÉTÉS",x-5,y+o.h-3,o.w+10,"#453652","#fff1b0")
+}
+function drawPlayerHomeSprite(o){
+ const x=Math.round(o.x),y=Math.round(o.y);drawBaseHouse(o,"#805437","#b8672f","#2d1c12");
+ // fox banner / home marker
+ ctx.fillStyle="#442719";ctx.fillRect(x+o.w-7,y-5,3,20);ctx.fillStyle="#f28c28";ctx.fillRect(x+o.w-4,y-4,14,10);ctx.fillStyle="#fff0c8";ctx.fillRect(x+o.w+2,y,4,3);
+ // chest and lantern
+ ctx.fillStyle="#6a3d20";ctx.fillRect(x-5,y+34,11,8);ctx.fillStyle="#d2a54d";ctx.fillRect(x-5,y+34,11,2);ctx.fillStyle="#e9c95f";ctx.fillRect(x+o.w-3,y+30,4,8);ctx.fillStyle="#ffd76e";ctx.fillRect(x+o.w-4,y+28,6,5);
+ buildingLabel("★ CHEZ TOI ★",x-6,y+o.h-3,o.w+12,"#553019","#fff1a8")
+}
+function drawSaleHomeSprite(o){
+ const x=Math.round(o.x),y=Math.round(o.y);drawBaseHouse(o,"#77705f","#7b6751","#30251c");
+ ctx.fillStyle="#714728";ctx.fillRect(x+o.w-4,y+22,4,20);ctx.fillStyle="#efe0a3";ctx.fillRect(x+o.w-12,y+19,18,10);ctx.fillStyle="#5b3624";ctx.font="bold 6px monospace";ctx.textAlign="center";ctx.fillText("À VENDRE",x+o.w-3,y+26);ctx.textAlign="left";
+ buildingLabel("À VENDRE",x-2,y+o.h-3,o.w+4,"#5b5142","#fff1b3")
+}
 function drawHouseSprite(o){
- const x=Math.round(o.x),y=Math.round(o.y);ctx.fillStyle="#4d321f";ctx.fillRect(x,y+12,o.w,o.h-12);ctx.fillStyle="#7b4e2c";ctx.fillRect(x+4,y+16,o.w-8,o.h-18);ctx.fillStyle="#b66a38";ctx.fillRect(x-3,y+8,o.w+6,8);ctx.fillStyle="#d08b45";ctx.fillRect(x+4,y+4,o.w-8,8);ctx.fillStyle="#2a1a12";ctx.fillRect(x+18,y+27,12,17);ctx.fillStyle="#78c8e8";ctx.fillRect(x+6,y+22,8,8);ctx.fillStyle="#f2d26c";ctx.font="bold 7px monospace";ctx.textAlign="center";ctx.fillText(ownedHomes.has(o.propertyId)?"CHEZ TOI":"À VENDRE",x+o.w/2,y+42);ctx.textAlign="left"
+ if(o.propertyId&&ownedHomes.has(o.propertyId))drawPlayerHomeSprite(o);else drawSaleHomeSprite(o)
 }
 function drawHomeDecor(){
  if(!isHome())return;
@@ -703,7 +758,10 @@ function drawHomeDecor(){
 function drawWorldObjects(){
  worldObjects().forEach(o=>{
    if(o.type==="gate"){const unlocked=gateUnlocked(o);ctx.fillStyle=unlocked?"#d9c76e":"#4c4c4c";ctx.fillRect(o.x,o.y+5,o.w,o.h-5);ctx.fillStyle=unlocked?"#7952a7":"#252525";ctx.fillRect(o.x+5,o.y+10,o.w-10,o.h-12);ctx.fillStyle="#fff";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(String(o.level+1),o.x+o.w/2,o.y+24);ctx.fillStyle="#fff3bd";ctx.font="7px monospace";ctx.fillText(o.name.split(" ")[0],o.x+o.w/2,o.y-2);ctx.textAlign="left"}
-   else if(o.type==="shop"||o.type==="forge"||o.type==="realtor"){drawHouseSprite({...o,propertyId:null});ctx.fillStyle="#fff3bd";ctx.font="bold 7px monospace";ctx.textAlign="center";ctx.fillText(o.type==="shop"?"BOUTIQUE":o.type==="forge"?"FORGE":"PROPRIÉTÉS",o.x+o.w/2,o.y+10);ctx.textAlign="left"}
+   else if(o.type==="shop")drawShopSprite(o)
+   else if(o.type==="forge")drawForgeSprite(o)
+   else if(o.type==="realtor")drawRealtorSprite(o)
+   else if(o.type==="starterHome")drawPlayerHomeSprite(o)
    else if(o.type==="house")drawHouseSprite(o)
    else if(o.type==="sign"){ctx.fillStyle="#65401f";ctx.fillRect(o.x+11,o.y+12,6,18);ctx.fillStyle="#b17a3d";ctx.fillRect(o.x,o.y,28,16);ctx.fillStyle="#fff0aa";ctx.font="bold 6px monospace";ctx.fillText("CLAIRBOIS",o.x+2,o.y+10)}
    else if(o.type==="homeExit"){ctx.fillStyle="#3a2418";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#9a6031";ctx.fillRect(o.x+4,o.y+2,o.w-8,o.h-4);ctx.fillStyle="#e1c169";ctx.fillRect(o.x+23,o.y+10,3,3)}
@@ -1352,7 +1410,7 @@ document.getElementById("homesBtn").onclick=()=>{activePropertyId=[...ownedHomes
 document.getElementById("drawerShade").onclick=closeDrawers;
 document.querySelectorAll("[data-close-drawer]").forEach(b=>b.onclick=closeDrawers);
 document.querySelectorAll(".gameDrawer .btn").forEach(b=>b.addEventListener("click",()=>setTimeout(closeDrawers,0)));
-function syncInteractionButton(){const b=document.getElementById("touchInteract");if(!b)return;const touch=window.matchMedia("(pointer:coarse)").matches;const wo=selected&&!paused&&!gameOver?nearestWorldObject():null,n=selected&&!paused&&!gameOver?nearestNPC():null,target=wo||n;b.hidden=!(touch&&target);if(target){const label=wo?(wo.type==="gate"?"ENTRER":wo.type==="house"?"MAISON":"INTERAGIR"):"PARLER";b.textContent=label;b.setAttribute("aria-label",wo?wo.name:n.name)}else{b.textContent="INTERAGIR";b.setAttribute("aria-label","Interaction indisponible")}}
+function syncInteractionButton(){const b=document.getElementById("touchInteract");if(!b)return;const touch=window.matchMedia("(pointer:coarse)").matches;const wo=selected&&!paused&&!gameOver?nearestWorldObject():null,n=selected&&!paused&&!gameOver?nearestNPC():null,target=wo||n;b.hidden=!(touch&&target);if(target){const label=wo?(wo.type==="gate"?"ENTRER":wo.type==="shop"?"BOUTIQUE":wo.type==="forge"?"FORGE":wo.type==="realtor"?"PROPRIÉTÉS":(wo.type==="house"||wo.type==="starterHome")?"MAISON":"INTERAGIR"):"PARLER";b.textContent=label;b.setAttribute("aria-label",wo?wo.name:n.name)}else{b.textContent="INTERAGIR";b.setAttribute("aria-label","Interaction indisponible")}}
 function syncMobilePanels(){const mobile=window.matchMedia("(max-width:790px),(pointer:coarse)").matches;const rb=document.getElementById("resBox"),gb=document.getElementById("gearBox"),kb=document.getElementById("keysBox");if(!rb||!gb||!kb)return;if(mobile){rb.open=true;gb.open=false;kb.open=false}else{rb.open=gb.open=kb.open=true}}
 window.addEventListener("resize",syncMobilePanels);syncMobilePanels();
 function setInputMode(mode){
