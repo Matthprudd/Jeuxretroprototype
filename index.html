@@ -21,7 +21,24 @@
 .newsHistory{display:grid;gap:7px}
 .newsItem{padding:8px;border:1px solid #665b36;background:#192219cc;color:#eef3eb;font-size:10px;line-height:1.35}
 .newsItem .newsMeta{display:block;color:#aab8a7;font-size:8px;margin-top:4px}
-.newsEmpty{padding:16px;text-align:center;color:#889588;font-size:10px}.storageRow{display:grid;grid-template-columns:1fr 1.3fr auto;gap:8px;align-items:center;padding:9px;border-bottom:1px solid #394139}.storageRow span{font-size:10px;color:#c6d0c1}.storageBtn{padding:5px 7px!important;font-size:9px!important}.controlModeBox{margin:12px 0;padding:10px;border:2px solid #6e633d;background:#182018}.controlModeBtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0}.controlModeBtns .activeMode{border-color:#ffe279;background:#4c5d35;color:#fff4a8}canvas.mouseMode{cursor:crosshair}@media(max-width:540px){.storageRow{grid-template-columns:1fr}.storageRow div{display:flex;gap:6px}}@media(max-width:790px),(pointer:coarse){
+.newsEmpty{padding:16px;text-align:center;color:#889588;font-size:10px}.storageRow{display:grid;grid-template-columns:1fr 1.3fr auto;gap:8px;align-items:center;padding:9px;border-bottom:1px solid #394139}.storageRow span{font-size:10px;color:#c6d0c1}.storageBtn{padding:5px 7px!important;font-size:9px!important}.controlModeBox{margin:12px 0;padding:10px;border:2px solid #6e633d;background:#182018}.controlModeBtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0}.controlModeBtns .activeMode{border-color:#ffe279;background:#4c5d35;color:#fff4a8}canvas.mouseMode{cursor:crosshair}@media(max-width:540px){.storageRow{grid-template-columns:1fr}.storageRow div{display:flex;gap:6px}}
+@media(min-width:791px) and (pointer:fine){
+  body{padding:16px}
+  .shell{width:min(1400px,calc(100vw - 32px));max-width:none}
+  .top{width:100%;padding:15px 18px}
+  .title{font-size:20px}
+  .layout{grid-template-columns:minmax(680px,1fr) minmax(340px,420px);gap:22px;width:100%;align-items:start}
+  .layout>div:first-child{min-width:0}
+  canvas{width:100%;height:auto;max-width:none}
+  .inventory{width:100%}
+  .invbox{padding:16px}
+  .invbox h3,.invbox summary{font-size:16px}
+  .line{font-size:15px;line-height:1.55}
+  .token{font-size:14px}
+  .status{font-size:15px}
+}
+
+@media(max-width:790px),(pointer:coarse){
 html,body{width:100%;max-width:100%;overflow-x:hidden}
 body{padding:0 6px 10px}
 .shell,.layout,.layout>div,.inventory,.touch,.top,.buttons{min-width:0;max-width:100%}
@@ -805,10 +822,16 @@ function npcsForLevel(){
     return {...n,...sp,id:n.role+"_"+i}
   })
 }
-function nearestNPC(){let best=null,bd=999;for(const n of npcsForLevel()){const d=Math.hypot((player.x+12)-(n.x+12),(player.y+12)-(n.y+12));if(d<bd){best=n;bd=d}}return bd<78?best:null}
+function nearestNPC(){let best=null,bd=999;for(const n of npcsForLevel()){const d=Math.hypot((player.x+12)-(n.x+12),(player.y+12)-(n.y+12));if(d<bd){best=n;bd=d}}return bd<120?best:null}
 function pointInObject(p,o,pad=8){return p.x>=o.x-pad&&p.x<=o.x+o.w+pad&&p.y>=o.y-pad&&p.y<=o.y+o.h+pad}
+function npcAtPoint(p){
+  return npcsForLevel().filter(n=>pointInObject(p,n,24)).sort((a,b)=>{
+    const da=Math.hypot(p.x-(a.x+12),p.y-(a.y+12)),db=Math.hypot(p.x-(b.x+12),p.y-(b.y+12));
+    return da-db
+  })[0]||null
+}
 function clickableAtPoint(p){
-  const npc=npcsForLevel().filter(n=>pointInObject(p,n,18)).sort((a,b)=>Math.hypot((player.x+12)-(a.x+12),(player.y+12)-(a.y+12))-Math.hypot((player.x+12)-(b.x+12),(player.y+12)-(b.y+12)))[0];
+  const npc=npcAtPoint(p);
   if(npc)return{kind:"npc",obj:npc};
   const world=worldObjects().filter(o=>o.type!=="gate"&&pointInObject(p,o,12)).sort((a,b)=>interactionDistance(a)-interactionDistance(b))[0];
   if(world)return{kind:"world",obj:world};
@@ -915,7 +938,7 @@ function drawWorldObjects(){
    else if(o.type==="starterChest"){ctx.fillStyle="#5b351c";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#9b622d";ctx.fillRect(o.x+2,o.y+3,o.w-4,8);ctx.fillStyle="#e5c363";ctx.fillRect(o.x+14,o.y+9,6,9)}
    else if(o.type==="bed"){ctx.fillStyle="#5a3926";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#b9a476";ctx.fillRect(o.x+3,o.y+4,o.w-6,o.h-8);ctx.fillStyle="#ddd0a7";ctx.fillRect(o.x+5,o.y+5,o.w-10,12)}
  });
- const o=nearestWorldObject();if(o){ctx.fillStyle="#0a0d0acc";ctx.fillRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.strokeStyle="#d8c37a";ctx.strokeRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.fillStyle="#fff3bd";ctx.font="bold 7px monospace";ctx.fillText(o.type==="gate"?"TRAVERSE LE PORTAIL":(window.matchMedia("(pointer:coarse)").matches?"INTERAGIR":inputMode==="mouse"?"CLIQUE":"H : INTERAGIR"),Math.max(8,o.x-5),Math.max(HUD+12,o.y-12))}
+ const o=nearestWorldObject();if(o){ctx.fillStyle="#0a0d0acc";ctx.fillRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.strokeStyle="#d8c37a";ctx.strokeRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.fillStyle="#fff3bd";ctx.font="bold 7px monospace";ctx.fillText(o.type==="gate"?"TRAVERSE LE PORTAIL":(window.matchMedia("(pointer:coarse)").matches?"INTERAGIR":"CLIQUE / H"),Math.max(8,o.x-5),Math.max(HUD+12,o.y-12))}
 }
 function drawNPCs(){npcsForLevel().forEach(drawNPCSprite);const n=nearestNPC();if(n){ctx.fillStyle="#0a0d0acc";ctx.fillRect(n.x-18,n.y-25,60,14);ctx.strokeStyle="#d8c37a";ctx.strokeRect(n.x-18,n.y-25,60,14);ctx.fillStyle="#fff3bd";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(window.matchMedia("(pointer:coarse)").matches?"PARLER":inputMode==="mouse"?"CLIQUE":"H : PARLER",n.x+12,n.y-15);ctx.textAlign="left"}}
 function journalHTML(){
@@ -1602,16 +1625,28 @@ setTimeout(()=>setInputMode(inputMode),0);
 function canvasPoint(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
 canvas.addEventListener("contextmenu",e=>{if(inputMode==="mouse")e.preventDefault()});
 canvas.addEventListener("pointerdown",e=>{
-  if(e.pointerType==="touch"||paused||gameOver)return;
-  const p=canvasPoint(e),target=e.button===0?clickableAtPoint(p):null;
+  if(e.pointerType==="touch"||gameOver)return;
+  const p=canvasPoint(e);
+  if(e.button===0){
+    const directNpc=npcAtPoint(p);
+    if(directNpc&&!pausedByUser){
+      e.preventDefault();lastInput="mouse";
+      if(paused)paused=false;
+      interactWithNPC(directNpc);
+      return
+    }
+  }
+  if(paused)return;
+  const target=e.button===0?clickableAtPoint(p):null;
   if(target){
     e.preventDefault();lastInput="mouse";
+    if(target.kind==="npc"){executeMouseInteraction(target);return}
     if(targetInteractionDistance(target)<82)executeMouseInteraction(target);
     else if(inputMode==="mouse"){
       pendingMouseInteract=target;mouseHeld=false;
       const o=target.obj,tx=o.x+o.w/2,ty=o.y+o.h+10;
       mouseTarget={active:true,x:tx,y:ty};message("JE M’APPROCHE DE "+(o.name||"L’OBJET").toUpperCase())
-    }else message("APPROCHE-TOI ENCORE UN PEU")
+    }else message("APPROCHE-TOI ENCORE UN PEU");
     return
   }
   if(inputMode!=="mouse")return;
@@ -1631,7 +1666,26 @@ canvas.addEventListener("pointermove",e=>{
 canvas.addEventListener("pointerleave",()=>{if(inputMode==="mouse"){mouseHover=null;canvas.style.cursor="crosshair"}});
 canvas.addEventListener("pointerup",e=>{if(inputMode!=="mouse"||e.pointerType==="touch")return;if(e.button===0)mouseHeld=false});
 canvas.addEventListener("pointercancel",()=>{mouseHeld=false});
-window.addEventListener("keydown",e=>{if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault();if(paused)return;if(inputMode==="keyboard")keys[e.code]=true;if(inputMode==="keyboard"&&e.code==="Space"&&!e.repeat)attack();if(inputMode==="keyboard"&&e.code==="KeyF"&&!e.repeat)useSkill();if(e.code==="KeyE"&&!e.repeat){if(selected==="mage"&&inputMode==="keyboard")fireProjectile();else interactNPC()}if(inputMode==="keyboard"&&e.code==="KeyG"&&!e.repeat)toggleJetpack();if((e.code==="KeyH"||e.code==="Enter")&&!e.repeat)interactNPC();if(e.code==="KeyR"&&!e.repeat)restart();if(e.code==="KeyP"&&!e.repeat)togglePause();if(e.code==="KeyK"&&!e.repeat)saveGame();if(e.code==="KeyL"&&!e.repeat)loadGame();if(e.code==="KeyJ"&&!e.repeat){document.getElementById("journalContent").innerHTML=journalHTML();openModal("journalModal")}if(e.code==="KeyC"&&!e.repeat){paused=true;document.getElementById("select").classList.remove("hidden")}});window.addEventListener("keyup",e=>keys[e.code]=false);document.querySelectorAll("[data-char]").forEach(b=>b.onclick=()=>{chooseHero(b.dataset.char);document.getElementById("select").classList.add("hidden");paused=false;restart()});document.querySelectorAll("[data-key]").forEach(b=>{const on=e=>{e.preventDefault();keys[b.dataset.key]=true},off=e=>{e.preventDefault();keys[b.dataset.key]=false};b.onpointerdown=on;b.onpointerup=off;b.onpointercancel=off;b.onpointerleave=off});document.getElementById("touchAttack").onpointerdown=e=>{e.preventDefault();attack()};document.getElementById("touchSkill").onpointerdown=e=>{e.preventDefault();useSkill()};document.getElementById("touchMagic").onpointerdown=e=>{e.preventDefault();if(selected==="mage")fireProjectile();else useSkill()};document.getElementById("touchJet").onpointerdown=e=>{e.preventDefault();toggleJetpack()};document.getElementById("touchInteract").onpointerdown=e=>{e.preventDefault();interactNPC()};function openModal(id){const wasPlaying=modalResumeOnClose||drawerResumeOnClose||infoResumeOnClose||(!paused&&!pausedByUser);if(document.getElementById("infoBubblePanel").classList.contains("open")){document.getElementById("infoBubblePanel").classList.remove("open");document.getElementById("infoBubbleShade").classList.remove("show");infoResumeOnClose=false}closeDrawers(false);modalResumeOnClose=wasPlaying;paused=true;renderPlayerDashboards();document.getElementById(id).classList.add("show")}function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show"));const shouldResume=modalResumeOnClose;modalResumeOnClose=false;if(shouldResume&&canResumeGame())paused=false;else if(pausedByUser)paused=true}document.getElementById("controlsBtn").onclick=()=>openModal("controls");document.getElementById("inventoryBtn").onclick=()=>{updateInventory();openModal("inventoryModal")};document.getElementById("journalBtn").onclick=()=>{document.getElementById("journalContent").innerHTML=journalHTML();openModal("journalModal")};document.getElementById("questsBtn").onclick=()=>{renderQuests();openModal("questsModal")};document.getElementById("shopBtn").onclick=()=>{renderShop();openModal("shopModal")};document.getElementById("forgeBtn").onclick=()=>{renderForge();openModal("forgeModal")};document.getElementById("saveBtn").onclick=()=>saveGame();document.getElementById("loadBtn").onclick=()=>loadGame();document.getElementById("audioBtn").onclick=()=>{audioEnabled=!audioEnabled;document.getElementById("audioBtn").textContent=audioEnabled?"SON ON":"SON OFF";if(audioEnabled)sfx("pickup")};document.getElementById("pauseBtn").onclick=()=>togglePause();document.getElementById("fullBtn").onclick=()=>toggleFullscreen();document.getElementById("changeBtn").onclick=()=>{paused=true;document.getElementById("select").classList.remove("hidden")};document.querySelectorAll(".close").forEach(b=>b.onclick=closeModal);document.getElementById("shopContent").onclick=e=>{const b=e.target.closest("[data-buy]");if(b)buyShop(b.dataset.buy)};document.getElementById("forgeContent").onclick=e=>{const b=e.target.closest("[data-craft]");if(b)craftArtifact(b.dataset.craft)};document.getElementById("questsContent").onclick=e=>{const b=e.target.closest("[data-claim]");if(b)claimQuest(b.dataset.claim)};document.getElementById("houseContent").onclick=e=>{const buy=e.target.closest("[data-buy-home]"),store=e.target.closest("[data-store]"),take=e.target.closest("[data-take]"),save=e.target.closest("[data-home-save]");if(buy)buyHome(buy.dataset.buyHome);if(store)changeStorage(store.dataset.store,Number(store.dataset.amount)||1,true);if(take)changeStorage(take.dataset.take,Number(take.dataset.amount)||1,false);if(save){saveGame();message("PARTIE SAUVEGARDÉE À LA MAISON")}};
+window.addEventListener("keydown",e=>{
+  if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault();
+  if((e.code==="KeyH"||e.code==="Enter")&&!e.repeat&&!pausedByUser&&!document.querySelector(".modal.show")){
+    if(paused)paused=false;
+    interactNPC();
+    return
+  }
+  if(paused)return;
+  if(inputMode==="keyboard")keys[e.code]=true;
+  if(inputMode==="keyboard"&&e.code==="Space"&&!e.repeat)attack();
+  if(inputMode==="keyboard"&&e.code==="KeyF"&&!e.repeat)useSkill();
+  if(e.code==="KeyE"&&!e.repeat){if(selected==="mage"&&inputMode==="keyboard")fireProjectile();else interactNPC()}
+  if(inputMode==="keyboard"&&e.code==="KeyG"&&!e.repeat)toggleJetpack();
+  if(e.code==="KeyR"&&!e.repeat)restart();
+  if(e.code==="KeyP"&&!e.repeat)togglePause();
+  if(e.code==="KeyK"&&!e.repeat)saveGame();
+  if(e.code==="KeyL"&&!e.repeat)loadGame();
+  if(e.code==="KeyJ"&&!e.repeat){document.getElementById("journalContent").innerHTML=journalHTML();openModal("journalModal")}
+  if(e.code==="KeyC"&&!e.repeat){paused=true;document.getElementById("select").classList.remove("hidden")}
+});window.addEventListener("keyup",e=>keys[e.code]=false);document.querySelectorAll("[data-char]").forEach(b=>b.onclick=()=>{chooseHero(b.dataset.char);document.getElementById("select").classList.add("hidden");paused=false;restart()});document.querySelectorAll("[data-key]").forEach(b=>{const on=e=>{e.preventDefault();keys[b.dataset.key]=true},off=e=>{e.preventDefault();keys[b.dataset.key]=false};b.onpointerdown=on;b.onpointerup=off;b.onpointercancel=off;b.onpointerleave=off});document.getElementById("touchAttack").onpointerdown=e=>{e.preventDefault();attack()};document.getElementById("touchSkill").onpointerdown=e=>{e.preventDefault();useSkill()};document.getElementById("touchMagic").onpointerdown=e=>{e.preventDefault();if(selected==="mage")fireProjectile();else useSkill()};document.getElementById("touchJet").onpointerdown=e=>{e.preventDefault();toggleJetpack()};document.getElementById("touchInteract").onpointerdown=e=>{e.preventDefault();interactNPC()};function openModal(id){const wasPlaying=modalResumeOnClose||drawerResumeOnClose||infoResumeOnClose||(!paused&&!pausedByUser);if(document.getElementById("infoBubblePanel").classList.contains("open")){document.getElementById("infoBubblePanel").classList.remove("open");document.getElementById("infoBubbleShade").classList.remove("show");infoResumeOnClose=false}closeDrawers(false);modalResumeOnClose=wasPlaying;paused=true;renderPlayerDashboards();document.getElementById(id).classList.add("show")}function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show"));const shouldResume=modalResumeOnClose;modalResumeOnClose=false;if(shouldResume&&canResumeGame())paused=false;else if(pausedByUser)paused=true}document.getElementById("controlsBtn").onclick=()=>openModal("controls");document.getElementById("inventoryBtn").onclick=()=>{updateInventory();openModal("inventoryModal")};document.getElementById("journalBtn").onclick=()=>{document.getElementById("journalContent").innerHTML=journalHTML();openModal("journalModal")};document.getElementById("questsBtn").onclick=()=>{renderQuests();openModal("questsModal")};document.getElementById("shopBtn").onclick=()=>{renderShop();openModal("shopModal")};document.getElementById("forgeBtn").onclick=()=>{renderForge();openModal("forgeModal")};document.getElementById("saveBtn").onclick=()=>saveGame();document.getElementById("loadBtn").onclick=()=>loadGame();document.getElementById("audioBtn").onclick=()=>{audioEnabled=!audioEnabled;document.getElementById("audioBtn").textContent=audioEnabled?"SON ON":"SON OFF";if(audioEnabled)sfx("pickup")};document.getElementById("pauseBtn").onclick=()=>togglePause();document.getElementById("fullBtn").onclick=()=>toggleFullscreen();document.getElementById("changeBtn").onclick=()=>{paused=true;document.getElementById("select").classList.remove("hidden")};document.querySelectorAll(".close").forEach(b=>b.onclick=closeModal);document.getElementById("shopContent").onclick=e=>{const b=e.target.closest("[data-buy]");if(b)buyShop(b.dataset.buy)};document.getElementById("forgeContent").onclick=e=>{const b=e.target.closest("[data-craft]");if(b)craftArtifact(b.dataset.craft)};document.getElementById("questsContent").onclick=e=>{const b=e.target.closest("[data-claim]");if(b)claimQuest(b.dataset.claim)};document.getElementById("houseContent").onclick=e=>{const buy=e.target.closest("[data-buy-home]"),store=e.target.closest("[data-store]"),take=e.target.closest("[data-take]"),save=e.target.closest("[data-home-save]");if(buy)buyHome(buy.dataset.buyHome);if(store)changeStorage(store.dataset.store,Number(store.dataset.amount)||1,true);if(take)changeStorage(take.dataset.take,Number(take.dataset.amount)||1,false);if(save){saveGame();message("PARTIE SAUVEGARDÉE À LA MAISON")}};
 document.getElementById("fullInventory").onclick=e=>{const up=e.target.closest("[data-up]"),eq=e.target.closest("[data-equip]"),sk=e.target.closest("[data-skill]");if(up)upgrade(up.dataset.up);if(eq)equip(eq.dataset.equip);if(sk){player.activeSkill=sk.dataset.skill;message("SKILL ACTIF : "+SKILLS[player.activeSkill].name);updateInventory()}};
 function validateGameData(){
   const errors=[];
