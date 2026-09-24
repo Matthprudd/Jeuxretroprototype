@@ -21,7 +21,7 @@
 .newsHistory{display:grid;gap:7px}
 .newsItem{padding:8px;border:1px solid #665b36;background:#192219cc;color:#eef3eb;font-size:10px;line-height:1.35}
 .newsItem .newsMeta{display:block;color:#aab8a7;font-size:8px;margin-top:4px}
-.newsEmpty{padding:16px;text-align:center;color:#889588;font-size:10px}.storageRow{display:grid;grid-template-columns:1fr 1.3fr auto;gap:8px;align-items:center;padding:9px;border-bottom:1px solid #394139}.storageRow span{font-size:10px;color:#c6d0c1}.storageBtn{padding:5px 7px!important;font-size:9px!important}@media(max-width:540px){.storageRow{grid-template-columns:1fr}.storageRow div{display:flex;gap:6px}}@media(max-width:790px),(pointer:coarse){
+.newsEmpty{padding:16px;text-align:center;color:#889588;font-size:10px}.storageRow{display:grid;grid-template-columns:1fr 1.3fr auto;gap:8px;align-items:center;padding:9px;border-bottom:1px solid #394139}.storageRow span{font-size:10px;color:#c6d0c1}.storageBtn{padding:5px 7px!important;font-size:9px!important}.controlModeBox{margin:12px 0;padding:10px;border:2px solid #6e633d;background:#182018}.controlModeBtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0}.controlModeBtns .activeMode{border-color:#ffe279;background:#4c5d35;color:#fff4a8}canvas.mouseMode{cursor:crosshair}@media(max-width:540px){.storageRow{grid-template-columns:1fr}.storageRow div{display:flex;gap:6px}}@media(max-width:790px),(pointer:coarse){
 html,body{width:100%;max-width:100%;overflow-x:hidden}
 body{padding:0 6px 10px}
 .shell,.layout,.layout>div,.inventory,.touch,.top,.buttons{min-width:0;max-width:100%}
@@ -112,7 +112,8 @@ canvas{width:100%;height:auto;max-width:512px;margin:0 auto;border-width:4px}
     <div class="infoPane" data-info-pane="skills"><div id="bubbleKeys"></div></div>
   </div>
 </section>
-<div id="controls" class="modal"><div class="panel"><h2>COMMANDES</h2><div class="row">Flèches ou ZQSD : déplacement</div><div class="row">ESPACE : épée, coupe arbres et herbes</div><div class="row">F : utiliser le skill sélectionné</div><div class="row">Mage : E lance un projectile magique</div><div class="row">Porte droite : avancer · Porte gauche : revenir</div><div class="row">R : recommencer · C : changer de héros</div><div class="row">K : sauvegarder · L : charger · J : journal · P : pause · G : jetpack · H : interaction PNJ</div><div class="row">Manette : stick/croix = déplacement · A = épée · B = skill · X = magie (Mage)</div><div class="row">Astuce : enchaîne les éliminations rapidement pour augmenter le combo et le score.</div><div class="row">Notifications : tous les dialogues et messages apparaissent 3 secondes en haut à droite du jeu, sans déplacer les commandes. Approche un PNJ puis utilise PARLER sur mobile ou H sur ordinateur.</div><button class="btn close">RETOUR</button></div></div>
+<div id="controls" class="modal"><div class="panel"><h2>COMMANDES</h2><div class="row">Clavier : flèches ou ZQSD = déplacement</div><div class="row">Clavier : ESPACE = épée, coupe arbres et herbes</div><div class="row">F : utiliser le skill sélectionné</div><div class="row">Mage : E lance un projectile magique</div><div class="row">Porte droite : avancer · Porte gauche : revenir</div><div class="row">R : recommencer · C : changer de héros</div><div class="row">K : sauvegarder · L : charger · J : journal · P : pause · G : jetpack · H : interaction PNJ</div><div class="row">Manette : stick/croix = déplacement · A = épée · B = skill · X = magie (Mage)</div>
+<div class="controlModeBox"><b>MODE DE CONTRÔLE ORDINATEUR</b><div class="controlModeBtns"><button id="keyboardModeBtn" class="btn">⌨ CLAVIER</button><button id="mouseModeBtn" class="btn">🖱 SOURIS</button></div><div id="mouseHelp" class="smallnote">Souris : gauche = déplacement · droite = attaque · molette = skill · bouton arrière = interagir · bouton avant = jetpack.</div></div><div class="row">Astuce : enchaîne les éliminations rapidement pour augmenter le combo et le score.</div><div class="row">Notifications : tous les dialogues et messages apparaissent 3 secondes en haut à droite du jeu, sans déplacer les commandes. Approche un PNJ puis utilise PARLER sur mobile ou H sur ordinateur.</div><button class="btn close">RETOUR</button></div></div>
 <div id="inventoryModal" class="modal"><div class="panel"><h2>INVENTAIRE COMPLET</h2><div class="playerDash" data-player-dash></div><div id="fullInventory"></div><button class="btn close">RETOUR</button></div></div><div id="journalModal" class="modal"><div class="panel"><h2>JOURNAL DE QUÊTE</h2><div class="playerDash" data-player-dash></div><div id="journalContent"></div><button class="btn close">RETOUR</button></div></div><div id="questsModal" class="modal"><div class="panel"><h2>PETITES QUÊTES DES ROYAUMES</h2><div class="playerDash" data-player-dash></div><div id="questsContent"></div><button class="btn close">RETOUR</button></div></div><div id="shopModal" class="modal"><div class="panel"><h2>MAGASIN DU VOYAGEUR</h2><div class="playerDash" data-player-dash></div><div class="merchantHead"><span class="merchantFace">🦝</span><b>BRIK, MARCHAND ITINÉRANT</b><div class="smallnote">« Ton or peut dormir dans ta bourse… ou te sauver la peau. »</div></div><div id="shopContent"></div><button class="btn close">RETOUR</button></div></div><div id="forgeModal" class="modal"><div class="panel"><h2>FORGE DES ARTÉFACTS</h2><div class="playerDash" data-player-dash></div><div class="merchantHead"><span class="merchantFace">🔥</span><b>ATELIER ANCIEN</b><div class="smallnote">Combine or, fragments et matériaux pour créer des reliques permanentes.</div></div><div id="forgeContent"></div><button class="btn close">RETOUR</button></div></div><div id="houseModal" class="modal"><div class="panel"><h2>MAISON & ENTREPOSAGE</h2><div class="playerDash" data-player-dash></div><div id="houseContent"></div><button class="btn close">RETOUR</button></div></div>
 <script>
 "use strict";
@@ -225,7 +226,7 @@ const PROPERTIES=[
  {id:"seal_home",level:6,name:"Maison des Sceaux",village:"Quatre Sceaux",cost:850,c:13,r:1}
 ];
 let ownedHomes=new Set(),completedKingdoms=new Set(),homeStorage={gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0},activePropertyId=null;
-let selected=null,levelIndex=0,level=LEVELS[0],paused=true,gameOver=false,victory=false,last=performance.now(),time=0;let notificationHistory=[],unreadNews=0;const keys={},arts=new Set(),ownedGear=new Set(),skills=new Set(),gearLevels={},crafted=new Set(),claimedQuests=new Set();const stats={gold:0,score:0,treasures:0,fragments:0,kills:0,treesCut:0,grassCut:0,parts:{wood:0,gear:0,valve:0,crystal:0},xp:0,rank:1,combo:0,bestCombo:0,damageDone:0};let states=createStates(),enemies=[],loot=[],artItems=[],gearItems=[],grass=[],hidden=[],lockedChests=[],repairParts=[];const msg={text:"",time:0};let particles=[],floatTexts=[],shake=0,flash=0,comboTimer=0,audioEnabled=true,audioCtx=null,lastBossSpawned=-1;let projectiles=[],enemyProjectiles=[],ambient=[],screenTint=0,animClock=0,weatherPhase=0;let pickups=[],transition={active:false,t:0,dir:1,next:null},pausedByUser=false,lastInput="keyboard",musicTimer=0,musicStep=0;let jetFuel=100,jetActive=false;const player={x:0,y:0,w:24,h:24,dir:"down",hp:3,maxHp:3,attack:false,attackTime:0,cool:0,inv:0,hitSet:new Set(),skillCool:0,powerReady:false,gear:{helmet:null,armor:null,sword:null,shield:null}};
+let selected=null,levelIndex=0,level=LEVELS[0],paused=true,gameOver=false,victory=false,last=performance.now(),time=0;let notificationHistory=[],unreadNews=0;const keys={},arts=new Set(),ownedGear=new Set(),skills=new Set(),gearLevels={},crafted=new Set(),claimedQuests=new Set();const stats={gold:0,score:0,treasures:0,fragments:0,kills:0,treesCut:0,grassCut:0,parts:{wood:0,gear:0,valve:0,crystal:0},xp:0,rank:1,combo:0,bestCombo:0,damageDone:0};let states=createStates(),enemies=[],loot=[],artItems=[],gearItems=[],grass=[],hidden=[],lockedChests=[],repairParts=[];const msg={text:"",time:0};let particles=[],floatTexts=[],shake=0,flash=0,comboTimer=0,audioEnabled=true,audioCtx=null,lastBossSpawned=-1;let projectiles=[],enemyProjectiles=[],ambient=[],screenTint=0,animClock=0,weatherPhase=0;let pickups=[],transition={active:false,t:0,dir:1,next:null,camera:true,axis:"x",sign:1},pausedByUser=false,lastInput="keyboard",musicTimer=0,musicStep=0;let inputMode=localStorage.getItem("q7r_input_mode")||"keyboard",mouseTarget={active:false,x:0,y:0},mouseHeld=false;let jetFuel=100,jetActive=false;const player={x:0,y:0,w:24,h:24,dir:"down",hp:3,maxHp:3,attack:false,attackTime:0,cool:0,inv:0,hitSet:new Set(),skillCool:0,powerReady:false,gear:{helmet:null,armor:null,sword:null,shield:null}};
 function createStates(){return LEVELS.map(()=>({trees:new Set(),grass:new Set(),loot:new Set(),hiddenShown:new Set(),hiddenTaken:new Set(),dead:new Set(),locked:new Set(),skills:new Set(),repairParts:new Set(),repairDone:false,bossSpawned:false,bossDead:false}))}function state(){return states[levelIndex]}
 function addNews(text){
   const clean=String(text).trim();if(!clean)return;
@@ -469,25 +470,35 @@ function drawProjectiles(){
 
 function roomName(){return isHome()?"MAISON · "+level.name:isWorld()?"MONDE · "+level.name:`${levelIndex+1}. ${level.name}`}
 function near(a,b,d=26){return Math.hypot((a.x+a.w/2)-(b.x+b.w/2),(a.y+a.h/2)-(b.y+b.h/2))<=d}
-function startTransition(nextFn){
+function startTransition(nextFn,axis="x",sign=1){
   if(transition.active)return;
-  transition={active:true,t:0,dir:1,next:nextFn};sfx("door");
+  transition={active:true,t:0,dir:1,next:nextFn,camera:true,axis,sign};sfx("door");
 }
 function updateTransition(dt){
   if(!transition.active)return;
-  transition.t+=dt*2.8*transition.dir;
+  transition.t+=dt*2.7*transition.dir;
   if(transition.dir===1&&transition.t>=1){
     transition.t=1;
     const fn=transition.next;transition.next=null;
-    if(fn)fn();transition.dir=-1;
+    if(fn)fn();
+    transition.dir=-1;
   }else if(transition.dir===-1&&transition.t<=0){
     transition.active=false;transition.t=0;transition.dir=1;
   }
 }
+function cameraTransitionOffset(){
+  if(!transition.active||!transition.camera)return{x:0,y:0};
+  const eased=transition.t*transition.t*(3-2*transition.t),amount=eased*(transition.axis==="x"?W:(H-HUD));
+  const incoming=transition.dir===-1;
+  const v=(incoming?(1-eased):eased)*transition.sign;
+  return transition.axis==="x"?{x:(incoming?1:-1)*v*W,y:0}:{x:0,y:(incoming?1:-1)*v*(H-HUD)}
+}
 function drawTransition(){
   if(!transition.active)return;
-  ctx.fillStyle=`rgba(5,8,5,${Math.max(0,Math.min(1,transition.t))})`;
-  ctx.fillRect(0,0,W,H);
+  const edge=transition.axis==="x"?(transition.sign>0?W-8:0):(transition.sign>0?H-8:HUD);
+  ctx.save();ctx.globalAlpha=.22;ctx.fillStyle="#d9c77a";
+  if(transition.axis==="x")ctx.fillRect(edge,HUD,8,H-HUD);else ctx.fillRect(0,edge,W,8);
+  ctx.restore();
 }
 function togglePause(){
   if(gameOver||!selected)return;
@@ -646,12 +657,12 @@ function openHouse(id){renderHouseModal(id);openModal("houseModal")}
 function interactWorldObject(o){
   if(o.type==="gate"){
     if(!gateUnlocked(o)){message("CHEMIN BLOQUÉ · IL TE MANQUE : "+artNames(missing(LEVELS[o.level].req)));return}
-    startTransition(()=>{loadLevel(o.level,"start");message("TU ENTRE DANS : "+LEVELS[o.level].name)})
+    startTransition(()=>{loadLevel(o.level,"start");message("TU ENTRE DANS : "+LEVELS[o.level].name)},"y",-1)
   }else if(o.type==="shop"){renderShop();openModal("shopModal")}
   else if(o.type==="forge"){renderForge();openModal("forgeModal")}
   else if(o.type==="realtor"){activePropertyId=PROPERTIES.find(p=>p.cost>0&&!ownedHomes.has(p.id))?.id||"crossroads";renderHouseModal(activePropertyId);openModal("houseModal")}
   else if(o.type==="house"){openHouse(o.propertyId)}
-  else if(o.type==="homeExit"){startTransition(()=>{loadLevel(WORLD_INDEX,"start");message("TU QUITTES TA CABANE · SUIS LE SENTIER VERS CLAIRBOIS")})}
+  else if(o.type==="homeExit"){startTransition(()=>{loadLevel(WORLD_INDEX,"start");message("TU QUITTES TA CABANE · SUIS LE SENTIER VERS CLAIRBOIS")},"y",-1)}
   else if(o.type==="starterChest"){openHouse("starter_cabin")}
   else if(o.type==="bed"){player.hp=player.maxHp;saveGame();message("TU TE REPOSES · VIE RESTAURÉE ET PARTIE SAUVEGARDÉE")}
   else if(o.type==="sign"){message("PANNEAU : VILLAGE DE CLAIRBOIS ↑ · BOUTIQUE · FORGE · PROPRIÉTÉS")}
@@ -767,7 +778,7 @@ function exitOpen(){
   return (isWorld()||isHome())?true:base&&(levelIndex!==FINAL_KINGDOM||state().bossDead)
 }
 function spawn(side){if(side==="start")return pos(level.start[0],level.start[1],player.w,player.h);const c=side==="right"?14:1;for(const r of [5,4,6,3,7,2,8,1,9])if(level.map[r][c]===GROUND)return pos(c,r,player.w,player.h);return pos(level.start[0],level.start[1],player.w,player.h)}
-function loadLevel(index,side="start"){if(index<0)return;pickups=[];projectiles=[];enemyProjectiles=[];ambient=[];musicStep=0;musicTimer=.15;if(index>=LEVELS.length){victory=gameOver=true;return}levelIndex=index;level=LEVELS[index];const p=spawn(side);player.x=p.x;player.y=p.y;player.dir=side==="right"?"left":"right";player.attack=false;player.cool=0;player.inv=0;enemies=level.enemies.map(createEnemy).filter(e=>!state().dead.has(e.id));loot=level.loot.map(createLoot);artItems=level.arts.map(createArt);gearItems=level.gear.map(createGear);grass=level.grass.map(createGrass);hidden=level.hidden.map(createHidden);lockedChests=level.locked.map(createLocked);repairParts=(level.repairParts||[]).map(createRepairPart);player.oxygen=100;jetActive=false;if(hasJetpack())jetFuel=Math.max(jetFuel,Math.min(100,70+levelIndex*5));if(level.skill&&!skills.has(level.skill))unlockSkill(level.skill);if(index===WORLD_INDEX){message("MONDE OUVERT · EXPLORE LES SENTIERS ET LES VILLAGES")}else{message("ROYAUME "+(index+1)+" : "+level.name)}
+function loadLevel(index,side="start"){if(index<0)return;const oldScreenPos={x:player.x,y:player.y};pickups=[];projectiles=[];enemyProjectiles=[];ambient=[];musicStep=0;musicTimer=.15;if(index>=LEVELS.length){victory=gameOver=true;return}levelIndex=index;level=LEVELS[index];const p=spawn(side);player.x=p.x;player.y=p.y;if(transition.active&&Number.isFinite(oldScreenPos.x)&&Number.isFinite(oldScreenPos.y)){const tx=clamp(oldScreenPos.x,34,W-58),ty=clamp(oldScreenPos.y,HUD+24,H-44);if(!hitsMap(tx,ty,player.w,player.h,false)){player.x=tx;player.y=ty}}player.dir=side==="right"?"left":"right";player.attack=false;player.cool=0;player.inv=0;enemies=level.enemies.map(createEnemy).filter(e=>!state().dead.has(e.id));loot=level.loot.map(createLoot);artItems=level.arts.map(createArt);gearItems=level.gear.map(createGear);grass=level.grass.map(createGrass);hidden=level.hidden.map(createHidden);lockedChests=level.locked.map(createLocked);repairParts=(level.repairParts||[]).map(createRepairPart);player.oxygen=100;jetActive=false;if(hasJetpack())jetFuel=Math.max(jetFuel,Math.min(100,70+levelIndex*5));if(level.skill&&!skills.has(level.skill))unlockSkill(level.skill);if(index===WORLD_INDEX){message("MONDE OUVERT · EXPLORE LES SENTIERS ET LES VILLAGES")}else{message("ROYAUME "+(index+1)+" : "+level.name)}
 updateInventory()}
 function restart(){stats.gold=stats.score=stats.treasures=stats.fragments=stats.kills=0;stats.xp=0;stats.rank=1;stats.combo=0;stats.bestCombo=0;stats.damageDone=0;stats.treesCut=0;stats.grassCut=0;stats.parts={wood:0,gear:0,valve:0,crystal:0};particles=[];floatTexts=[];shake=0;flash=0;arts.clear();ownedGear.clear();skills.clear();crafted.clear();claimedQuests.clear();ownedHomes.clear();ownedHomes.add("starter_cabin");completedKingdoms.clear();Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0});Object.keys(gearLevels).forEach(id=>delete gearLevels[id]);states=createStates();chooseHero(selected);jetFuel=100;jetActive=false;gameOver=victory=false;time=0;loadLevel(HOME_INDEX,"start");message("TU TE RÉVEILLES DANS TA PETITE CABANE · REJOINS LE VILLAGE DE CLAIRBOIS")}
 function safeTile(c,r){
@@ -872,7 +883,13 @@ function collect(){
 }
 function damage(){if(player.inv>0)return;for(const e of enemies){if(!hit(player,e))continue;let blocked=Math.random()<blockChance();if(!blocked){const attackElement=e.element;if(resistElement().includes(attackElement)&&Math.random()<.55)blocked=true}if(blocked)message("ATTAQUE BLOQUÉE !",.7);else{player.hp--;shake=.16;flash=.08;resetCombo();sfx("hurt");burst(player.x+12,player.y+12,"#ff6571",9,70);popText("-1",player.x+7,player.y-8,"#ff6571")}player.inv=1.1;if(player.hp<=0){player.hp=0;gameOver=true}break}}
 function updatePlayer(dt){
-  let dx=0,dy=0;if(keys.ArrowUp||keys.KeyZ||keys.KeyW)dy--;if(keys.ArrowDown||keys.KeyS)dy++;if(keys.ArrowLeft||keys.KeyQ||keys.KeyA)dx--;if(keys.ArrowRight||keys.KeyD)dx++;
+  let dx=0,dy=0;
+  if(inputMode==="mouse"&&mouseTarget.active){
+    const cx=player.x+player.w/2,cy=player.y+player.h/2,mx=mouseTarget.x-cx,my=mouseTarget.y-cy,d=Math.hypot(mx,my);
+    if(d>7){dx=mx/d;dy=my/d}else mouseTarget.active=false;
+  }else{
+    if(keys.ArrowUp||keys.KeyZ||keys.KeyW)dy--;if(keys.ArrowDown||keys.KeyS)dy++;if(keys.ArrowLeft||keys.KeyQ||keys.KeyA)dx--;if(keys.ArrowRight||keys.KeyD)dx++;
+  }
   if(dx&&dy){dx*=Math.SQRT1_2;dy*=Math.SQRT1_2}
   if(level.mode==="sideWater"){
     jetActive=false;
@@ -896,11 +913,11 @@ function doors(){
   if(transition.active||isWorld()||isHome())return;
   const y=HUD+4*T,leftDoor={x:0,y,w:T+14,h:T*2},rightDoor={x:W-T-14,y,w:T+14,h:T*2};
   if(hit(player,leftDoor)||player.x<8){
-    startTransition(()=>{loadLevel(WORLD_INDEX,"start");message("RETOUR AU CARREFOUR")});return
+    startTransition(()=>{loadLevel(WORLD_INDEX,"start");message("RETOUR AU CARREFOUR")},"x",-1);return
   }
   if(exitOpen()&&(hit(player,rightDoor)||player.x+player.w>W-8)){
     const finished=levelIndex;completedKingdoms.add(finished);
-    startTransition(()=>{loadLevel(WORLD_INDEX,"start");message("ROYAUME LIBÉRÉ : "+LEVELS[finished].name);if(completedKingdoms.size>=KINGDOM_COUNT){victory=true;message("LES SEPT ROYAUMES SONT LIBRES !")}})
+    startTransition(()=>{loadLevel(WORLD_INDEX,"start");message("ROYAUME LIBÉRÉ : "+LEVELS[finished].name);if(completedKingdoms.size>=KINGDOM_COUNT){victory=true;message("LES SEPT ROYAUMES SONT LIBRES !")}},"x",1)
   }
 }function lockedDoorMessage(){
   if(exitOpen())return;
@@ -1251,10 +1268,13 @@ function overlays(){
 }
 function render(){
   ctx.clearRect(0,0,W,H);if(!selected)return;
+  const cam=cameraTransitionOffset();
   ctx.save();
   if(shake>0){ctx.translate((Math.random()-.5)*8,(Math.random()-.5)*8)}
-  drawMap();drawHomeDecor();drawAmbient();drawWorldObjects();drawGrass();drawObjects();drawNPCs();drawPickups();drawEnemies();drawProjectiles();drawSword();drawPlayer();drawEffects();
+  ctx.translate(cam.x,cam.y);
+  drawMap();drawHomeDecor();drawAmbient();drawWorldObjects();drawGrass();drawObjects();drawNPCs();drawPickups();drawEnemies();drawProjectiles();drawSword();drawEffects();
   ctx.restore();
+  drawPlayer();
   vignette();hud();overlays();drawTransition();
   if(flash>0){ctx.fillStyle="rgba(255,255,255,.12)";ctx.fillRect(0,HUD,W,H-HUD)}
 }
@@ -1315,7 +1335,32 @@ document.querySelectorAll(".gameDrawer .btn").forEach(b=>b.addEventListener("cli
 function syncInteractionButton(){const b=document.getElementById("touchInteract");if(!b)return;const touch=window.matchMedia("(pointer:coarse)").matches;const wo=selected&&!paused&&!gameOver?nearestWorldObject():null,n=selected&&!paused&&!gameOver?nearestNPC():null,target=wo||n;b.hidden=!(touch&&target);if(target){const label=wo?(wo.type==="gate"?"ENTRER":wo.type==="house"?"MAISON":"INTERAGIR"):"PARLER";b.textContent=label;b.setAttribute("aria-label",wo?wo.name:n.name)}else{b.textContent="INTERAGIR";b.setAttribute("aria-label","Interaction indisponible")}}
 function syncMobilePanels(){const mobile=window.matchMedia("(max-width:790px),(pointer:coarse)").matches;const rb=document.getElementById("resBox"),gb=document.getElementById("gearBox"),kb=document.getElementById("keysBox");if(!rb||!gb||!kb)return;if(mobile){rb.open=true;gb.open=false;kb.open=false}else{rb.open=gb.open=kb.open=true}}
 window.addEventListener("resize",syncMobilePanels);syncMobilePanels();
-window.addEventListener("keydown",e=>{if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault();if(paused)return;keys[e.code]=true;if(e.code==="Space"&&!e.repeat)attack();if(e.code==="KeyF"&&!e.repeat)useSkill();if(e.code==="KeyE"&&!e.repeat&&selected==="mage")fireProjectile();if(e.code==="KeyG"&&!e.repeat)toggleJetpack();if(e.code==="KeyH"&&!e.repeat)interactNPC();if(e.code==="KeyR"&&!e.repeat)restart();if(e.code==="KeyP"&&!e.repeat)togglePause();if(e.code==="KeyK"&&!e.repeat)saveGame();if(e.code==="KeyL"&&!e.repeat)loadGame();if(e.code==="KeyJ"&&!e.repeat){document.getElementById("journalContent").innerHTML=journalHTML();openModal("journalModal")}if(e.code==="KeyC"&&!e.repeat){paused=true;document.getElementById("select").classList.remove("hidden")}});window.addEventListener("keyup",e=>keys[e.code]=false);document.querySelectorAll("[data-char]").forEach(b=>b.onclick=()=>{chooseHero(b.dataset.char);document.getElementById("select").classList.add("hidden");paused=false;restart()});document.querySelectorAll("[data-key]").forEach(b=>{const on=e=>{e.preventDefault();keys[b.dataset.key]=true},off=e=>{e.preventDefault();keys[b.dataset.key]=false};b.onpointerdown=on;b.onpointerup=off;b.onpointercancel=off;b.onpointerleave=off});document.getElementById("touchAttack").onpointerdown=e=>{e.preventDefault();attack()};document.getElementById("touchSkill").onpointerdown=e=>{e.preventDefault();useSkill()};document.getElementById("touchMagic").onpointerdown=e=>{e.preventDefault();if(selected==="mage")fireProjectile();else useSkill()};document.getElementById("touchJet").onpointerdown=e=>{e.preventDefault();toggleJetpack()};document.getElementById("touchInteract").onpointerdown=e=>{e.preventDefault();interactNPC()};function openModal(id){const wasPlaying=modalResumeOnClose||drawerResumeOnClose||infoResumeOnClose||(!paused&&!pausedByUser);if(document.getElementById("infoBubblePanel").classList.contains("open")){document.getElementById("infoBubblePanel").classList.remove("open");document.getElementById("infoBubbleShade").classList.remove("show");infoResumeOnClose=false}closeDrawers(false);modalResumeOnClose=wasPlaying;paused=true;renderPlayerDashboards();document.getElementById(id).classList.add("show")}function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show"));const shouldResume=modalResumeOnClose;modalResumeOnClose=false;if(shouldResume&&canResumeGame())paused=false;else if(pausedByUser)paused=true}document.getElementById("controlsBtn").onclick=()=>openModal("controls");document.getElementById("inventoryBtn").onclick=()=>{updateInventory();openModal("inventoryModal")};document.getElementById("journalBtn").onclick=()=>{document.getElementById("journalContent").innerHTML=journalHTML();openModal("journalModal")};document.getElementById("questsBtn").onclick=()=>{renderQuests();openModal("questsModal")};document.getElementById("shopBtn").onclick=()=>{renderShop();openModal("shopModal")};document.getElementById("forgeBtn").onclick=()=>{renderForge();openModal("forgeModal")};document.getElementById("saveBtn").onclick=()=>saveGame();document.getElementById("loadBtn").onclick=()=>loadGame();document.getElementById("audioBtn").onclick=()=>{audioEnabled=!audioEnabled;document.getElementById("audioBtn").textContent=audioEnabled?"SON ON":"SON OFF";if(audioEnabled)sfx("pickup")};document.getElementById("pauseBtn").onclick=()=>togglePause();document.getElementById("fullBtn").onclick=()=>toggleFullscreen();document.getElementById("changeBtn").onclick=()=>{paused=true;document.getElementById("select").classList.remove("hidden")};document.querySelectorAll(".close").forEach(b=>b.onclick=closeModal);document.getElementById("shopContent").onclick=e=>{const b=e.target.closest("[data-buy]");if(b)buyShop(b.dataset.buy)};document.getElementById("forgeContent").onclick=e=>{const b=e.target.closest("[data-craft]");if(b)craftArtifact(b.dataset.craft)};document.getElementById("questsContent").onclick=e=>{const b=e.target.closest("[data-claim]");if(b)claimQuest(b.dataset.claim)};document.getElementById("houseContent").onclick=e=>{const buy=e.target.closest("[data-buy-home]"),store=e.target.closest("[data-store]"),take=e.target.closest("[data-take]"),save=e.target.closest("[data-home-save]");if(buy)buyHome(buy.dataset.buyHome);if(store)changeStorage(store.dataset.store,Number(store.dataset.amount)||1,true);if(take)changeStorage(take.dataset.take,Number(take.dataset.amount)||1,false);if(save){saveGame();message("PARTIE SAUVEGARDÉE À LA MAISON")}};
+function setInputMode(mode){
+  inputMode=mode==="mouse"?"mouse":"keyboard";localStorage.setItem("q7r_input_mode",inputMode);
+  mouseTarget.active=false;mouseHeld=false;canvas.classList.toggle("mouseMode",inputMode==="mouse");
+  const kb=document.getElementById("keyboardModeBtn"),mb=document.getElementById("mouseModeBtn");
+  if(kb)kb.classList.toggle("activeMode",inputMode==="keyboard");if(mb)mb.classList.toggle("activeMode",inputMode==="mouse");
+  message(inputMode==="mouse"?"CONTRÔLES SOURIS ACTIVÉS":"CONTRÔLES CLAVIER ACTIVÉS");
+}
+document.getElementById("keyboardModeBtn").onclick=()=>setInputMode("keyboard");
+document.getElementById("mouseModeBtn").onclick=()=>setInputMode("mouse");
+setTimeout(()=>setInputMode(inputMode),0);
+function canvasPoint(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+canvas.addEventListener("contextmenu",e=>{if(inputMode==="mouse")e.preventDefault()});
+canvas.addEventListener("pointerdown",e=>{
+  if(inputMode!=="mouse"||e.pointerType==="touch"||paused||gameOver)return;
+  e.preventDefault();lastInput="mouse";
+  const p=canvasPoint(e);
+  if(e.button===0){mouseHeld=true;mouseTarget={active:true,x:p.x,y:p.y};canvas.setPointerCapture?.(e.pointerId)}
+  else if(e.button===1){useSkill()}
+  else if(e.button===2){attack()}
+  else if(e.button===3){interactNPC()}
+  else if(e.button===4){toggleJetpack()}
+});
+canvas.addEventListener("pointermove",e=>{if(inputMode!=="mouse"||!mouseHeld||e.pointerType==="touch")return;const p=canvasPoint(e);mouseTarget={active:true,x:p.x,y:p.y}});
+canvas.addEventListener("pointerup",e=>{if(inputMode!=="mouse"||e.pointerType==="touch")return;if(e.button===0)mouseHeld=false});
+canvas.addEventListener("pointercancel",()=>{mouseHeld=false});
+window.addEventListener("keydown",e=>{if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code))e.preventDefault();if(paused)return;if(inputMode==="keyboard")keys[e.code]=true;if(inputMode==="keyboard"&&e.code==="Space"&&!e.repeat)attack();if(inputMode==="keyboard"&&e.code==="KeyF"&&!e.repeat)useSkill();if(inputMode==="keyboard"&&e.code==="KeyE"&&!e.repeat&&selected==="mage")fireProjectile();if(inputMode==="keyboard"&&e.code==="KeyG"&&!e.repeat)toggleJetpack();if(inputMode==="keyboard"&&e.code==="KeyH"&&!e.repeat)interactNPC();if(e.code==="KeyR"&&!e.repeat)restart();if(e.code==="KeyP"&&!e.repeat)togglePause();if(e.code==="KeyK"&&!e.repeat)saveGame();if(e.code==="KeyL"&&!e.repeat)loadGame();if(e.code==="KeyJ"&&!e.repeat){document.getElementById("journalContent").innerHTML=journalHTML();openModal("journalModal")}if(e.code==="KeyC"&&!e.repeat){paused=true;document.getElementById("select").classList.remove("hidden")}});window.addEventListener("keyup",e=>keys[e.code]=false);document.querySelectorAll("[data-char]").forEach(b=>b.onclick=()=>{chooseHero(b.dataset.char);document.getElementById("select").classList.add("hidden");paused=false;restart()});document.querySelectorAll("[data-key]").forEach(b=>{const on=e=>{e.preventDefault();keys[b.dataset.key]=true},off=e=>{e.preventDefault();keys[b.dataset.key]=false};b.onpointerdown=on;b.onpointerup=off;b.onpointercancel=off;b.onpointerleave=off});document.getElementById("touchAttack").onpointerdown=e=>{e.preventDefault();attack()};document.getElementById("touchSkill").onpointerdown=e=>{e.preventDefault();useSkill()};document.getElementById("touchMagic").onpointerdown=e=>{e.preventDefault();if(selected==="mage")fireProjectile();else useSkill()};document.getElementById("touchJet").onpointerdown=e=>{e.preventDefault();toggleJetpack()};document.getElementById("touchInteract").onpointerdown=e=>{e.preventDefault();interactNPC()};function openModal(id){const wasPlaying=modalResumeOnClose||drawerResumeOnClose||infoResumeOnClose||(!paused&&!pausedByUser);if(document.getElementById("infoBubblePanel").classList.contains("open")){document.getElementById("infoBubblePanel").classList.remove("open");document.getElementById("infoBubbleShade").classList.remove("show");infoResumeOnClose=false}closeDrawers(false);modalResumeOnClose=wasPlaying;paused=true;renderPlayerDashboards();document.getElementById(id).classList.add("show")}function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show"));const shouldResume=modalResumeOnClose;modalResumeOnClose=false;if(shouldResume&&canResumeGame())paused=false;else if(pausedByUser)paused=true}document.getElementById("controlsBtn").onclick=()=>openModal("controls");document.getElementById("inventoryBtn").onclick=()=>{updateInventory();openModal("inventoryModal")};document.getElementById("journalBtn").onclick=()=>{document.getElementById("journalContent").innerHTML=journalHTML();openModal("journalModal")};document.getElementById("questsBtn").onclick=()=>{renderQuests();openModal("questsModal")};document.getElementById("shopBtn").onclick=()=>{renderShop();openModal("shopModal")};document.getElementById("forgeBtn").onclick=()=>{renderForge();openModal("forgeModal")};document.getElementById("saveBtn").onclick=()=>saveGame();document.getElementById("loadBtn").onclick=()=>loadGame();document.getElementById("audioBtn").onclick=()=>{audioEnabled=!audioEnabled;document.getElementById("audioBtn").textContent=audioEnabled?"SON ON":"SON OFF";if(audioEnabled)sfx("pickup")};document.getElementById("pauseBtn").onclick=()=>togglePause();document.getElementById("fullBtn").onclick=()=>toggleFullscreen();document.getElementById("changeBtn").onclick=()=>{paused=true;document.getElementById("select").classList.remove("hidden")};document.querySelectorAll(".close").forEach(b=>b.onclick=closeModal);document.getElementById("shopContent").onclick=e=>{const b=e.target.closest("[data-buy]");if(b)buyShop(b.dataset.buy)};document.getElementById("forgeContent").onclick=e=>{const b=e.target.closest("[data-craft]");if(b)craftArtifact(b.dataset.craft)};document.getElementById("questsContent").onclick=e=>{const b=e.target.closest("[data-claim]");if(b)claimQuest(b.dataset.claim)};document.getElementById("houseContent").onclick=e=>{const buy=e.target.closest("[data-buy-home]"),store=e.target.closest("[data-store]"),take=e.target.closest("[data-take]"),save=e.target.closest("[data-home-save]");if(buy)buyHome(buy.dataset.buyHome);if(store)changeStorage(store.dataset.store,Number(store.dataset.amount)||1,true);if(take)changeStorage(take.dataset.take,Number(take.dataset.amount)||1,false);if(save){saveGame();message("PARTIE SAUVEGARDÉE À LA MAISON")}};
 document.getElementById("fullInventory").onclick=e=>{const up=e.target.closest("[data-up]"),eq=e.target.closest("[data-equip]"),sk=e.target.closest("[data-skill]");if(up)upgrade(up.dataset.up);if(eq)equip(eq.dataset.equip);if(sk){player.activeSkill=sk.dataset.skill;message("SKILL ACTIF : "+SKILLS[player.activeSkill].name);updateInventory()}};
 function validateGameData(){
   const errors=[];
