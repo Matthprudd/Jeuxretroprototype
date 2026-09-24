@@ -326,7 +326,7 @@ const WORLD_GATES=[
 const WORLD_BUILDINGS=[
  {id:"village_sign",type:"sign",name:"Village de Clairbois",c:8,r:6,w:28,h:28},
  {id:"world_shop",type:"shop",name:"Boutique de Brik",c:5,r:3,w:48,h:44},
- {id:"world_forge",type:"forge",name:"Forge de Cendre",c:8,r:3,w:48,h:44},
+ {id:"world_forge",type:"forge",name:"Forge de Cendre",c:7,r:3,w:48,h:44},
  {id:"world_realtor",type:"realtor",name:"Bureau des Propriétés",c:11,r:3,w:48,h:44},
  {id:"world_home",type:"house",propertyId:"crossroads",name:"Maison de Clairbois",c:13,r:6,w:48,h:44},
  {id:"starter_home_outside",type:"starterHome",propertyId:"starter_cabin",name:"Ta cabane",c:8,r:9,w:54,h:48}
@@ -1795,7 +1795,7 @@ function validateGameData(){
   });
   if(errors.length)console.warn("VALIDATION JEU",errors);
   else console.info("VALIDATION JEU: aucun objet visible dans un mur et aucun chevauchement critique");
-  return errors
+  window.__Q7R_VALIDATION_ERRORS__=errors.slice();return errors
 }function loop(now){const dt=clamp((now-last)/1000,0,.05);last=now;update(dt);syncInteractionButton();render();requestAnimationFrame(loop)}validateGameData();updateInventory();renderNewsHistory();updateNewsBadge();requestAnimationFrame(loop);
 </script>
 </body>
