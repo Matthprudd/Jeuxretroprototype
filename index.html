@@ -207,7 +207,7 @@ html,body{font-size:16px;line-height:1.5}
 <button class="card" data-char="warrior"><div class="preview"><i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#3175d6"></i><i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#d7a46d"></i><i style="position:absolute;left:24px;top:9px;width:38px;height:12px;background:#858e99"></i></div><h3>🥷 GUERRIER</h3><ul><li>Vie 5</li><li>Attaque 2</li><li>Défense 1</li><li>Skill initial : Coup puissant</li></ul></button>
 <button class="card" data-char="mage"><div class="preview"><i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#7e46c4"></i><i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#d9ac79"></i><i style="position:absolute;left:25px;top:4px;width:36px;height:20px;background:#552a8d"></i></div><h3>🧙 MAGE</h3><ul><li>Vie 3</li><li>Portée accrue</li><li>Recharge rapide</li><li>Skill initial : Onde magique</li></ul></button>
 </div></div></section>
-<main class="shell"><header class="top compactTop"><button id="leftMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau jeu">☰ JEU</button><div class="title">SEPT ROYAUMES · V6.1</div><button id="rightMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau aventure">AVENTURE ☰</button></header>
+<main class="shell"><header class="top compactTop"><button id="leftMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau jeu">☰ JEU</button><div class="title">SEPT ROYAUMES · V6.2</div><button id="rightMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau aventure">AVENTURE ☰</button></header>
 <div id="drawerShade" class="drawerShade"></div>
 <aside id="leftDrawer" class="gameDrawer leftDrawer" aria-hidden="true"><div class="drawerHead"><b>MENU JEU</b><button class="drawerClose" data-close-drawer>×</button></div><div class="drawerButtons"><button id="controlsBtn" class="btn">COMMANDES</button><button id="inventoryBtn" class="btn">INVENTAIRE</button><button id="saveBtn" class="btn">SAUVER</button><button id="loadBtn" class="btn">CHARGER</button><button id="audioBtn" class="btn">SON ON</button><button id="pauseBtn" class="btn">PAUSE</button><button id="fullBtn" class="btn">PLEIN ÉCRAN</button><button id="changeBtn" class="btn">PERSONNAGE</button></div></aside>
 <aside id="rightDrawer" class="gameDrawer rightDrawer" aria-hidden="true"><div class="drawerHead"><b>AVENTURE</b><button class="drawerClose" data-close-drawer>×</button></div><div class="drawerButtons"><button id="journalBtn" class="btn">JOURNAL</button><button id="questsBtn" class="btn">QUÊTES</button><button id="worldReturnBtn" class="btn">CARTE / MONDE</button><button id="homesBtn" class="btn">MES MAISONS</button></div><button id="shopBtn" hidden></button><button id="forgeBtn" hidden></button></aside><div class="layout"><div><canvas id="game" width="512" height="448"></canvas><div class="touch"><div class="pad"><button class="tbtn up" data-key="ArrowUp">▲</button><button class="tbtn left" data-key="ArrowLeft">◀</button><button class="tbtn down" data-key="ArrowDown">▼</button><button class="tbtn right" data-key="ArrowRight">▶</button></div><div class="action"><button id="touchAttack" class="tbtn attack">ÉPÉE</button><button id="touchSkill" class="tbtn skillbtn">SKILL</button><button id="touchMagic" class="tbtn skillbtn">MAGIE</button><button id="touchJet" class="tbtn skillbtn">JET</button><button id="touchInteract" class="tbtn interactbtn" hidden>PARLER</button></div></div><div class="mobileUtility"><button id="quickGameMenu" class="utilityBtn">☰ JEU</button><button id="quickAdventureMenu" class="utilityBtn">★ AVENTURE</button><button id="quickSave" class="utilityBtn">💾 SAUVE</button><button id="quickPause" class="utilityBtn">Ⅱ PAUSE</button></div></div><aside class="inventory"><details class="invbox" id="resBox" open><summary>RESSOURCES</summary><div id="res"></div></details><details class="invbox" id="gearBox"><summary>ÉQUIPEMENT ACTIF</summary><div id="gear"></div></details><details class="invbox" id="keysBox"><summary>ARTÉFACTS & SKILLS</summary><div id="keys"></div></details></aside></div><div class="status">Porte droite : avancer · Porte gauche : revenir · ESPACE : épée · F : skill · Niveau aquatique : nage en vue de côté</div></main>
@@ -755,7 +755,7 @@ function worldObjects(){
 }
 function interactionDistance(o){const px=player.x+player.w/2,py=player.y+player.h/2,ix=o.x+o.w/2,iy=o.y+o.h;return Math.hypot(px-ix,py-iy)}
 function nearestWorldObject(){let best=null,bd=999;for(const o of worldObjects()){if(o.type==="gate")continue;const d=interactionDistance(o);if(d<bd){best=o;bd=d}}return bd<76?best:null}
-function gateUnlocked(g){return hasAll(LEVELS[g.level].req||[])}
+function gateUnlocked(g){return Number.isInteger(g?.level)&&g.level>=0&&g.level<KINGDOM_COUNT}
 function playerCenter(){return{x:player.x+player.w/2,y:player.y+player.h/2}}
 function insidePortal(o,margin=3){
   const p=playerCenter();
@@ -772,10 +772,7 @@ function autoGateTraversal(){
   for(const o of worldObjects()){
     if(o.type!=="gate")continue;
     if(gateDepth(o)<7)continue;
-    if(!gateUnlocked(o)){
-      if(msg.time<.4)message("CHEMIN BLOQUÉ · IL TE MANQUE : "+artNames(missing(LEVELS[o.level].req)));
-      return
-    }
+    if(!gateUnlocked(o)){message("PORTAIL INVALIDE",1.2);return}
     doorGrace=1.1;
     startTransition(()=>{loadLevel(o.level,"left",false);message("TU ENTRE DANS : "+LEVELS[o.level].name)},"y",-1);
     return
@@ -803,7 +800,7 @@ function buyHome(id){const p=PROPERTIES.find(x=>x.id===id);if(!p||ownedHomes.has
 function openHouse(id){renderHouseModal(id);openModal("houseModal")}
 function interactWorldObject(o){
   if(o.type==="gate"){
-    if(!gateUnlocked(o)){message("CHEMIN BLOQUÉ · IL TE MANQUE : "+artNames(missing(LEVELS[o.level].req)));return}
+    if(!gateUnlocked(o)){message("PORTAIL INVALIDE",1.2);return}
     message("TRAVERSE LE PORTAIL EN AVANÇANT DEDANS")
   }else if(o.type==="shop"){renderShop();openModal("shopModal")}
   else if(o.type==="forge"){renderForge();openModal("forgeModal")}
@@ -997,8 +994,8 @@ function drawWorldObjects(){
 }
 function drawNPCs(){npcsForLevel().forEach(drawNPCSprite);const n=nearestNPC();if(n){ctx.fillStyle="#0a0d0acc";ctx.fillRect(n.x-18,n.y-25,60,14);ctx.strokeStyle="#d8c37a";ctx.strokeRect(n.x-18,n.y-25,60,14);ctx.fillStyle="#fff3bd";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(window.matchMedia("(pointer:coarse)").matches?"PARLER":inputMode==="mouse"?"CLIQUE":"H : PARLER",n.x+12,n.y-15);ctx.textAlign="left"}}
 function journalHTML(){
-  if(isHome()){return `<div class="item"><b>TA PREMIÈRE CABANE</b><div>Un refuge très simple dans le bois. Tu possèdes déjà cette cabane.</div></div><div class="item"><b>PROCHAINE ÉTAPE</b><div>Sors par la porte du bas et suis le sentier jusqu’au village de Clairbois.</div></div><div class="item"><b>COFFRE</b><div>Le petit coffre donne accès à ton stockage partagé.</div></div>`} if(isWorld()){return `<div class="item"><b>MONDE OUVERT DES SEPT ROYAUMES</b><div>Royaumes libérés : ${completedKingdoms.size}/7.</div></div><div class="item"><b>PROPRIÉTÉS</b><div>${ownedHomes.size} maison(s) possédée(s). Visite les villages pour acheter des refuges et accéder à ton coffre partagé.</div></div><div class="item"><b>EXPLORATION</b><div>Les sentiers forestiers relient les sept royaumes. Certains passages exigent les artéfacts trouvés dans les royaumes précédents.</div></div>`}
-  const o=level.objective,repair=level.repair,reqMissing=missing(level.req);
+  if(isHome()){return `<div class="item"><b>TA PREMIÈRE CABANE</b><div>Un refuge très simple dans le bois. Tu possèdes déjà cette cabane.</div></div><div class="item"><b>PROCHAINE ÉTAPE</b><div>Sors par la porte du bas et suis le sentier jusqu’au village de Clairbois.</div></div><div class="item"><b>COFFRE</b><div>Le petit coffre donne accès à ton stockage partagé.</div></div>`} if(isWorld()){return `<div class="item"><b>MONDE OUVERT DES SEPT ROYAUMES</b><div>Royaumes libérés : ${completedKingdoms.size}/7.</div></div><div class="item"><b>PROPRIÉTÉS</b><div>${ownedHomes.size} maison(s) possédée(s). Visite les villages pour acheter des refuges et accéder à ton coffre partagé.</div></div><div class="item"><b>EXPLORATION</b><div>Les sept portails sont accessibles dès le départ. Chaque royaume possède ses propres objectifs et peut être complété indépendamment.</div></div>`}
+  const o=level.objective,repair=level.repair;
   const enemyDone=enemiesRequirementDone();
   const q=SIDE_QUESTS[levelIndex];
   const lines=[
@@ -1075,8 +1072,8 @@ function objectiveDone(){
 }
 function enemiesRequirementDone(){return !level.clearEnemies||enemies.length===0}
 function exitOpen(){
-  const base=enemiesRequirementDone()&&objectiveDone()&&hasAll(level.req)&&(!level.repair||state().repairDone);
-  return (isWorld()||isHome())?true:base&&(levelIndex!==FINAL_KINGDOM||state().bossDead)
+  const localObjectives=enemiesRequirementDone()&&objectiveDone()&&(!level.repair||state().repairDone);
+  return (isWorld()||isHome())?true:localObjectives&&(levelIndex!==FINAL_KINGDOM||state().bossDead)
 }
 function spawn(side){if(side==="start")return pos(level.start[0],level.start[1],player.w,player.h);const c=side==="right"?14:1;for(const r of [5,4,6,3,7,2,8,1,9])if(level.map[r][c]===GROUND)return pos(c,r,player.w,player.h);return pos(level.start[0],level.start[1],player.w,player.h)}
 function loadLevel(index,side="start",preservePosition=true){if(index<0)return;const oldScreenPos={x:player.x,y:player.y};pickups=[];projectiles=[];enemyProjectiles=[];ambient=[];musicStep=0;musicTimer=.15;if(index>=LEVELS.length){victory=gameOver=true;return}levelIndex=index;level=LEVELS[index];const p=spawn(side);player.x=p.x;player.y=p.y;if(preservePosition&&transition.active&&Number.isFinite(oldScreenPos.x)&&Number.isFinite(oldScreenPos.y)){const tx=clamp(oldScreenPos.x,34,W-58),ty=clamp(oldScreenPos.y,HUD+24,H-44);if(!hitsMap(tx,ty,player.w,player.h,false)){player.x=tx;player.y=ty}}player.dir=side==="right"?"left":"right";player.attack=false;player.cool=0;player.inv=0;enemies=level.enemies.map(createEnemy).filter(e=>!state().dead.has(e.id));loot=level.loot.map(createLoot);artItems=level.arts.map(createArt);gearItems=level.gear.map(createGear);grass=level.grass.map(createGrass);hidden=level.hidden.map(createHidden);lockedChests=level.locked.map(createLocked);repairParts=(level.repairParts||[]).map(createRepairPart);player.oxygen=100;jetActive=false;doorGrace=1.0;if(hasJetpack())jetFuel=Math.max(jetFuel,Math.min(100,70+levelIndex*5));if(level.skill&&!skills.has(level.skill))unlockSkill(level.skill);if(index===WORLD_INDEX){message("MONDE OUVERT · EXPLORE LES SENTIERS ET LES VILLAGES")}else{message("ROYAUME "+(index+1)+" : "+level.name)}
@@ -1231,8 +1228,6 @@ function lockedDoorMessage(){
   const reasons=[];
   if(level.clearEnemies&&enemies.length)reasons.push(enemies.length+" ENNEMI(S)");
   if(!objectiveDone())reasons.push("OBJECTIF : "+level.objective[0]);
-  const m=missing(level.req);
-  if(m.length)reasons.push("ARTÉFACT : "+artNames(m));
   if(level.repair&&!state().repairDone){
     const have=stats.parts[level.repair.part]||0;
     reasons.push("RÉPARATION : "+level.repair.name+" "+have+"/"+level.repair.need);
@@ -1789,6 +1784,10 @@ function validateGameData(){
     const t=WORLD_LEVEL.map[g.r]?.[g.c];
     if(t!==GROUND)errors.push("PORTAIL "+(g.level+1)+" sur tuile monde bloquée "+g.c+","+g.r)
   });
+  const portalLevels=WORLD_GATES.map(g=>g.level).sort((a,b)=>a-b);
+  if(WORLD_GATES.length!==KINGDOM_COUNT)errors.push("Il faut exactement "+KINGDOM_COUNT+" portails monde");
+  if(new Set(portalLevels).size!==KINGDOM_COUNT)errors.push("Les portails ne pointent pas vers 7 royaumes uniques");
+  for(let i=0;i<KINGDOM_COUNT;i++)if(portalLevels[i]!==i)errors.push("Royaume "+(i+1)+" absent du réseau de portails");
   WORLD_BUILDINGS.forEach(b=>{
     const t=WORLD_LEVEL.map[b.r]?.[b.c];
     if(t!==GROUND)errors.push("BÂTIMENT "+b.id+" sur tuile monde bloquée "+b.c+","+b.r)
