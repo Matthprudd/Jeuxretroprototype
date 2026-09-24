@@ -716,6 +716,11 @@ function worldObjects(){
 function interactionDistance(o){const px=player.x+player.w/2,py=player.y+player.h/2,ix=o.x+o.w/2,iy=o.y+o.h;return Math.hypot(px-ix,py-iy)}
 function nearestWorldObject(){let best=null,bd=999;for(const o of worldObjects()){const d=interactionDistance(o);if(d<bd){best=o;bd=d}}return bd<76?best:null}
 function gateUnlocked(g){return hasAll(LEVELS[g.level].req||[])}
+function playerCenter(){return{x:player.x+player.w/2,y:player.y+player.h/2}}
+function insidePortal(o,margin=3){
+  const p=playerCenter();
+  return p.x>=o.x+margin&&p.x<=o.x+o.w-margin&&p.y>=o.y+margin&&p.y<=o.y+o.h-margin
+}
 function renderHouseModal(propertyId){
   activePropertyId=propertyId||activePropertyId||PROPERTIES[0].id;const p=PROPERTIES.find(x=>x.id===activePropertyId)||PROPERTIES[0];const own=ownedHomes.has(p.id),el=document.getElementById("houseContent");
   if(!own){
@@ -738,6 +743,7 @@ function buyHome(id){const p=PROPERTIES.find(x=>x.id===id);if(!p||ownedHomes.has
 function openHouse(id){renderHouseModal(id);openModal("houseModal")}
 function interactWorldObject(o){
   if(o.type==="gate"){
+    if(!insidePortal(o,2)){message("ENTRE DANS LE PORTAIL POUR LE TRAVERSER");return}
     if(!gateUnlocked(o)){message("CHEMIN BLOQUÉ · IL TE MANQUE : "+artNames(missing(LEVELS[o.level].req)));return}
     startTransition(()=>{loadLevel(o.level,"left",false);message("TU ENTRE DANS : "+LEVELS[o.level].name)},"y",-1)
   }else if(o.type==="shop"){renderShop();openModal("shopModal")}
@@ -890,7 +896,7 @@ function drawWorldObjects(){
    else if(o.type==="starterChest"){ctx.fillStyle="#5b351c";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#9b622d";ctx.fillRect(o.x+2,o.y+3,o.w-4,8);ctx.fillStyle="#e5c363";ctx.fillRect(o.x+14,o.y+9,6,9)}
    else if(o.type==="bed"){ctx.fillStyle="#5a3926";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#b9a476";ctx.fillRect(o.x+3,o.y+4,o.w-6,o.h-8);ctx.fillStyle="#ddd0a7";ctx.fillRect(o.x+5,o.y+5,o.w-10,12)}
  });
- const o=nearestWorldObject();if(o){ctx.fillStyle="#0a0d0acc";ctx.fillRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.strokeStyle="#d8c37a";ctx.strokeRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.fillStyle="#fff3bd";ctx.font="bold 7px monospace";ctx.fillText(window.matchMedia("(pointer:coarse)").matches?"INTERAGIR":inputMode==="mouse"?"CLIQUE":"H : INTERAGIR",Math.max(8,o.x-5),Math.max(HUD+12,o.y-12))}
+ const o=nearestWorldObject();if(o){ctx.fillStyle="#0a0d0acc";ctx.fillRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.strokeStyle="#d8c37a";ctx.strokeRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.fillStyle="#fff3bd";ctx.font="bold 7px monospace";ctx.fillText(o.type==="gate"&&!insidePortal(o,2)?"ENTRE DANS LE PORTAIL":(window.matchMedia("(pointer:coarse)").matches?"INTERAGIR":inputMode==="mouse"?"CLIQUE":"H : INTERAGIR"),Math.max(8,o.x-5),Math.max(HUD+12,o.y-12))}
 }
 function drawNPCs(){npcsForLevel().forEach(drawNPCSprite);const n=nearestNPC();if(n){ctx.fillStyle="#0a0d0acc";ctx.fillRect(n.x-18,n.y-25,60,14);ctx.strokeStyle="#d8c37a";ctx.strokeRect(n.x-18,n.y-25,60,14);ctx.fillStyle="#fff3bd";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(window.matchMedia("(pointer:coarse)").matches?"PARLER":inputMode==="mouse"?"CLIQUE":"H : PARLER",n.x+12,n.y-15);ctx.textAlign="left"}}
 function journalHTML(){
@@ -1111,15 +1117,22 @@ function updatePlayer(dt){
 function updateEnemies(dt){enemies.forEach(e=>{e.flash=Math.max(0,(e.flash||0)-dt);if(e.stun>0){e.stun-=dt;return}if(e.recoil>0){e.recoil-=dt;move(e,e.rx*dt,e.ry*dt);return}const px=player.x-e.x,py=player.y-e.y,d=Math.hypot(px,py)||1;if(e.type==="berserk"&&e.hp<e.max/2)e.speed=105;if(e.behavior==="chase"){e.dx=px/d;e.dy=py/d}else if(e.behavior==="flee"){e.dx=-px/d;e.dy=-py/d}else if(e.behavior==="guard"){const hd=Math.hypot(e.homeX-e.x,e.homeY-e.y);if(d<120){e.dx=px/d;e.dy=py/d}else if(hd>12){e.dx=(e.homeX-e.x)/hd;e.dy=(e.homeY-e.y)/hd}else{e.dx=e.dy=0}}else if(e.behavior==="orbit"){e.dx=-py/d;e.dy=px/d}move(e,e.dx*e.speed*dt,e.dy*e.speed*dt)})}
 function doors(){
   if(transition.active||doorGrace>0||isWorld()||isHome())return;
-  const y=HUD+4*T,leftDoor={x:0,y,w:T+14,h:T*2},rightDoor={x:W-T-14,y,w:T+14,h:T*2};
-  if(hit(player,leftDoor)||player.x<8){
+  const pc=playerCenter();
+  const doorTop=HUD+4*T+6,doorBottom=HUD+6*T-6;
+  const verticallyInside=pc.y>doorTop&&pc.y<doorBottom;
+
+  // Une porte ne se déclenche qu'après franchissement réel du seuil.
+  const crossedLeft=verticallyInside&&pc.x<=11;
+  const crossedRight=verticallyInside&&pc.x>=W-11;
+
+  if(crossedLeft){
     startTransition(()=>{loadLevel(WORLD_INDEX,"start",false);message("RETOUR AU CARREFOUR")},"x",-1);return
   }
-  if(exitOpen()&&(hit(player,rightDoor)||player.x+player.w>W-8)){
+  if(exitOpen()&&crossedRight){
     const finished=levelIndex;completedKingdoms.add(finished);
     startTransition(()=>{loadLevel(WORLD_INDEX,"start",false);message("ROYAUME LIBÉRÉ : "+LEVELS[finished].name);if(completedKingdoms.size>=KINGDOM_COUNT){victory=true;message("LES SEPT ROYAUMES SONT LIBRES !")}},"x",1)
   }
-}function lockedDoorMessage(){
+function lockedDoorMessage(){
   if(exitOpen())return;
   const zone={x:W-82,y:HUD+4*T-10,w:82,h:84};
   if(!(hit(player,zone)||near(player,zone,32))||msg.time>.2)return;
@@ -1553,7 +1566,7 @@ document.getElementById("homesBtn").onclick=()=>{activePropertyId=[...ownedHomes
 document.getElementById("drawerShade").onclick=closeDrawers;
 document.querySelectorAll("[data-close-drawer]").forEach(b=>b.onclick=closeDrawers);
 document.querySelectorAll(".gameDrawer .btn").forEach(b=>b.addEventListener("click",()=>setTimeout(closeDrawers,0)));
-function syncInteractionButton(){const b=document.getElementById("touchInteract");if(!b)return;const touch=window.matchMedia("(pointer:coarse)").matches;const wo=selected&&!paused&&!gameOver?nearestWorldObject():null,n=selected&&!paused&&!gameOver?nearestNPC():null,target=wo||n;b.hidden=!(touch&&target);if(target){const label=wo?(wo.type==="gate"?"ENTRER":wo.type==="shop"?"BOUTIQUE":wo.type==="forge"?"FORGE":wo.type==="realtor"?"PROPRIÉTÉS":(wo.type==="house"||wo.type==="starterHome")?"MAISON":"INTERAGIR"):"PARLER";b.textContent=label;b.setAttribute("aria-label",wo?wo.name:n.name)}else{b.textContent="INTERAGIR";b.setAttribute("aria-label","Interaction indisponible")}}
+function syncInteractionButton(){const b=document.getElementById("touchInteract");if(!b)return;const touch=window.matchMedia("(pointer:coarse)").matches;const wo=selected&&!paused&&!gameOver?nearestWorldObject():null,n=selected&&!paused&&!gameOver?nearestNPC():null,target=wo||n;b.hidden=!(touch&&target);if(target){const label=wo?(wo.type==="gate"?(insidePortal(wo,2)?"TRAVERSER":"PORTAIL"):wo.type==="shop"?"BOUTIQUE":wo.type==="forge"?"FORGE":wo.type==="realtor"?"PROPRIÉTÉS":(wo.type==="house"||wo.type==="starterHome")?"MAISON":"INTERAGIR"):"PARLER";b.textContent=label;b.setAttribute("aria-label",wo?wo.name:n.name)}else{b.textContent="INTERAGIR";b.setAttribute("aria-label","Interaction indisponible")}}
 function syncMobilePanels(){const mobile=window.matchMedia("(max-width:790px),(pointer:coarse)").matches;const rb=document.getElementById("resBox"),gb=document.getElementById("gearBox"),kb=document.getElementById("keysBox");if(!rb||!gb||!kb)return;if(mobile){rb.open=true;gb.open=false;kb.open=false}else{rb.open=gb.open=kb.open=true}}
 window.addEventListener("resize",syncMobilePanels);syncMobilePanels();
 function setInputMode(mode){
