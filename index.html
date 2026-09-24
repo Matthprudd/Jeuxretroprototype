@@ -351,7 +351,7 @@ function addNews(text){
   if(notificationHistory.length>50)notificationHistory.length=50;
   unreadNews=Math.min(99,unreadNews+1);renderNewsHistory();updateNewsBadge();
 }
-function message(text,duration=3){msg.text=String(text);msg.time=3;addNews(msg.text)}function hasAll(req=[]){return req.every(id=>arts.has(id))}function missing(req=[]){return req.filter(id=>!arts.has(id))}function artNames(ids){return ids.map(id=>ART[id]?.name||id).join(" + ")}
+function message(text,duration=3){msg.text=String(text);msg.time=Math.max(.2,Number(duration)||3);addNews(msg.text)}function hasAll(req=[]){return req.every(id=>arts.has(id))}function missing(req=[]){return req.filter(id=>!arts.has(id))}function artNames(ids){return ids.map(id=>ART[id]?.name||id).join(" + ")}
 function xpNeed(){return 250+(stats.rank-1)*180}
 function grantXP(n){
   stats.xp+=n;
@@ -716,6 +716,12 @@ function saveGame(){
   const data={v:60,selected,levelIndex,states:states.map(serializeState),arts:[...arts],ownedGear:[...ownedGear],skills:[...skills],gearLevels:{...gearLevels},crafted:[...crafted],claimedQuests:[...claimedQuests],ownedHomes:[...ownedHomes],completedKingdoms:[...completedKingdoms],homeStorage:{...homeStorage},stats:JSON.parse(JSON.stringify(stats)),jetpack:{fuel:jetFuel,active:jetActive},player:{hp:player.hp,x:player.x,y:player.y,dir:player.dir,oxygen:player.oxygen??100,gear:{...player.gear},activeSkill:player.activeSkill,artHp:player.artHp,artAtk:player.artAtk,artSpeed:player.artSpeed}};
   localStorage.setItem("q7r_v6_save",JSON.stringify(data));message("PARTIE SAUVEGARDÉE",1.5);sfx("pickup");
 }
+function positionInDoorTrigger(x,y){
+  const cx=x+player.w/2,cy=y+player.h/2;
+  if(isWorld()||isHome())return false;
+  const vertical=cy>HUD+4*T+4&&cy<HUD+6*T-4;
+  return vertical&&(cx<44||cx>W-44)
+}
 function loadGame(){
   const raw=localStorage.getItem("q7r_v6_save")||localStorage.getItem("q7r_v5_6_save")||localStorage.getItem("q7r_v5_5_save")||localStorage.getItem("q7r_v5_4_save")||localStorage.getItem("q7r_v3_save");if(!raw){message("AUCUNE SAUVEGARDE",1.5);return}
   try{
@@ -726,7 +732,7 @@ function loadGame(){
     Object.assign(stats,d.stats||{});stats.parts ||= {wood:0,gear:0,valve:0,crystal:0};ownedHomes.clear();(d.ownedHomes||[]).forEach(x=>ownedHomes.add(x));ownedHomes.add("starter_cabin");completedKingdoms.clear();(d.completedKingdoms||[]).forEach(x=>completedKingdoms.add(x));Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0},d.homeStorage||{});
     jetFuel=d.jetpack?.fuel ?? (crafted.has("jetpackCore")?100:0);jetActive=false;
     player.artHp=d.player?.artHp||0;player.artAtk=d.player?.artAtk||0;player.artSpeed=d.player?.artSpeed||0;player.gear={helmet:null,armor:null,sword:null,shield:null,...(d.player?.gear||{})};player.activeSkill=d.player?.activeSkill||[...skills][0];
-    recalc(true);player.hp=Math.min(player.maxHp,d.player?.hp??player.maxHp);gameOver=victory=false;paused=false;document.getElementById("select").classList.add("hidden");loadLevel(clamp(d.levelIndex||0,0,LEVELS.length-1),"start");if(Number.isFinite(d.player?.x)&&Number.isFinite(d.player?.y)&&!hitsMap(d.player.x,d.player.y,player.w,player.h,false)){player.x=d.player.x;player.y=d.player.y}if(d.player?.dir)player.dir=d.player.dir;player.oxygen=d.player?.oxygen??100;message("PARTIE CHARGÉE — POSITION RESTAURÉE",1.8);sfx("level");
+    recalc(true);player.hp=Math.min(player.maxHp,d.player?.hp??player.maxHp);gameOver=victory=false;paused=false;document.getElementById("select").classList.add("hidden");loadLevel(clamp(d.levelIndex||0,0,LEVELS.length-1),"start");if(Number.isFinite(d.player?.x)&&Number.isFinite(d.player?.y)&&!hitsMap(d.player.x,d.player.y,player.w,player.h,false)&&!positionInDoorTrigger(d.player.x,d.player.y)){player.x=d.player.x;player.y=d.player.y}if(d.player?.dir)player.dir=d.player.dir;player.oxygen=d.player?.oxygen??100;message("PARTIE CHARGÉE — POSITION RESTAURÉE",1.8);sfx("level");
   }catch(e){console.error(e);message("SAUVEGARDE INCOMPATIBLE",2)}
 }
 function isWorld(){return levelIndex===WORLD_INDEX}
@@ -841,6 +847,33 @@ function npcsForLevel(){
 }
 function nearestNPC(){let best=null,bd=999;for(const n of npcsForLevel()){const d=Math.hypot((player.x+12)-(n.x+12),(player.y+12)-(n.y+12));if(d<bd){best=n;bd=d}}return bd<120?best:null}
 function pointInObject(p,o,pad=8){return p.x>=o.x-pad&&p.x<=o.x+o.w+pad&&p.y>=o.y-pad&&p.y<=o.y+o.h+pad}
+function chestObjects(){
+  const arr=[];
+  loot.forEach(o=>{if(!o.taken&&o.type==="chest")arr.push({kind:"loot",obj:o,name:"Coffre"})});
+  hidden.forEach(o=>{if(o.shown&&!o.taken&&o.type==="chest")arr.push({kind:"hidden",obj:o,name:"Coffre caché"})});
+  lockedChests.forEach(o=>{if(!o.opened)arr.push({kind:"locked",obj:o,name:"Coffre mystique"})});
+  return arr
+}
+function chestDistance(c){const o=c.obj;return Math.hypot((player.x+12)-(o.x+o.w/2),(player.y+12)-(o.y+o.h/2))}
+function nearestChest(){let best=null,bd=999;for(const c of chestObjects()){const d=chestDistance(c);if(d<bd){best=c;bd=d}}return bd<86?best:null}
+function chestAtPoint(p){return chestObjects().filter(c=>pointInObject(p,c.obj,18)).sort((a,b)=>Math.hypot(p.x-(a.obj.x+a.obj.w/2),p.y-(a.obj.y+a.obj.h/2))-Math.hypot(p.x-(b.obj.x+b.obj.w/2),p.y-(b.obj.y+b.obj.h/2)))[0]||null}
+function openChest(c){
+  if(!c)return false;
+  const o=c.obj;
+  if(c.kind==="locked"){
+    const m=missing(o.req);
+    if(m.length){message("COFFRE VERROUILLÉ · IL TE MANQUE : "+artNames(m),2);return true}
+    o.opened=true;state().locked.add(o.id);
+    const gold=Math.round(o.gold*player.goldMult*(crafted.has("foxCharm")?1.10:1));
+    stats.gold+=gold;stats.fragments+=o.fragments;stats.score+=800;
+    message("COFFRE MYSTIQUE : +"+gold+" OR · +"+o.fragments+" FRAGMENT(S)",2);grantXP(100);sfx("pickup");burst(o.x+14,o.y+12,"#fff19a",16,75);updateInventory();return true
+  }
+  const v=Math.round(o.value*player.goldMult*(crafted.has("foxCharm")?1.10:1));
+  o.taken=true;
+  if(c.kind==="hidden"){state().hiddenTaken.add(o.id);stats.score+=v*12;message("COFFRE CACHÉ : +"+v+" OR",1.6)}
+  else{state().loot.add(o.id);stats.score+=v*10;message("COFFRE OUVERT : +"+v+" OR",1.5)}
+  stats.gold+=v;stats.treasures++;grantXP(c.kind==="hidden"?45:35);sfx("coin");burst(o.x+o.w/2,o.y+o.h/2,c.kind==="hidden"?"#d9b6ff":"#fff17a",10,60);updateInventory();return true
+}
 function npcAtPoint(p){
   return npcsForLevel().filter(n=>pointInObject(p,n,24)).sort((a,b)=>{
     const da=Math.hypot(p.x-(a.x+12),p.y-(a.y+12)),db=Math.hypot(p.x-(b.x+12),p.y-(b.y+12));
@@ -850,11 +883,13 @@ function npcAtPoint(p){
 function clickableAtPoint(p){
   const npc=npcAtPoint(p);
   if(npc)return{kind:"npc",obj:npc};
+  const chest=chestAtPoint(p);
+  if(chest)return{kind:"chest",obj:chest};
   const world=worldObjects().filter(o=>o.type!=="gate"&&pointInObject(p,o,12)).sort((a,b)=>interactionDistance(a)-interactionDistance(b))[0];
   if(world)return{kind:"world",obj:world};
   return null
 }
-function targetInteractionDistance(t){if(!t)return 999;if(t.kind==="world")return interactionDistance(t.obj);return Math.hypot((player.x+12)-(t.obj.x+12),(player.y+12)-(t.obj.y+12))}
+function targetInteractionDistance(t){if(!t)return 999;if(t.kind==="world")return interactionDistance(t.obj);if(t.kind==="chest")return chestDistance(t.obj);return Math.hypot((player.x+12)-(t.obj.x+12),(player.y+12)-(t.obj.y+12))}
 function interactWithNPC(n){
   if(!n)return false;
   pendingMouseInteract=null;mouseTarget.active=false;mouseHeld=false;
@@ -868,11 +903,14 @@ function executeMouseInteraction(t){
   if(!t)return;
   pendingMouseInteract=null;mouseTarget.active=false;mouseHeld=false;
   if(t.kind==="npc")interactWithNPC(t.obj);
+  else if(t.kind==="chest")openChest(t.obj);
   else if(t.kind==="world")interactWorldObject(t.obj)
 }
 function interactNPC(){
   const n=nearestNPC();
   if(n){interactWithNPC(n);return}
+  const ch=nearestChest();
+  if(ch){openChest(ch);return}
   const wo=nearestWorldObject();
   if(wo){interactWorldObject(wo);return}
   message("RIEN À INTERAGIR À PROXIMITÉ")
@@ -1019,7 +1057,7 @@ function getGear(id){if(!ownedGear.has(id))ownedGear.add(id);sfx("pickup");burst
 function equip(id){if(!ownedGear.has(id))return;player.gear[GEAR[id].slot]=id;recalc(false);message(GEAR[id].name+" ÉQUIPÉ",1.3);updateInventory()}
 function upgradeCost(id){const lv=gearLevels[id]||0;return{gold:75+lv*75,frag:1+lv}}function upgrade(id){if(!ownedGear.has(id))return;if((gearLevels[id]||0)>=2){message("NIVEAU MAXIMUM");return}const c=upgradeCost(id);if(stats.gold<c.gold||stats.fragments<c.frag){message("IL FAUT "+c.gold+" OR ET "+c.frag+" FRAGMENT(S)",2);return}stats.gold-=c.gold;stats.fragments-=c.frag;gearLevels[id]=(gearLevels[id]||0)+1;recalc(true);message(GEAR[id].name+" AMÉLIORÉ NIV. "+gearLevels[id],2);updateInventory()}
 function unlockSkill(id){if(!id||skills.has(id))return;skills.add(id);player.activeSkill=id;state().skills.add(id);stats.score+=400;message("SKILL DÉBLOQUÉ : "+SKILLS[id].name,2.2);updateInventory()}
-function useSkill(){if(paused||gameOver||player.skillCool>0||!player.activeSkill)return;sfx("skill");const id=player.activeSkill,s=SKILLS[id];player.skillCool=s.cool;if(id==="dash"){const d={up:[0,-90],down:[0,90],left:[-90,0],right:[90,0]}[player.dir];move(player,d[0],d[1]);message("ESQUIVE !",.8)}else if(id==="power"){player.powerReady=true;message("COUP PUISSANT PRÊT",1)}else if(id==="wave"||id==="spin"||id==="blast"||id==="quake"){const radius=id==="wave"?70:id==="spin"?55:id==="blast"?80:75;const elem=id==="blast"?"fire":id==="quake"?"earth":activeElement();enemies.forEach(e=>{const d=Math.hypot(e.x-player.x,e.y-player.y);if(d<radius){e.hp-=Math.max(1,Math.round(atk()*elementalMultiplier(elem,e.element)*(id==="blast"?1.5:1)));if(id==="quake")e.stun=2}});message(SKILLS[id].name.toUpperCase(),1)}else if(id==="heal"){player.hp=Math.min(player.maxHp,player.hp+1);message("SOIN +1 CŒUR",1)}else if(id==="tornado"){enemies.forEach(e=>{if(Math.abs(e.y-player.y)<45){e.hp-=Math.max(1,Math.round(atk()*elementalMultiplier("wind",e.element)*1.5));e.recoil=.3;e.rx=player.dir==="left"?-180:180;e.ry=0}});message("TORNADE !",1)}removeDead()}
+function useSkill(){if(paused||gameOver||player.skillCool>0||!player.activeSkill)return;sfx("skill");const id=player.activeSkill,s=SKILLS[id];player.skillCool=s.cool;if(id==="dash"){const d={up:[0,-90],down:[0,90],left:[-90,0],right:[90,0]}[player.dir];for(let i=0;i<6;i++)move(player,d[0]/6,d[1]/6);message("ESQUIVE !",.8)}else if(id==="power"){player.powerReady=true;message("COUP PUISSANT PRÊT",1)}else if(id==="wave"||id==="spin"||id==="blast"||id==="quake"){const radius=id==="wave"?70:id==="spin"?55:id==="blast"?80:75;const elem=id==="blast"?"fire":id==="quake"?"earth":activeElement();enemies.forEach(e=>{const d=Math.hypot(e.x-player.x,e.y-player.y);if(d<radius){e.hp-=Math.max(1,Math.round(atk()*elementalMultiplier(elem,e.element)*(id==="blast"?1.5:1)));if(id==="quake")e.stun=2}});message(SKILLS[id].name.toUpperCase(),1)}else if(id==="heal"){player.hp=Math.min(player.maxHp,player.hp+1);message("SOIN +1 CŒUR",1)}else if(id==="tornado"){enemies.forEach(e=>{if(Math.abs(e.y-player.y)<45){e.hp-=Math.max(1,Math.round(atk()*elementalMultiplier("wind",e.element)*1.5));e.recoil=.3;e.rx=player.dir==="left"?-180:180;e.ry=0}});message("TORNADE !",1)}removeDead()}
 function elementsOwned(){return new Set([...ownedGear].map(id=>GEAR[id].element).filter(e=>e&&e!=="none")).size}
 function equippedElements(){return new Set(Object.values(player.gear).filter(Boolean).map(id=>GEAR[id]?.element).filter(e=>e&&e!=="none"))}
 function objectiveDone(){
@@ -1064,11 +1102,11 @@ function safeTile(c,r){
 function safePos(c,r,w=24,h=24){const s=safeTile(c,r);return pos(s[0],s[1],w,h)}
 function createEnemy(d,i){const[c,r,hp,type="brute",element="none"]=d,p=safePos(c,r),t=ENEMY_TYPES[type];return{id:"e"+i,x:p.x,y:p.y,w:24,h:24,hp,max:hp,type,element,color:t.color,behavior:t.behavior,speed:t.speed,homeX:p.x,homeY:p.y,dx:0,dy:0,next:0,recoil:0,rx:0,ry:0,stun:0}}
 function createLoot(d,i){const[type,c,r,value]=d,size=type==="chest"?24:16,p=safePos(c,r,size,size),id="l"+i;return{id,type,value,x:p.x,y:p.y,w:size,h:size,taken:state().loot.has(id)}}function createArt([id,c,r]){const p=safePos(c,r,22,22);return{id,x:p.x,y:p.y,w:22,h:22,taken:arts.has(id)}}function createGear([id,c,r]){const p=safePos(c,r);return{id,x:p.x,y:p.y,w:24,h:24,taken:ownedGear.has(id)}}function createGrass([id,c,r]){const s=safeTile(c,r),p=pos(s[0],s[1],26,26);return{id,c:s[0],r:s[1],x:p.x,y:p.y,w:26,h:26,cut:state().grass.has(id)}}
-function createHidden([id,source,sourceId,type,value]){let c=0,r=0;if(source==="tree")[c,r]=sourceId.split(",").map(Number);else{const g=level.grass.find(x=>x[0]===sourceId);c=g[1];r=g[2]}const size=type==="chest"?24:16,p=pos(c,r,size,size);return{id,source,sourceId,type,value,x:p.x,y:p.y,w:size,h:size,shown:state().hiddenShown.has(id),taken:state().hiddenTaken.has(id)}}function createLocked([id,c,r,req,gold,fragments]){const p=pos(c,r,28,24);return{id,req,gold,fragments,x:p.x,y:p.y,w:28,h:24,opened:state().locked.has(id),wait:0}}function createRepairPart([type,c,r],i){const p=safePos(c,r,18,18);const id="rp"+i;return{id,type,x:p.x,y:p.y,w:18,h:18,taken:state().repairParts.has(id)}}
+function createHidden([id,source,sourceId,type,value]){let c=0,r=0;if(source==="tree")[c,r]=sourceId.split(",").map(Number);else{const g=level.grass.find(x=>x[0]===sourceId);c=g[1];r=g[2]}const size=type==="chest"?24:16,p=pos(c,r,size,size);return{id,source,sourceId,type,value,x:p.x,y:p.y,w:size,h:size,shown:state().hiddenShown.has(id),taken:state().hiddenTaken.has(id)}}function createLocked([id,c,r,req,gold,fragments]){const p=safePos(c,r,28,24);return{id,req,gold,fragments,x:p.x,y:p.y,w:28,h:24,opened:state().locked.has(id),wait:0}}function createRepairPart([type,c,r],i){const p=safePos(c,r,18,18);const id="rp"+i;return{id,type,x:p.x,y:p.y,w:18,h:18,taken:state().repairParts.has(id)}}
 function tileAt(x,y){return{c:Math.floor(x/T),r:Math.floor((y-HUD)/T)}}
 function solid(c,r,air=false){
   if(c<0||c>=COLS||r<0||r>=ROWS)return true;
-  if(levelIndex>0&&!isWorld()&&!isHome()&&c===0&&(r===4||r===5))return false;
+  if(!isWorld()&&!isHome()&&c===0&&(r===4||r===5))return false;
   if(!isWorld()&&!isHome()&&exitOpen()&&c===15&&(r===4||r===5))return false;
   const tile=level.map[r][c];
   if(level.mode==="sideWater")return tile===WALL||tile===ROCK;
@@ -1076,7 +1114,7 @@ function solid(c,r,air=false){
   if(air)return tile===WALL||tile===CRYSTAL;
   return tile!==GROUND
 }
-function hitsMap(x,y,w,h,air=false){const m=2,mapHit=[[x+m,y+m],[x+w-m,y+m],[x+m,y+h-m],[x+w-m,y+h-m]].some(([px,py])=>{const t=tileAt(px,py);return solid(t.c,t.r,air)});if(mapHit)return true;if(air)return false;const box={x,y,w,h};return worldObjects().some(o=>o.type!=="gate"&&hit(box,{x:o.x,y:o.y+8,w:o.w,h:o.h-8}))}
+function hitsMap(x,y,w,h,air=false){const m=2,mapHit=[[x+m,y+m],[x+w-m,y+m],[x+m,y+h-m],[x+w-m,y+h-m]].some(([px,py])=>{const t=tileAt(px,py);return solid(t.c,t.r,air)});if(mapHit)return true;if(air)return false;const box={x,y,w,h};return worldObjects().some(o=>{const blocks=o.type==="gate"?!gateUnlocked(o):true;return blocks&&hit(box,{x:o.x,y:o.y+8,w:o.w,h:o.h-8})})}
 function move(o,mx,my){const air=(o===player&&jetActive&&level.mode!=="sideWater"),ox=o.x,oy=o.y;if(!hitsMap(o.x+mx,o.y,o.w,o.h,air))o.x+=mx;if(!hitsMap(o.x,o.y+my,o.w,o.h,air))o.y+=my;if(o===player&&inputMode==="mouse"&&mouseTarget.active&&Math.abs(o.x-ox)<.01&&Math.abs(o.y-oy)<.01){mouseTarget.active=false}}
 function sword(){const l=player.range+gearBonus("range"),e=10;if(player.dir==="up")return{x:player.x+7,y:player.y-l,w:e,h:l};if(player.dir==="down")return{x:player.x+7,y:player.y+player.h,w:e,h:l};if(player.dir==="left")return{x:player.x-l,y:player.y+7,w:l,h:e};return{x:player.x+player.w,y:player.y+7,w:l,h:e}}function reveal(source,id){hidden.forEach(h=>{if(h.source===source&&h.sourceId===id&&!h.shown){h.shown=true;state().hiddenShown.add(h.id);message("TRÉSOR CACHÉ RÉVÉLÉ !")}})}function attack(){if(paused||gameOver||player.attack||player.cool>0)return;player.attack=true;player.attackTime=.18;player.cool=player.maxCool;player.hitSet.clear()}
 function removeDead(){
@@ -1121,26 +1159,18 @@ function collect(){
     }
   }
   loot.forEach(o=>{
-    if(o.taken||!(hit(player,o)||near(player,o,25)))return;
+    if(o.taken||o.type==="chest"||!(hit(player,o)||near(player,o,25)))return;
     o.taken=true;state().loot.add(o.id);const v=Math.round(o.value*player.goldMult*(crafted.has("foxCharm")?1.10:1));
-    stats.gold+=v;stats.treasures++;stats.score+=v*(o.type==="chest"?10:5);message("+"+v+" OR");
-    grantXP(o.type==="chest"?35:10);sfx("coin");burst(o.x+o.w/2,o.y+o.h/2,"#fff17a",6,45);
+    stats.gold+=v;stats.treasures++;stats.score+=v*5;message("+"+v+" OR");
+    grantXP(10);sfx("coin");burst(o.x+o.w/2,o.y+o.h/2,"#fff17a",6,45);
   });
   artItems.forEach(o=>{if(!o.taken&&(hit(player,o)||near(player,o,26))){o.taken=true;getArtifact(o.id)}});
   gearItems.forEach(o=>{if(!o.taken&&(hit(player,o)||near(player,o,26))){o.taken=true;getGear(o.id)}});
   hidden.forEach(o=>{
-    if(!o.shown||o.taken||!(hit(player,o)||near(player,o,26)))return;
+    if(!o.shown||o.taken||o.type==="chest"||!(hit(player,o)||near(player,o,26)))return;
     o.taken=true;state().hiddenTaken.add(o.id);const v=Math.round(o.value*player.goldMult*(crafted.has("foxCharm")?1.10:1));
-    stats.gold+=v;stats.treasures++;stats.score+=v*(o.type==="chest"?12:6);message("TRÉSOR CACHÉ : +"+v+" OR",1.6);
+    stats.gold+=v;stats.treasures++;stats.score+=v*6;message("TRÉSOR CACHÉ : +"+v+" OR",1.6);
     grantXP(45);sfx("coin");burst(o.x+o.w/2,o.y+o.h/2,"#d9b6ff",10,55);
-  });
-  lockedChests.forEach(o=>{
-    o.wait=Math.max(0,o.wait-.016);
-    if(o.opened||!(hit(player,o)||near(player,o,28)))return;
-    const m=missing(o.req);
-    if(m.length){if(!o.wait){message("IL VOUS MANQUE : "+artNames(m),2);o.wait=1.2}return}
-    o.opened=true;state().locked.add(o.id);stats.gold+=Math.round(o.gold*player.goldMult*(crafted.has("foxCharm")?1.10:1));stats.fragments+=o.fragments;stats.score+=800;
-    message("COFFRE MYSTIQUE OUVERT !",2);grantXP(100);sfx("pickup");burst(o.x+14,o.y+12,"#fff19a",16,75);
   });
   updateInventory();
 }
@@ -1156,6 +1186,7 @@ function updatePlayer(dt){
     if(keys.ArrowUp||keys.KeyZ||keys.KeyW)dy--;if(keys.ArrowDown||keys.KeyS)dy++;if(keys.ArrowLeft||keys.KeyQ||keys.KeyA)dx--;if(keys.ArrowRight||keys.KeyD)dx++;
   }
   if(dx&&dy){dx*=Math.SQRT1_2;dy*=Math.SQRT1_2}
+  player.vx=dx*speed();player.vy=dy*speed();
   if(level.mode==="sideWater"){
     jetActive=false;
     if(dx<0)player.dir="left";if(dx>0)player.dir="right";move(player,dx*speed()*.78*dt,dy*speed()*.78*dt);
@@ -1189,7 +1220,7 @@ function doors(){
   }
   if(exitOpen()&&crossedRight){
     const finished=levelIndex;completedKingdoms.add(finished);
-    startTransition(()=>{loadLevel(WORLD_INDEX,"start",false);message("ROYAUME LIBÉRÉ : "+LEVELS[finished].name);if(completedKingdoms.size>=KINGDOM_COUNT){victory=true;message("LES SEPT ROYAUMES SONT LIBRES !")}},"x",1)
+    startTransition(()=>{loadLevel(WORLD_INDEX,"start",false);message("ROYAUME LIBÉRÉ : "+LEVELS[finished].name);if(completedKingdoms.size>=KINGDOM_COUNT){victory=true;gameOver=true;message("LES SEPT ROYAUMES SONT LIBRES !")}},"x",1)
   }
 }
 function lockedDoorMessage(){
@@ -1366,6 +1397,13 @@ function drawObjects(){
     ctx.fillStyle="#d9b7ff";ctx.fillRect(o.x+5,o.y+5,7,2);
     ctx.fillStyle="#fff2";ctx.fillRect(o.x+2,o.y+14,o.w-4,1);
   });
+  const nearChestObj=nearestChest();
+  if(nearChestObj){
+    const o=nearChestObj.obj;
+    ctx.fillStyle="#090c09dd";ctx.fillRect(Math.max(4,o.x-8),Math.max(HUD+2,o.y-20),110,14);
+    ctx.strokeStyle="#d8c37a";ctx.strokeRect(Math.max(4,o.x-8)+.5,Math.max(HUD+2,o.y-20)+.5,109,13);
+    ctx.fillStyle="#fff3bd";ctx.font="bold 7px monospace";ctx.fillText(window.matchMedia("(max-width:900px)").matches?"INTERAGIR":"CLIQUE / H",Math.max(8,o.x-3),Math.max(HUD+12,o.y-10));
+  }
   if(level.repair && !state().repairDone){
     const rp=pos(level.repair.c,level.repair.r,30,30);
     ctx.fillStyle="rgba(255,255,255,.08)";ctx.fillRect(rp.x-4,rp.y-4,38,38);
@@ -1621,13 +1659,25 @@ document.getElementById("quickGameMenu").onclick=()=>openDrawer("left");
 document.getElementById("quickAdventureMenu").onclick=()=>openDrawer("right");
 document.getElementById("quickSave").onclick=()=>saveGame();
 document.getElementById("quickPause").onclick=()=>togglePause();
-document.getElementById("worldReturnBtn").onclick=()=>{if(!isWorld())startTransition(()=>loadLevel(WORLD_INDEX,"start"));closeDrawers(false)};
+document.getElementById("worldReturnBtn").onclick=()=>{if(!isWorld())startTransition(()=>loadLevel(WORLD_INDEX,"start",false));closeDrawers(false)};
 document.getElementById("homesBtn").onclick=()=>{activePropertyId=[...ownedHomes][0]||PROPERTIES[0].id;renderHouseModal(activePropertyId);openModal("houseModal")};
 document.getElementById("drawerShade").onclick=closeDrawers;
 document.querySelectorAll("[data-close-drawer]").forEach(b=>b.onclick=closeDrawers);
 document.querySelectorAll(".gameDrawer .btn").forEach(b=>b.addEventListener("click",()=>setTimeout(closeDrawers,0)));
-function syncInteractionButton(){const b=document.getElementById("touchInteract");if(!b)return;const touch=window.matchMedia("(pointer:coarse)").matches;const wo=selected&&!paused&&!gameOver?nearestWorldObject():null,n=selected&&!paused&&!gameOver?nearestNPC():null,target=wo||n;b.hidden=!(touch&&target);if(target){const label=wo?(wo.type==="shop"?"BOUTIQUE":wo.type==="forge"?"FORGE":wo.type==="realtor"?"PROPRIÉTÉS":(wo.type==="house"||wo.type==="starterHome")?"MAISON":"INTERAGIR"):"PARLER";b.textContent=label;b.setAttribute("aria-label",wo?wo.name:n.name)}else{b.textContent="INTERAGIR";b.setAttribute("aria-label","Interaction indisponible")}}
-function syncMobilePanels(){const mobile=window.matchMedia("(max-width:790px),(pointer:coarse)").matches;const rb=document.getElementById("resBox"),gb=document.getElementById("gearBox"),kb=document.getElementById("keysBox");if(!rb||!gb||!kb)return;if(mobile){rb.open=true;gb.open=false;kb.open=false}else{rb.open=gb.open=kb.open=true}}
+function syncInteractionButton(){
+  const b=document.getElementById("touchInteract");if(!b)return;
+  const mobile=window.matchMedia("(max-width:900px)").matches;
+  const wo=selected&&!paused&&!gameOver?nearestWorldObject():null;
+  const n=selected&&!paused&&!gameOver?nearestNPC():null;
+  const ch=selected&&!paused&&!gameOver?nearestChest():null;
+  const target=n||ch||wo;
+  b.hidden=!(mobile&&target);
+  if(n){b.textContent="PARLER";b.setAttribute("aria-label",n.name)}
+  else if(ch){b.textContent="COFFRE";b.setAttribute("aria-label",ch.name)}
+  else if(wo){const label=wo.type==="shop"?"BOUTIQUE":wo.type==="forge"?"FORGE":wo.type==="realtor"?"PROPRIÉTÉS":(wo.type==="house"||wo.type==="starterHome")?"MAISON":"INTERAGIR";b.textContent=label;b.setAttribute("aria-label",wo.name)}
+  else{b.textContent="INTERAGIR";b.setAttribute("aria-label","Interaction indisponible")}
+}
+function syncMobilePanels(){const mobile=window.matchMedia("(max-width:900px)").matches;const rb=document.getElementById("resBox"),gb=document.getElementById("gearBox"),kb=document.getElementById("keysBox");if(!rb||!gb||!kb)return;if(mobile){rb.open=true;gb.open=false;kb.open=false}else{rb.open=gb.open=kb.open=true}}
 window.addEventListener("resize",syncMobilePanels);syncMobilePanels();
 function setInputMode(mode){
   inputMode=mode==="mouse"?"mouse":"keyboard";localStorage.setItem("q7r_input_mode",inputMode);
@@ -1729,6 +1779,19 @@ function validateGameData(){
     (lv.grass||[]).forEach(x=>add("herbe",x[1],x[2]));
     (lv.enemies||[]).forEach(x=>add("ennemi",x[0],x[1]));
     if(lv.repair)add("station réparation",lv.repair.c,lv.repair.r);
+  });
+  PROPERTIES.filter(p=>p.level>=0&&p.level<KINGDOM_COUNT).forEach(p=>{
+    const lv=LEVELS[p.level],t=lv.map[p.r]?.[p.c];
+    const ok=lv.mode==="sideWater"?(t!==WALL&&t!==ROCK):t===GROUND;
+    if(!ok)errors.push("PROPRIÉTÉ "+p.id+" sur tuile bloquée "+p.c+","+p.r)
+  });
+  WORLD_GATES.forEach(g=>{
+    const t=WORLD_LEVEL.map[g.r]?.[g.c];
+    if(t!==GROUND)errors.push("PORTAIL "+(g.level+1)+" sur tuile monde bloquée "+g.c+","+g.r)
+  });
+  WORLD_BUILDINGS.forEach(b=>{
+    const t=WORLD_LEVEL.map[b.r]?.[b.c];
+    if(t!==GROUND)errors.push("BÂTIMENT "+b.id+" sur tuile monde bloquée "+b.c+","+b.r)
   });
   if(errors.length)console.warn("VALIDATION JEU",errors);
   else console.info("VALIDATION JEU: aucun objet visible dans un mur et aucun chevauchement critique");
