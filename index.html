@@ -488,10 +488,9 @@ function updateTransition(dt){
 }
 function cameraTransitionOffset(){
   if(!transition.active||!transition.camera)return{x:0,y:0};
-  const eased=transition.t*transition.t*(3-2*transition.t),amount=eased*(transition.axis==="x"?W:(H-HUD));
-  const incoming=transition.dir===-1;
-  const v=(incoming?(1-eased):eased)*transition.sign;
-  return transition.axis==="x"?{x:(incoming?1:-1)*v*W,y:0}:{x:0,y:(incoming?1:-1)*v*(H-HUD)}
+  const eased=transition.t*transition.t*(3-2*transition.t),incoming=transition.dir===-1;
+  if(transition.axis==="x")return{x:(incoming?1:-1)*transition.sign*eased*W,y:0};
+  return{x:0,y:(incoming?1:-1)*transition.sign*eased*(H-HUD)}
 }
 function drawTransition(){
   if(!transition.active)return;
@@ -814,7 +813,7 @@ function solid(c,r,air=false){
   return tile!==GROUND
 }
 function hitsMap(x,y,w,h,air=false){const m=2,mapHit=[[x+m,y+m],[x+w-m,y+m],[x+m,y+h-m],[x+w-m,y+h-m]].some(([px,py])=>{const t=tileAt(px,py);return solid(t.c,t.r,air)});if(mapHit)return true;if(air)return false;const box={x,y,w,h};return worldObjects().some(o=>o.type!=="gate"&&hit(box,{x:o.x,y:o.y+8,w:o.w,h:o.h-8}))}
-function move(o,mx,my){const air=(o===player&&jetActive&&level.mode!=="sideWater");if(!hitsMap(o.x+mx,o.y,o.w,o.h,air))o.x+=mx;if(!hitsMap(o.x,o.y+my,o.w,o.h,air))o.y+=my}
+function move(o,mx,my){const air=(o===player&&jetActive&&level.mode!=="sideWater"),ox=o.x,oy=o.y;if(!hitsMap(o.x+mx,o.y,o.w,o.h,air))o.x+=mx;if(!hitsMap(o.x,o.y+my,o.w,o.h,air))o.y+=my;if(o===player&&inputMode==="mouse"&&mouseTarget.active&&Math.abs(o.x-ox)<.01&&Math.abs(o.y-oy)<.01){mouseTarget.active=false}}
 function sword(){const l=player.range+gearBonus("range"),e=10;if(player.dir==="up")return{x:player.x+7,y:player.y-l,w:e,h:l};if(player.dir==="down")return{x:player.x+7,y:player.y+player.h,w:e,h:l};if(player.dir==="left")return{x:player.x-l,y:player.y+7,w:l,h:e};return{x:player.x+player.w,y:player.y+7,w:l,h:e}}function reveal(source,id){hidden.forEach(h=>{if(h.source===source&&h.sourceId===id&&!h.shown){h.shown=true;state().hiddenShown.add(h.id);message("TRÉSOR CACHÉ RÉVÉLÉ !")}})}function attack(){if(paused||gameOver||player.attack||player.cool>0)return;player.attack=true;player.attackTime=.18;player.cool=player.maxCool;player.hitSet.clear()}
 function removeDead(){
   const killed=enemies.filter(e=>e.hp<=0);
@@ -884,9 +883,11 @@ function collect(){
 function damage(){if(player.inv>0)return;for(const e of enemies){if(!hit(player,e))continue;let blocked=Math.random()<blockChance();if(!blocked){const attackElement=e.element;if(resistElement().includes(attackElement)&&Math.random()<.55)blocked=true}if(blocked)message("ATTAQUE BLOQUÉE !",.7);else{player.hp--;shake=.16;flash=.08;resetCombo();sfx("hurt");burst(player.x+12,player.y+12,"#ff6571",9,70);popText("-1",player.x+7,player.y-8,"#ff6571")}player.inv=1.1;if(player.hp<=0){player.hp=0;gameOver=true}break}}
 function updatePlayer(dt){
   let dx=0,dy=0;
-  if(inputMode==="mouse"&&mouseTarget.active){
-    const cx=player.x+player.w/2,cy=player.y+player.h/2,mx=mouseTarget.x-cx,my=mouseTarget.y-cy,d=Math.hypot(mx,my);
-    if(d>7){dx=mx/d;dy=my/d}else mouseTarget.active=false;
+  if(inputMode==="mouse"){
+    if(mouseTarget.active){
+      const cx=player.x+player.w/2,cy=player.y+player.h/2,mx=mouseTarget.x-cx,my=mouseTarget.y-cy,d=Math.hypot(mx,my);
+      if(d>7){dx=mx/d;dy=my/d}else mouseTarget.active=false;
+    }
   }else{
     if(keys.ArrowUp||keys.KeyZ||keys.KeyW)dy--;if(keys.ArrowDown||keys.KeyS)dy++;if(keys.ArrowLeft||keys.KeyQ||keys.KeyA)dx--;if(keys.ArrowRight||keys.KeyD)dx++;
   }
@@ -1337,7 +1338,7 @@ function syncMobilePanels(){const mobile=window.matchMedia("(max-width:790px),(p
 window.addEventListener("resize",syncMobilePanels);syncMobilePanels();
 function setInputMode(mode){
   inputMode=mode==="mouse"?"mouse":"keyboard";localStorage.setItem("q7r_input_mode",inputMode);
-  mouseTarget.active=false;mouseHeld=false;canvas.classList.toggle("mouseMode",inputMode==="mouse");
+  mouseTarget.active=false;mouseHeld=false;["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","KeyW","KeyA","KeyS","KeyD","KeyZ","KeyQ"].forEach(k=>keys[k]=false);canvas.classList.toggle("mouseMode",inputMode==="mouse");
   const kb=document.getElementById("keyboardModeBtn"),mb=document.getElementById("mouseModeBtn");
   if(kb)kb.classList.toggle("activeMode",inputMode==="keyboard");if(mb)mb.classList.toggle("activeMode",inputMode==="mouse");
   message(inputMode==="mouse"?"CONTRÔLES SOURIS ACTIVÉS":"CONTRÔLES CLAVIER ACTIVÉS");
