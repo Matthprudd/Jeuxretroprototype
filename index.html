@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>La Quête des Sept Royaumes V6.0</title>
+<title>La Quête des Sept Royaumes V6.2</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at top,#2b3b2d,#101610 58%,#050805);color:#fff;font-family:monospace}body{display:flex;justify-content:center;padding:10px}button{font:inherit}.shell{width:790px;max-width:100%}.top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px;margin-bottom:10px;border:3px solid #dbc36e;background:linear-gradient(#202a20,#111711);box-shadow:0 8px 20px #0008}.title{color:#f4df91;font-weight:bold}.buttons{display:flex;gap:6px;flex-wrap:wrap}.btn{padding:7px 10px;border:3px solid #e3ce7c;background:linear-gradient(#46773f,#2a4b27);color:#fff;cursor:pointer;box-shadow:inset 2px 2px #6e9a66,inset -2px -2px #1d341a,0 2px 0 #0008;text-shadow:1px 1px #000}.btn:hover{background:#4b7b44}.layout{display:grid;grid-template-columns:512px 1fr;gap:12px;align-items:start}canvas{display:block;width:512px;height:448px;max-width:100%;border:6px solid #d8c37a;background:#4d9d47;image-rendering:pixelated;box-shadow:0 0 0 4px #49341d,0 14px 35px #0009,0 0 28px #d9c47722}.inventory{display:grid;gap:8px}.invbox{padding:9px;border:2px solid #75683c;background:linear-gradient(#202820,#151a15);box-shadow:inset 0 0 18px #0007}.invbox h3{margin:0 0 7px;color:#f2d978;font-size:12px}.invbox summary{color:#f2d978;font-weight:bold;font-size:12px;cursor:pointer;list-style:none;outline:none}.invbox summary::-webkit-details-marker{display:none}.invbox summary:after{content:" +";float:right;color:#dbc36e}.invbox[open] summary:after{content:" −"}.invbox[open] summary{margin-bottom:7px}.line{margin:4px 0;font-size:11px;line-height:1.35}.token{display:inline-block;margin:2px 2px 0 0;padding:2px 4px;border:1px solid #a9934f;background:#303830;color:#fff2a4;font-size:10px}.muted{color:#7f8d7f}.status{text-align:center;color:#f2e6b8;font-size:12px;margin-top:10px;text-shadow:1px 1px #000}.overlay,.modal{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px;background:#000d}.overlay.hidden,.modal{display:none}.modal.show{display:flex}.panel{width:780px;max-width:100%;max-height:92vh;overflow:auto;padding:20px;border:5px solid #dfc76e;background:linear-gradient(#1d241d,#101510);box-shadow:0 0 0 5px #5d4223,0 22px 60px #000c}.panel h1,.panel h2{text-align:center;color:#f3df91}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.card{padding:12px;border:3px solid #6a603e;background:#222922;color:#fff;cursor:pointer;text-align:center}.card:hover{border-color:#ffe47c;background:#303a30}.preview{width:86px;height:86px;margin:auto auto 10px;position:relative;border:3px solid #d8c37a;background:#101510}.card h3{color:#ffe279}.card ul{padding:0;list-style:none;line-height:1.6;font-size:12px}.row{padding:9px 0;border-bottom:1px solid #394139}.item{padding:10px;margin:8px 0;border:2px solid #685d38;background:#232923}.locked{opacity:.45}.upgrade,.equipBtn{margin-top:7px;padding:5px 7px;border:2px solid #dac36e;background:#704b25;color:#fff;cursor:pointer}.equipBtn{background:#315d6d}.upgrade:disabled,.equipBtn:disabled{opacity:.45;cursor:not-allowed}.touch{display:none;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;user-select:none}.pad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,48px);justify-content:center;gap:4px}.tbtn{border:3px solid #d9c477;background:#293329;color:#fff;font-size:20px;touch-action:none}.up{grid-column:2}.left{grid-column:1;grid-row:2}.down{grid-column:2;grid-row:2}.right{grid-column:3;grid-row:2}.attack{width:84px;height:84px;border-radius:50%;background:#9b312f}.skillbtn{width:70px;height:70px;border-radius:50%;background:#5b3a87;font-size:12px}.action{display:flex;align-items:center;justify-content:center;gap:10px}.element-water{color:#6cdcff}.element-fire{color:#ff875c}.element-earth{color:#c7a36a}.element-wind{color:#b9ffd8}.element-none{color:#ddd}.shopgrid,.forgegrid,.questgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.shopitem,.forgeitem,.questitem{padding:12px;border:2px solid #75683c;background:linear-gradient(#252d25,#171d17);box-shadow:inset 0 0 18px #0006}.shopitem h3,.forgeitem h3,.questitem h3{margin:0 0 6px;color:#ffe279}.price{color:#f4d46b;font-weight:bold}.recipe{font-size:11px;color:#d7e0d2;margin:7px 0}.done{border-color:#70c97c}.craftIcon{font-size:28px;float:right;margin-left:8px}.questbar{height:8px;background:#111;border:1px solid #555;margin:7px 0}.questbar>i{display:block;height:100%;background:#d6b95e}.smallnote{font-size:10px;color:#aebaaa}.merchantHead{padding:12px;border:2px solid #8c743b;background:#20291f;margin-bottom:12px}.merchantFace{font-size:30px;margin-right:8px}.playerDash{position:sticky;top:-20px;z-index:3;margin:0 0 12px;padding:10px;border:2px solid #b79d52;background:linear-gradient(#172117f5,#101710f5);box-shadow:0 5px 14px #0008}.dashTop{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.dashStat{padding:6px;border:1px solid #665b36;background:#222b22;min-width:0}.dashStat b{display:block;color:#ffe07d;font-size:13px;overflow-wrap:anywhere}.dashStat span{font-size:9px;color:#b8c4b3}.dashSkill{margin-top:8px;padding:7px;border:1px solid #6b5c37;background:#1d251d}.dashSkill strong{color:#c9adff}.dashSkills{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.skillChip{padding:3px 5px;border:1px solid #73589a;background:#2b203a;font-size:9px;color:#e4d6ff}.skillChip.active{border-color:#f0d66e;background:#4b3b19;color:#fff2ac}.dashMats{margin-top:7px;font-size:9px;color:#d7dfd2;overflow-wrap:anywhere}.xpMini{height:5px;background:#111;border:1px solid #555;margin-top:4px}.xpMini i{display:block;height:100%;background:#d8b958}
 .infoBubbleBtn{display:none;position:fixed;right:14px;bottom:16px;z-index:22;border:3px solid #dfc76e;background:linear-gradient(#4f713f,#294027);color:#fff;padding:10px 13px;border-radius:999px;font:bold 11px monospace;box-shadow:0 5px 18px #000b;cursor:pointer}
@@ -327,6 +327,8 @@ const WORLD_BUILDINGS=[
  {id:"village_sign",type:"sign",name:"Village de Clairbois",c:8,r:6,w:28,h:28},
  {id:"world_shop",type:"shop",name:"Boutique de Brik",c:5,r:3,w:48,h:44},
  {id:"world_forge",type:"forge",name:"Forge de Cendre",c:7,r:3,w:48,h:44},
+ {id:"world_general",type:"general",name:"Comptoir des Voyageurs",c:9,r:2,w:48,h:44},
+ {id:"world_lab",type:"laboratory",name:"Laboratoire des Arcanes",c:11,r:2,w:48,h:44},
  {id:"world_realtor",type:"realtor",name:"Bureau des Propriétés",c:11,r:3,w:48,h:44},
  {id:"world_home",type:"house",propertyId:"crossroads",name:"Maison de Clairbois",c:13,r:6,w:48,h:44},
  {id:"starter_home_outside",type:"starterHome",propertyId:"starter_cabin",name:"Ta cabane",c:8,r:9,w:54,h:48}
@@ -713,7 +715,7 @@ function deserializeState(s){
   }
 }
 function saveGame(){
-  const data={v:60,selected,levelIndex,states:states.map(serializeState),arts:[...arts],ownedGear:[...ownedGear],skills:[...skills],gearLevels:{...gearLevels},crafted:[...crafted],claimedQuests:[...claimedQuests],ownedHomes:[...ownedHomes],completedKingdoms:[...completedKingdoms],homeStorage:{...homeStorage},stats:JSON.parse(JSON.stringify(stats)),jetpack:{fuel:jetFuel,active:jetActive},player:{hp:player.hp,x:player.x,y:player.y,dir:player.dir,oxygen:player.oxygen??100,gear:{...player.gear},activeSkill:player.activeSkill,artHp:player.artHp,artAtk:player.artAtk,artSpeed:player.artSpeed}};
+  const data={v:62,outfits:[...ownedOutfits],portableCaches:JSON.parse(JSON.stringify(portableCaches)),selected,levelIndex,states:states.map(serializeState),arts:[...arts],ownedGear:[...ownedGear],skills:[...skills],gearLevels:{...gearLevels},crafted:[...crafted],claimedQuests:[...claimedQuests],ownedHomes:[...ownedHomes],completedKingdoms:[...completedKingdoms],homeStorage:{...homeStorage},stats:JSON.parse(JSON.stringify(stats)),jetpack:{fuel:jetFuel,active:jetActive},player:{hp:player.hp,x:player.x,y:player.y,dir:player.dir,oxygen:player.oxygen??100,gear:{...player.gear},activeSkill:player.activeSkill,artHp:player.artHp,artAtk:player.artAtk,artSpeed:player.artSpeed}};
   localStorage.setItem("q7r_v6_save",JSON.stringify(data));message("PARTIE SAUVEGARDÉE",1.5);sfx("pickup");
 }
 function positionInDoorTrigger(x,y){
@@ -725,14 +727,14 @@ function positionInDoorTrigger(x,y){
 function loadGame(){
   const raw=localStorage.getItem("q7r_v6_save")||localStorage.getItem("q7r_v5_6_save")||localStorage.getItem("q7r_v5_5_save")||localStorage.getItem("q7r_v5_4_save")||localStorage.getItem("q7r_v3_save");if(!raw){message("AUCUNE SAUVEGARDE",1.5);return}
   try{
-    const d=JSON.parse(raw);chooseHero(d.selected||"fox");selected=d.selected||"fox";
+    const d=JSON.parse(raw);resetCaches(d.portableCaches);ownedOutfits.clear();(d.outfits||[]).forEach(x=>ownedOutfits.add(x));chooseHero(d.selected||"fox");selected=d.selected||"fox";
     states=(d.states||[]).map(deserializeState);while(states.length<LEVELS.length)states.push(createStates()[states.length]);
     arts.clear();(d.arts||[]).forEach(x=>arts.add(x));ownedGear.clear();(d.ownedGear||[]).forEach(x=>ownedGear.add(x));skills.clear();(d.skills||[]).forEach(x=>skills.add(x));
     Object.keys(gearLevels).forEach(k=>delete gearLevels[k]);Object.assign(gearLevels,d.gearLevels||{});crafted.clear();(d.crafted||[]).forEach(x=>crafted.add(x));claimedQuests.clear();(d.claimedQuests||[]).forEach(x=>claimedQuests.add(x));
     Object.assign(stats,d.stats||{});stats.parts ||= {wood:0,gear:0,valve:0,crystal:0};ownedHomes.clear();(d.ownedHomes||[]).forEach(x=>ownedHomes.add(x));ownedHomes.add("starter_cabin");completedKingdoms.clear();(d.completedKingdoms||[]).forEach(x=>completedKingdoms.add(x));Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0},d.homeStorage||{});
     jetFuel=d.jetpack?.fuel ?? (crafted.has("jetpackCore")?100:0);jetActive=false;
     player.artHp=d.player?.artHp||0;player.artAtk=d.player?.artAtk||0;player.artSpeed=d.player?.artSpeed||0;player.gear={helmet:null,armor:null,sword:null,shield:null,...(d.player?.gear||{})};player.activeSkill=d.player?.activeSkill||[...skills][0];
-    recalc(true);player.hp=Math.min(player.maxHp,d.player?.hp??player.maxHp);gameOver=victory=false;paused=false;document.getElementById("select").classList.add("hidden");loadLevel(clamp(d.levelIndex||0,0,LEVELS.length-1),"start");if(Number.isFinite(d.player?.x)&&Number.isFinite(d.player?.y)&&!hitsMap(d.player.x,d.player.y,player.w,player.h,false)&&!positionInDoorTrigger(d.player.x,d.player.y)){player.x=d.player.x;player.y=d.player.y}if(d.player?.dir)player.dir=d.player.dir;player.oxygen=d.player?.oxygen??100;message("PARTIE CHARGÉE — POSITION RESTAURÉE",1.8);sfx("level");
+    recalc(true);player.hp=Math.min(player.maxHp,d.player?.hp??player.maxHp);gameOver=victory=false;paused=false;document.getElementById("select").classList.add("hidden");loadLevel(clamp(d.levelIndex??0,0,LEVELS.length-1),"start");if(Number.isFinite(d.player?.x)&&Number.isFinite(d.player?.y)&&!hitsMap(d.player.x,d.player.y,player.w,player.h,false)&&!positionInDoorTrigger(d.player.x,d.player.y)){player.x=d.player.x;player.y=d.player.y}if(d.player?.dir)player.dir=d.player.dir;player.oxygen=d.player?.oxygen??100;message("PARTIE CHARGÉE — POSITION RESTAURÉE",1.8);sfx("level");
   }catch(e){console.error(e);message("SAUVEGARDE INCOMPATIBLE",2)}
 }
 function isWorld(){return levelIndex===WORLD_INDEX}
@@ -745,12 +747,15 @@ function worldObjects(){
     arr.push({id:"starter_exit",type:"homeExit",name:"Sortir vers la forêt",x:door.x,y:door.y,w:32,h:22});
     arr.push({id:"starter_chest",type:"starterChest",propertyId:"starter_cabin",name:"Petit coffre",x:chest.x,y:chest.y,w:34,h:28});
     arr.push({id:"starter_bed",type:"bed",propertyId:"starter_cabin",name:"Paillasse",x:bed.x,y:bed.y,w:34,h:46});
+    const wardrobe=pos(5,3,32,36);arr.push({id:"wardrobe",type:"cache",name:"Armoire",x:wardrobe.x,y:wardrobe.y,w:32,h:36});
   }else if(isWorld()){
     WORLD_GATES.forEach(g=>{const p=pos(g.c,g.r,26,30);arr.push({...g,id:"gate_"+g.level,type:"gate",x:p.x,y:p.y,w:26,h:30})});
     WORLD_BUILDINGS.forEach(b=>{const p=pos(b.c,b.r,b.w,b.h);arr.push({...b,x:p.x,y:p.y})});
   }else{
     const prop=propertyForLevel();if(prop){const p=pos(prop.c,prop.r,48,44);arr.push({...prop,type:"house",propertyId:prop.id,x:p.x,y:p.y,w:48,h:44})}
   }
+  if(!isHome()&&!isWorld()&&level.mode!=="sideWater"){const p=pos(2,2,24,24);arr.push({id:"hollow_"+levelIndex,type:"cache",name:"Creux d’arbre",x:p.x,y:p.y,w:24,h:24})}
+  if(isWorld()){const p=pos(1,6,24,24);arr.push({id:"hollow_world",type:"cache",name:"Creux d’arbre",x:p.x,y:p.y,w:24,h:24})}
   return arr
 }
 function interactionDistance(o){const px=player.x+player.w/2,py=player.y+player.h/2,ix=o.x+o.w/2,iy=o.y+o.h;return Math.hypot(px-ix,py-iy)}
@@ -778,7 +783,7 @@ function autoGateTraversal(){
     return
   }
 }
-function renderHouseModal(propertyId){
+function renderHouseModal(propertyId){activeCacheId=null;
   activePropertyId=propertyId||activePropertyId||PROPERTIES[0].id;const p=PROPERTIES.find(x=>x.id===activePropertyId)||PROPERTIES[0];const own=ownedHomes.has(p.id),el=document.getElementById("houseContent");
   if(!own){
     el.innerHTML='<div class="item"><b>'+p.name+'</b><div>'+p.village+'</div><div class="price">'+p.cost+' OR</div><div>Cette propriété devient un refuge permanent avec accès au coffre partagé de tes maisons.</div><button class="btn" data-buy-home="'+p.id+'" '+(stats.gold<p.cost?'disabled':'')+'>ACHETER LA MAISON</button></div>';
@@ -802,13 +807,14 @@ function interactWorldObject(o){
   if(o.type==="gate"){
     if(!gateUnlocked(o)){message("PORTAIL INVALIDE",1.2);return}
     message("TRAVERSE LE PORTAIL EN AVANÇANT DEDANS")
-  }else if(o.type==="shop"){renderShop();openModal("shopModal")}
-  else if(o.type==="forge"){renderForge();openModal("forgeModal")}
+  }else if(["shop","general","laboratory"].includes(o.type)){enterInterior(o.type)}
+  else if(o.type==="forge"){enterInterior("forge")}
   else if(o.type==="realtor"){activePropertyId=PROPERTIES.find(p=>p.cost>0&&!ownedHomes.has(p.id))?.id||"crossroads";renderHouseModal(activePropertyId);openModal("houseModal")}
   else if(o.type==="house"){openHouse(o.propertyId)}
   else if(o.type==="starterHome"){startTransition(()=>{loadLevel(HOME_INDEX,"start",false);message("TU RENTRES CHEZ TOI · TA CABANE")},"y",1)}
   else if(o.type==="homeExit"){startTransition(()=>{loadLevel(WORLD_INDEX,"start",false);message("TU QUITTES TA CABANE · SUIS LE SENTIER VERS CLAIRBOIS")},"y",-1)}
   else if(o.type==="starterChest"){openHouse("starter_cabin")}
+  else if(o.type==="cache"){openPortableCache(o.id,o.name)}
   else if(o.type==="bed"){player.hp=player.maxHp;saveGame();message("TU TE REPOSES · VIE RESTAURÉE ET PARTIE SAUVEGARDÉE")}
   else if(o.type==="sign"){message("PANNEAU : VILLAGE DE CLAIRBOIS ↑ · BOUTIQUE · FORGE · PROPRIÉTÉS")}
 }
@@ -891,8 +897,8 @@ function interactWithNPC(n){
   if(!n)return false;
   pendingMouseInteract=null;mouseTarget.active=false;mouseHeld=false;
   message(n.name+" : "+n.line);
-  if(n.role==="shop"){renderShop();openModal("shopModal")}
-  else if(n.role==="forge"){renderForge();openModal("forgeModal")}
+  if(n.role==="shop"){enterInterior("shop")}
+  else if(n.role==="forge"){enterInterior("forge")}
   else{renderQuests();openModal("questsModal")}
   return true
 }
@@ -904,6 +910,7 @@ function executeMouseInteraction(t){
   else if(t.kind==="world")interactWorldObject(t.obj)
 }
 function interactNPC(){
+  if(interior.active){interiorInteract();return}
   const n=nearestNPC();
   if(n){interactWithNPC(n);return}
   const ch=nearestChest();
@@ -980,11 +987,12 @@ function drawHomeDecor(){
 function drawWorldObjects(){
  worldObjects().forEach(o=>{
    if(o.type==="gate"){const unlocked=gateUnlocked(o);ctx.fillStyle=unlocked?"#d9c76e":"#4c4c4c";ctx.fillRect(o.x,o.y+5,o.w,o.h-5);ctx.fillStyle=unlocked?"#7952a7":"#252525";ctx.fillRect(o.x+5,o.y+10,o.w-10,o.h-12);ctx.fillStyle="#fff";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(String(o.level+1),o.x+o.w/2,o.y+24);ctx.fillStyle="#fff3bd";ctx.font="7px monospace";ctx.fillText(o.name.split(" ")[0],o.x+o.w/2,o.y-2);ctx.textAlign="left"}
-   else if(o.type==="shop")drawShopSprite(o)
+   else if(o.type==="shop"||o.type==="general"||o.type==="laboratory")drawShopSprite(o)
    else if(o.type==="forge")drawForgeSprite(o)
    else if(o.type==="realtor")drawRealtorSprite(o)
    else if(o.type==="starterHome")drawPlayerHomeSprite(o)
    else if(o.type==="house")drawHouseSprite(o)
+   else if(o.type==="cache"){ctx.fillStyle="#684a2f";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#21170e";ctx.fillRect(o.x+7,o.y+8,o.w-14,o.h-13);ctx.fillStyle="#dcc583";ctx.font="8px monospace";ctx.fillText("CACHE",o.x,o.y-3)}
    else if(o.type==="sign"){ctx.fillStyle="#65401f";ctx.fillRect(o.x+11,o.y+12,6,18);ctx.fillStyle="#b17a3d";ctx.fillRect(o.x,o.y,28,16);ctx.fillStyle="#fff0aa";ctx.font="bold 6px monospace";ctx.fillText("CLAIRBOIS",o.x+2,o.y+10)}
    else if(o.type==="homeExit"){ctx.fillStyle="#3a2418";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#9a6031";ctx.fillRect(o.x+4,o.y+2,o.w-8,o.h-4);ctx.fillStyle="#e1c169";ctx.fillRect(o.x+23,o.y+10,3,3)}
    else if(o.type==="starterChest"){ctx.fillStyle="#5b351c";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#9b622d";ctx.fillRect(o.x+2,o.y+3,o.w-4,8);ctx.fillStyle="#e5c363";ctx.fillRect(o.x+14,o.y+9,6,9)}
@@ -1078,7 +1086,7 @@ function exitOpen(){
 function spawn(side){if(side==="start")return pos(level.start[0],level.start[1],player.w,player.h);const c=side==="right"?14:1;for(const r of [5,4,6,3,7,2,8,1,9])if(level.map[r][c]===GROUND)return pos(c,r,player.w,player.h);return pos(level.start[0],level.start[1],player.w,player.h)}
 function loadLevel(index,side="start",preservePosition=true){if(index<0)return;const oldScreenPos={x:player.x,y:player.y};pickups=[];projectiles=[];enemyProjectiles=[];ambient=[];musicStep=0;musicTimer=.15;if(index>=LEVELS.length){victory=gameOver=true;return}levelIndex=index;level=LEVELS[index];const p=spawn(side);player.x=p.x;player.y=p.y;if(preservePosition&&transition.active&&Number.isFinite(oldScreenPos.x)&&Number.isFinite(oldScreenPos.y)){const tx=clamp(oldScreenPos.x,34,W-58),ty=clamp(oldScreenPos.y,HUD+24,H-44);if(!hitsMap(tx,ty,player.w,player.h,false)){player.x=tx;player.y=ty}}player.dir=side==="right"?"left":"right";player.attack=false;player.cool=0;player.inv=0;enemies=level.enemies.map(createEnemy).filter(e=>!state().dead.has(e.id));loot=level.loot.map(createLoot);artItems=level.arts.map(createArt);gearItems=level.gear.map(createGear);grass=level.grass.map(createGrass);hidden=level.hidden.map(createHidden);lockedChests=level.locked.map(createLocked);repairParts=(level.repairParts||[]).map(createRepairPart);player.oxygen=100;jetActive=false;doorGrace=1.0;if(hasJetpack())jetFuel=Math.max(jetFuel,Math.min(100,70+levelIndex*5));if(level.skill&&!skills.has(level.skill))unlockSkill(level.skill);if(index===WORLD_INDEX){message("MONDE OUVERT · EXPLORE LES SENTIERS ET LES VILLAGES")}else{message("ROYAUME "+(index+1)+" : "+level.name)}
 updateInventory()}
-function restart(){stats.gold=stats.score=stats.treasures=stats.fragments=stats.kills=0;stats.xp=0;stats.rank=1;stats.combo=0;stats.bestCombo=0;stats.damageDone=0;stats.treesCut=0;stats.grassCut=0;stats.parts={wood:0,gear:0,valve:0,crystal:0};particles=[];floatTexts=[];shake=0;flash=0;arts.clear();ownedGear.clear();skills.clear();crafted.clear();claimedQuests.clear();ownedHomes.clear();ownedHomes.add("starter_cabin");completedKingdoms.clear();Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0});Object.keys(gearLevels).forEach(id=>delete gearLevels[id]);states=createStates();chooseHero(selected);jetFuel=100;jetActive=false;gameOver=victory=false;time=0;loadLevel(HOME_INDEX,"start");message("TU TE RÉVEILLES DANS TA PETITE CABANE · REJOINS LE VILLAGE DE CLAIRBOIS")}
+function restart(){resetCaches();ownedOutfits.clear();stats.gold=stats.score=stats.treasures=stats.fragments=stats.kills=0;stats.xp=0;stats.rank=1;stats.combo=0;stats.bestCombo=0;stats.damageDone=0;stats.treesCut=0;stats.grassCut=0;stats.parts={wood:0,gear:0,valve:0,crystal:0};particles=[];floatTexts=[];shake=0;flash=0;arts.clear();ownedGear.clear();skills.clear();crafted.clear();claimedQuests.clear();ownedHomes.clear();ownedHomes.add("starter_cabin");completedKingdoms.clear();Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0});Object.keys(gearLevels).forEach(id=>delete gearLevels[id]);states=createStates();chooseHero(selected);jetFuel=100;jetActive=false;gameOver=victory=false;time=0;loadLevel(HOME_INDEX,"start");message("TU TE RÉVEILLES DANS TA PETITE CABANE · REJOINS LE VILLAGE DE CLAIRBOIS")}
 function safeTile(c,r){
   const ok=(cc,rr)=>{
     if(cc<1||cc>14||rr<1||rr>9)return false;
@@ -1254,6 +1262,7 @@ function maybeSpawnBoss(){
   }
 }
 function update(dt){
+  if(interior.active){updateInterior(dt);return}
   if(gameOver)return;
   time+=dt;msg.time=Math.max(0,msg.time-dt);doorGrace=Math.max(0,doorGrace-dt);updateEffects(dt);
   if(paused||transition.active)return;
@@ -1595,6 +1604,7 @@ function overlays(){
 }
 function render(){
   ctx.clearRect(0,0,W,H);if(!selected)return;
+  if(interior.active){drawInterior();return}
   const cam=cameraTransitionOffset();
   ctx.save();
   if(shake>0){ctx.translate((Math.random()-.5)*8,(Math.random()-.5)*8)}
@@ -1662,6 +1672,7 @@ document.querySelectorAll(".gameDrawer .btn").forEach(b=>b.addEventListener("cli
 function syncInteractionButton(){
   const b=document.getElementById("touchInteract");if(!b)return;
   const mobile=window.matchMedia("(max-width:900px)").matches;
+  if(interior.active){b.hidden=false;b.textContent="INTERAGIR";b.setAttribute("aria-label","Interagir avec le comptoir, la forge ou la porte");return}
   const wo=selected&&!paused&&!gameOver?nearestWorldObject():null;
   const n=selected&&!paused&&!gameOver?nearestNPC():null;
   const ch=selected&&!paused&&!gameOver?nearestChest():null;
@@ -1741,13 +1752,13 @@ window.addEventListener("keydown",e=>{
   if(inputMode==="keyboard"&&e.code==="KeyF"&&!e.repeat)useSkill();
   if(e.code==="KeyE"&&!e.repeat){if(selected==="mage"&&inputMode==="keyboard")fireProjectile();else interactNPC()}
   if(inputMode==="keyboard"&&e.code==="KeyG"&&!e.repeat)toggleJetpack();
-  if(e.code==="KeyR"&&!e.repeat)restart();
+  if(e.code==="KeyR"&&!e.repeat&&window.confirm("Recommencer la quête depuis le début ? La progression non sauvegardée sera perdue."))restart();
   if(e.code==="KeyP"&&!e.repeat)togglePause();
   if(e.code==="KeyK"&&!e.repeat)saveGame();
   if(e.code==="KeyL"&&!e.repeat)loadGame();
   if(e.code==="KeyJ"&&!e.repeat){document.getElementById("journalContent").innerHTML=journalHTML();openModal("journalModal")}
   if(e.code==="KeyC"&&!e.repeat){paused=true;document.getElementById("select").classList.remove("hidden")}
-});window.addEventListener("keyup",e=>keys[e.code]=false);document.querySelectorAll("[data-char]").forEach(b=>b.onclick=()=>{chooseHero(b.dataset.char);document.getElementById("select").classList.add("hidden");paused=false;restart()});document.querySelectorAll("[data-key]").forEach(b=>{const on=e=>{e.preventDefault();keys[b.dataset.key]=true},off=e=>{e.preventDefault();keys[b.dataset.key]=false};b.onpointerdown=on;b.onpointerup=off;b.onpointercancel=off;b.onpointerleave=off});document.getElementById("touchAttack").onpointerdown=e=>{e.preventDefault();attack()};document.getElementById("touchSkill").onpointerdown=e=>{e.preventDefault();useSkill()};document.getElementById("touchMagic").onpointerdown=e=>{e.preventDefault();if(selected==="mage")fireProjectile();else useSkill()};document.getElementById("touchJet").onpointerdown=e=>{e.preventDefault();toggleJetpack()};document.getElementById("touchInteract").onpointerdown=e=>{e.preventDefault();interactNPC()};function openModal(id){const wasPlaying=modalResumeOnClose||drawerResumeOnClose||infoResumeOnClose||(!paused&&!pausedByUser);if(document.getElementById("infoBubblePanel").classList.contains("open")){document.getElementById("infoBubblePanel").classList.remove("open");document.getElementById("infoBubbleShade").classList.remove("show");infoResumeOnClose=false}closeDrawers(false);modalResumeOnClose=wasPlaying;paused=true;renderPlayerDashboards();document.getElementById(id).classList.add("show")}function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show"));const shouldResume=modalResumeOnClose;modalResumeOnClose=false;if(shouldResume&&canResumeGame())paused=false;else if(pausedByUser)paused=true}document.getElementById("controlsBtn").onclick=()=>openModal("controls");document.getElementById("inventoryBtn").onclick=()=>{updateInventory();openModal("inventoryModal")};document.getElementById("journalBtn").onclick=()=>{document.getElementById("journalContent").innerHTML=journalHTML();openModal("journalModal")};document.getElementById("questsBtn").onclick=()=>{renderQuests();openModal("questsModal")};document.getElementById("shopBtn").onclick=()=>{renderShop();openModal("shopModal")};document.getElementById("forgeBtn").onclick=()=>{renderForge();openModal("forgeModal")};document.getElementById("saveBtn").onclick=()=>saveGame();document.getElementById("loadBtn").onclick=()=>loadGame();document.getElementById("audioBtn").onclick=()=>{audioEnabled=!audioEnabled;document.getElementById("audioBtn").textContent=audioEnabled?"SON ON":"SON OFF";if(audioEnabled)sfx("pickup")};document.getElementById("pauseBtn").onclick=()=>togglePause();document.getElementById("fullBtn").onclick=()=>toggleFullscreen();document.getElementById("changeBtn").onclick=()=>{paused=true;document.getElementById("select").classList.remove("hidden")};document.querySelectorAll(".close").forEach(b=>b.onclick=closeModal);document.getElementById("shopContent").onclick=e=>{const b=e.target.closest("[data-buy]");if(b)buyShop(b.dataset.buy)};document.getElementById("forgeContent").onclick=e=>{const b=e.target.closest("[data-craft]");if(b)craftArtifact(b.dataset.craft)};document.getElementById("questsContent").onclick=e=>{const b=e.target.closest("[data-claim]");if(b)claimQuest(b.dataset.claim)};document.getElementById("houseContent").onclick=e=>{const buy=e.target.closest("[data-buy-home]"),store=e.target.closest("[data-store]"),take=e.target.closest("[data-take]"),save=e.target.closest("[data-home-save]");if(buy)buyHome(buy.dataset.buyHome);if(store)changeStorage(store.dataset.store,Number(store.dataset.amount)||1,true);if(take)changeStorage(take.dataset.take,Number(take.dataset.amount)||1,false);if(save){saveGame();message("PARTIE SAUVEGARDÉE À LA MAISON")}};
+});window.addEventListener("keyup",e=>keys[e.code]=false);document.querySelectorAll("[data-char]").forEach(b=>b.onclick=()=>{chooseHero(b.dataset.char);document.getElementById("select").classList.add("hidden");paused=false;restart()});document.querySelectorAll("[data-key]").forEach(b=>{const on=e=>{e.preventDefault();keys[b.dataset.key]=true},off=e=>{e.preventDefault();keys[b.dataset.key]=false};b.onpointerdown=on;b.onpointerup=off;b.onpointercancel=off;b.onpointerleave=off});document.getElementById("touchAttack").onpointerdown=e=>{e.preventDefault();attack()};document.getElementById("touchSkill").onpointerdown=e=>{e.preventDefault();useSkill()};document.getElementById("touchMagic").onpointerdown=e=>{e.preventDefault();if(selected==="mage")fireProjectile();else useSkill()};document.getElementById("touchJet").onpointerdown=e=>{e.preventDefault();toggleJetpack()};document.getElementById("touchInteract").onpointerdown=e=>{e.preventDefault();interactNPC()};function openModal(id){const wasPlaying=modalResumeOnClose||drawerResumeOnClose||infoResumeOnClose||(!paused&&!pausedByUser);if(document.getElementById("infoBubblePanel").classList.contains("open")){document.getElementById("infoBubblePanel").classList.remove("open");document.getElementById("infoBubbleShade").classList.remove("show");infoResumeOnClose=false}closeDrawers(false);modalResumeOnClose=wasPlaying;paused=true;renderPlayerDashboards();document.getElementById(id).classList.add("show")}function closeModal(){document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show"));const shouldResume=modalResumeOnClose;modalResumeOnClose=false;if(shouldResume&&canResumeGame())paused=false;else if(pausedByUser)paused=true}document.getElementById("controlsBtn").onclick=()=>openModal("controls");document.getElementById("inventoryBtn").onclick=()=>{updateInventory();openModal("inventoryModal")};document.getElementById("journalBtn").onclick=()=>{document.getElementById("journalContent").innerHTML=journalHTML();openModal("journalModal")};document.getElementById("questsBtn").onclick=()=>{renderQuests();openModal("questsModal")};document.getElementById("shopBtn").onclick=()=>{renderShop();openModal("shopModal")};document.getElementById("forgeBtn").onclick=()=>{renderForge();openModal("forgeModal")};document.getElementById("saveBtn").onclick=()=>saveGame();document.getElementById("loadBtn").onclick=()=>loadGame();document.getElementById("audioBtn").onclick=()=>{audioEnabled=!audioEnabled;document.getElementById("audioBtn").textContent=audioEnabled?"SON ON":"SON OFF";if(audioEnabled)sfx("pickup")};document.getElementById("pauseBtn").onclick=()=>togglePause();document.getElementById("fullBtn").onclick=()=>toggleFullscreen();document.getElementById("changeBtn").onclick=()=>{paused=true;document.getElementById("select").classList.remove("hidden")};document.querySelectorAll(".close").forEach(b=>b.onclick=closeModal);document.getElementById("shopContent").onclick=e=>{const b=e.target.closest("[data-buy]");if(b)buyShop(b.dataset.buy)};document.getElementById("forgeContent").onclick=e=>{const b=e.target.closest("[data-craft]");if(b)craftArtifact(b.dataset.craft)};document.getElementById("questsContent").onclick=e=>{const b=e.target.closest("[data-claim]");if(b)claimQuest(b.dataset.claim)};document.getElementById("houseContent").onclick=e=>{const buy=e.target.closest("[data-buy-home]"),store=e.target.closest("[data-store]"),take=e.target.closest("[data-take]"),save=e.target.closest("[data-home-save]");if(buy)buyHome(buy.dataset.buyHome);if(store&&activeCacheId){moveCacheItem(store.dataset.store,1,true);return}if(take&&activeCacheId){moveCacheItem(take.dataset.take,1,false);return}if(store)changeStorage(store.dataset.store,Number(store.dataset.amount)||1,true);if(take)changeStorage(take.dataset.take,Number(take.dataset.amount)||1,false);if(save){saveGame();message("PARTIE SAUVEGARDÉE À LA MAISON")}};
 document.getElementById("fullInventory").onclick=e=>{const up=e.target.closest("[data-up]"),eq=e.target.closest("[data-equip]"),sk=e.target.closest("[data-skill]");if(up)upgrade(up.dataset.up);if(eq)equip(eq.dataset.equip);if(sk){player.activeSkill=sk.dataset.skill;message("SKILL ACTIF : "+SKILLS[player.activeSkill].name);updateInventory()}};
 function validateGameData(){
   const errors=[];
@@ -1795,7 +1806,133 @@ function validateGameData(){
   if(errors.length)console.warn("VALIDATION JEU",errors);
   else console.info("VALIDATION JEU: aucun objet visible dans un mur et aucun chevauchement critique");
   window.__Q7R_VALIDATION_ERRORS__=errors.slice();return errors
-}function loop(now){const dt=clamp((now-last)/1000,0,.05);last=now;update(dt);syncInteractionButton();render();requestAnimationFrame(loop)}validateGameData();updateInventory();renderNewsHistory();updateNewsBadge();requestAnimationFrame(loop);
+}
+/* V6.2 - Bâtiments jouables. Indépendants des index de royaumes existants. */
+const ownedOutfits=new Set();
+const interior={active:false,kind:null,x:256,y:370,forgeLit:false,choice:0};
+const INTERIOR_NAMES={shop:"Boutique de Brik",general:"Comptoir des Voyageurs",laboratory:"Laboratoire des Arcanes",forge:"Forge de Cendre"};
+function enterInterior(kind){
+ if(!INTERIOR_NAMES[kind]||interior.active)return;
+ interior.active=true;interior.kind=kind;interior.x=256;interior.y=361;interior.forgeLit=false;
+ mouseTarget.active=false;pendingMouseInteract=null;doorGrace=1;
+ message("ENTRÉE : "+INTERIOR_NAMES[kind].toUpperCase()+" · APPROCHE-TOI DU COMPTOIR",2);
+}
+function leaveInterior(){
+ interior.active=false;interior.kind=null;doorGrace=1.5;
+ Object.keys(keys).forEach(k=>keys[k]=false);
+ message("TU RETOURNES AU VILLAGE DE CLAIRBOIS",1.5);
+}
+function updateInterior(dt){
+ msg.time=Math.max(0,msg.time-dt);time+=dt;
+ if(paused||transition.active)return;
+ let dx=0,dy=0;
+ if(keys.ArrowLeft||keys.KeyA||keys.KeyQ)dx--;
+ if(keys.ArrowRight||keys.KeyD)dx++;
+ if(keys.ArrowUp||keys.KeyW||keys.KeyZ)dy--;
+ if(keys.ArrowDown||keys.KeyS)dy++;
+ if(dx&&dy){dx*=.7071;dy*=.7071}
+ interior.x=clamp(interior.x+dx*115*dt,70,442);
+ interior.y=clamp(interior.y+dy*115*dt,247,402);
+ if(interior.y>392&&interior.x>210&&interior.x<302&&dy>0)leaveInterior();
+}
+function interiorInteract(){
+ if(!interior.active)return;
+ if(interior.y>355&&interior.x>210&&interior.x<302){leaveInterior();return}
+ if(interior.y>333){message("APPROCHE-TOI DU COMPTOIR OU DE LA STATION",1.3);return}
+ if(interior.kind==="forge"){
+  if(interior.x<230){
+   interior.forgeLit=true;sfx("level");message("FOYER ALLUMÉ · LA FORGE EST ACTIVE",2);return;
+  }
+  if(!interior.forgeLit){message("ALLUME D’ABORD LE FOYER À GAUCHE",2);return}
+  renderForge();openModal("forgeModal");return;
+ }
+ if(interior.kind==="shop"){renderShop();openModal("shopModal");return}
+ showCommerce();
+}
+function tradeMaterial(kind){
+ const stock=stats.parts;
+ if(kind==="sellWood"){
+  if(stock.wood<1)return message("AUCUN BOIS À VENDRE");
+  stock.wood--;stats.gold+=20;
+ }else if(kind==="sellGear"){
+  if(stock.gear<1)return message("AUCUN ENGRenAGE À VENDRE");
+  stock.gear--;stats.gold+=30;
+ }else if(kind==="exchange"){
+  if(stats.fragments<2)return message("IL FAUT DEUX FRAGMENTS");
+  stats.fragments-=2;stock.crystal=(stock.crystal||0)+1;
+ }else if(kind==="clothes"){
+  if(ownedOutfits.has("travel"))return message("TENUE DÉJÀ ACHETÉE");
+  if(stats.gold<80)return message("PAS ASSEZ D’OR");
+  stats.gold-=80;ownedOutfits.add("travel");
+ }else if(kind==="potion"){
+  if(stock.wood<1||stats.fragments<1)return message("IL FAUT UN BOIS ET UN FRAGMENT");
+  stock.wood--;stats.fragments--;player.hp=Math.min(player.maxHp,player.hp+3);
+ }else if(kind==="magic"){
+  if(stats.fragments<2||stock.crystal<1)return message("IL FAUT DEUX FRAGMENTS ET UN CRISTAL");
+  stats.fragments-=2;stock.crystal--;grantXP(100);
+ }
+ sfx("coin");updateInventory();showCommerce();message("TRANSACTION EFFECTUÉE",1.2);
+}
+function showCommerce(){
+ const lab=interior.kind==="laboratory";
+ const entries=lab
+ ? [["potion","Préparer une potion de soin","1 bois + 1 fragment"],["magic","Recherche magique · +100 XP","2 fragments + 1 cristal"],["exchange","Transmutation : 1 cristal","2 fragments"]]
+ : [["clothes","Tenue de voyage "+(ownedOutfits.has("travel")?"✓":""),"80 or · collection"],["sellWood","Vendre du bois","20 or / unité"],["sellGear","Vendre un engrenage","30 or / unité"],["exchange","Échanger 2 fragments","1 cristal"]];
+ const heading=lab?"CHIMIE & MAGIE — ALCHEMISTE":"MAGASIN GÉNÉRAL — MARCHAND";
+ const el=document.getElementById("shopContent");
+ el.innerHTML='<div class="merchantHead"><b>'+heading+'</b><p>Choisis une action. Les ressources sont vérifiées avant chaque transaction.</p></div><div class="shopgrid">'+entries.map(([id,name,cost])=>'<div class="shopitem"><h3>'+name+'</h3><div class="recipe">'+cost+'</div><button class="btn" data-interior-trade="'+id+'">CONFIRMER</button></div>').join("")+'</div>';
+ openModal("shopModal");
+}
+document.addEventListener("click",function(e){
+ const b=e.target.closest("[data-interior-trade]");
+ if(!b)return;tradeMaterial(b.dataset.interiorTrade);
+});
+canvas.addEventListener("pointerdown",function(e){
+ if(!interior.active||paused)return;
+ e.stopImmediatePropagation();
+ const p=canvasPoint(e);
+ if(p.y>370&&p.x>210&&p.x<305){leaveInterior();return}
+ if(p.y<235){interiorInteract();return}
+ interior.x=clamp(p.x,70,442);interior.y=clamp(p.y,247,402);
+},true);
+function drawInterior(){
+ const kind=interior.kind;const lab=kind==="laboratory",forge=kind==="forge";
+ ctx.fillStyle="#211b25";ctx.fillRect(0,0,W,H);
+ ctx.fillStyle="#9f805d";ctx.fillRect(28,72,456,354);
+ ctx.fillStyle="#6d523c";ctx.fillRect(38,82,436,338);
+ for(let x=48;x<462;x+=32){for(let y=104;y<416;y+=32){ctx.fillStyle=((x+y)/32)%2?"#776047":"#81694c";ctx.fillRect(x,y,30,30)}}
+ ctx.fillStyle="#392719";ctx.fillRect(60,174,392,50);
+ ctx.fillStyle="#bd9362";ctx.fillRect(60,218,392,17);
+ ctx.fillStyle="#2e3d44";ctx.fillRect(238,135,36,60);
+ ctx.fillStyle=lab?"#904ad3":forge?"#d56834":"#387b62";ctx.fillRect(242,145,28,34);
+ ctx.fillStyle="#f4d1a5";ctx.fillRect(247,120,18,19);
+ ctx.fillStyle="#291d16";ctx.fillRect(245,117,22,6);
+ ctx.fillStyle="#dac489";ctx.font="bold 15px monospace";ctx.textAlign="center";
+ ctx.fillText(INTERIOR_NAMES[kind].toUpperCase(),256,31);
+ ctx.font="11px monospace";ctx.fillText("MONTE AU COMPTOIR · H / ENTRÉE : PARLER",256,52);
+ if(forge){
+  ctx.fillStyle="#373333";ctx.fillRect(87,244,88,45);ctx.fillStyle=interior.forgeLit?"#ff892c":"#555";ctx.fillRect(99,256,62,26);
+  ctx.fillStyle="#fbe3a0";ctx.font="10px monospace";ctx.fillText(interior.forgeLit?"FOYER ACTIF":"ALLUMER FOYER",134,305);
+ }
+ if(lab){ctx.fillStyle="#45bdbc";ctx.fillRect(375,248,13,24);ctx.fillStyle="#ac76e7";ctx.fillRect(397,258,16,19)}
+ ctx.fillStyle="#23201c";ctx.fillRect(211,403,90,27);ctx.fillStyle="#e3cc80";ctx.font="10px monospace";ctx.fillText("SORTIE ↓",256,420);
+ ctx.fillStyle="#2c3a70";ctx.fillRect(interior.x-10,interior.y-13,20,24);
+ ctx.fillStyle="#eac196";ctx.fillRect(interior.x-7,interior.y-23,14,12);
+ ctx.fillStyle="#f9dc87";ctx.font="11px monospace";
+ ctx.fillText(forge?(interior.forgeLit?"FORGE PRÊTE":"ALLUME LE FEU"):"ACHETER · VENDRE · ÉCHANGER",256,338);
+ ctx.textAlign="left";
+ if(msg.time>0){ctx.fillStyle="#101010bb";ctx.fillRect(20,60,472,34);ctx.fillStyle="#fff1bd";ctx.font="11px monospace";ctx.fillText(msg.text.slice(0,73),28,81)}
+}
+
+
+const CACHE_TYPES=["gold","fragments","wood","gear","valve","crystal"];let portableCaches={},activeCacheId=null,activeCacheName="";
+function resetCaches(data){portableCaches={};activeCacheId=null;if(!data||typeof data!=="object")return;for(const [id,obj] of Object.entries(data)){if(!/^(wardrobe|hollow_world|hollow_[0-6])$/.test(id)||!obj||typeof obj!=="object")continue;portableCaches[id]={};for(const type of CACHE_TYPES)portableCaches[id][type]=Math.max(0,Math.min(999999,Math.floor(Number(obj[type])||0)));}}
+function walletCount(type){return type==="gold"?stats.gold:type==="fragments"?stats.fragments:(stats.parts[type]||0)}
+function adjustWallet(type,delta){if(type==="gold")stats.gold+=delta;else if(type==="fragments")stats.fragments+=delta;else stats.parts[type]=(stats.parts[type]||0)+delta}
+function openPortableCache(id,name){if(!/^(wardrobe|hollow_world|hollow_[0-6])$/.test(id))return;activeCacheId=id;activeCacheName=name;if(!portableCaches[id])portableCaches[id]={};renderPortableCache();openModal("houseModal")}
+function renderPortableCache(){if(!activeCacheId)return;const list=[["gold","Or"],["fragments","Fragments"],["wood","Bois ancien"],["gear","Engrenage"],["valve","Valves"],["crystal","Cristaux"]];document.getElementById("houseContent").innerHTML='<div class="merchantHead"><b>'+activeCacheName+'</b><div class="smallnote">Chaque cache conserve ses propres ressources</div></div>'+list.map(([id,name])=>'<div class="storageRow"><b>'+name+'</b><span>Sur toi : '+walletCount(id)+' · Ici : '+(portableCaches[activeCacheId][id]||0)+'</span><div><button class="btn storageBtn" data-store="'+id+'">DÉPOSER 1</button> <button class="btn storageBtn" data-take="'+id+'">REPRENDRE 1</button></div></div>').join("")+'<button class="btn" data-home-save>SAUVEGARDER</button>'}
+function moveCacheItem(type,amount,deposit){if(!activeCacheId||!CACHE_TYPES.includes(type)||!Number.isSafeInteger(amount)||amount<=0)return;const cache=portableCaches[activeCacheId],available=deposit?walletCount(type):(cache[type]||0);if(available<amount){message("QUANTITÉ INSUFFISANTE");return}if(deposit){adjustWallet(type,-amount);cache[type]=(cache[type]||0)+amount}else{cache[type]-=amount;adjustWallet(type,amount)}renderPortableCache();updateInventory();message(deposit?"OBJET DÉPOSÉ":"OBJET RÉCUPÉRÉ",1)}
+function loop(now){const dt=clamp((now-last)/1000,0,.05);last=now;update(dt);syncInteractionButton();render();requestAnimationFrame(loop)}validateGameData();updateInventory();renderNewsHistory();updateNewsBadge();requestAnimationFrame(loop);
 </script>
 </body>
 </html>
