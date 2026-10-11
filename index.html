@@ -327,6 +327,8 @@ const WORLD_BUILDINGS=[
  {id:"village_sign",type:"sign",name:"Village de Clairbois",c:8,r:6,w:28,h:28},
  {id:"world_shop",type:"shop",name:"Boutique de Brik",c:5,r:3,w:48,h:44},
  {id:"world_forge",type:"forge",name:"Forge de Cendre",c:7,r:3,w:48,h:44},
+ {id:"world_general",type:"general",name:"Comptoir des Voyageurs",c:9,r:2,w:48,h:44},
+ {id:"world_lab",type:"laboratory",name:"Laboratoire des Arcanes",c:11,r:2,w:48,h:44},
  {id:"world_realtor",type:"realtor",name:"Bureau des Propriétés",c:11,r:3,w:48,h:44},
  {id:"world_home",type:"house",propertyId:"crossroads",name:"Maison de Clairbois",c:13,r:6,w:48,h:44},
  {id:"starter_home_outside",type:"starterHome",propertyId:"starter_cabin",name:"Ta cabane",c:8,r:9,w:54,h:48}
@@ -713,7 +715,7 @@ function deserializeState(s){
   }
 }
 function saveGame(){
-  const data={v:60,selected,levelIndex,states:states.map(serializeState),arts:[...arts],ownedGear:[...ownedGear],skills:[...skills],gearLevels:{...gearLevels},crafted:[...crafted],claimedQuests:[...claimedQuests],ownedHomes:[...ownedHomes],completedKingdoms:[...completedKingdoms],homeStorage:{...homeStorage},stats:JSON.parse(JSON.stringify(stats)),jetpack:{fuel:jetFuel,active:jetActive},player:{hp:player.hp,x:player.x,y:player.y,dir:player.dir,oxygen:player.oxygen??100,gear:{...player.gear},activeSkill:player.activeSkill,artHp:player.artHp,artAtk:player.artAtk,artSpeed:player.artSpeed}};
+  const data={v:62,outfits:[...ownedOutfits],selected,levelIndex,states:states.map(serializeState),arts:[...arts],ownedGear:[...ownedGear],skills:[...skills],gearLevels:{...gearLevels},crafted:[...crafted],claimedQuests:[...claimedQuests],ownedHomes:[...ownedHomes],completedKingdoms:[...completedKingdoms],homeStorage:{...homeStorage},stats:JSON.parse(JSON.stringify(stats)),jetpack:{fuel:jetFuel,active:jetActive},player:{hp:player.hp,x:player.x,y:player.y,dir:player.dir,oxygen:player.oxygen??100,gear:{...player.gear},activeSkill:player.activeSkill,artHp:player.artHp,artAtk:player.artAtk,artSpeed:player.artSpeed}};
   localStorage.setItem("q7r_v6_save",JSON.stringify(data));message("PARTIE SAUVEGARDÉE",1.5);sfx("pickup");
 }
 function positionInDoorTrigger(x,y){
@@ -725,7 +727,7 @@ function positionInDoorTrigger(x,y){
 function loadGame(){
   const raw=localStorage.getItem("q7r_v6_save")||localStorage.getItem("q7r_v5_6_save")||localStorage.getItem("q7r_v5_5_save")||localStorage.getItem("q7r_v5_4_save")||localStorage.getItem("q7r_v3_save");if(!raw){message("AUCUNE SAUVEGARDE",1.5);return}
   try{
-    const d=JSON.parse(raw);chooseHero(d.selected||"fox");selected=d.selected||"fox";
+    const d=JSON.parse(raw);ownedOutfits.clear();(d.outfits||[]).forEach(x=>ownedOutfits.add(x));chooseHero(d.selected||"fox");selected=d.selected||"fox";
     states=(d.states||[]).map(deserializeState);while(states.length<LEVELS.length)states.push(createStates()[states.length]);
     arts.clear();(d.arts||[]).forEach(x=>arts.add(x));ownedGear.clear();(d.ownedGear||[]).forEach(x=>ownedGear.add(x));skills.clear();(d.skills||[]).forEach(x=>skills.add(x));
     Object.keys(gearLevels).forEach(k=>delete gearLevels[k]);Object.assign(gearLevels,d.gearLevels||{});crafted.clear();(d.crafted||[]).forEach(x=>crafted.add(x));claimedQuests.clear();(d.claimedQuests||[]).forEach(x=>claimedQuests.add(x));
@@ -802,8 +804,8 @@ function interactWorldObject(o){
   if(o.type==="gate"){
     if(!gateUnlocked(o)){message("PORTAIL INVALIDE",1.2);return}
     message("TRAVERSE LE PORTAIL EN AVANÇANT DEDANS")
-  }else if(o.type==="shop"){renderShop();openModal("shopModal")}
-  else if(o.type==="forge"){renderForge();openModal("forgeModal")}
+  }else if(["shop","general","laboratory"].includes(o.type)){enterInterior(o.type)}
+  else if(o.type==="forge"){enterInterior("forge")}
   else if(o.type==="realtor"){activePropertyId=PROPERTIES.find(p=>p.cost>0&&!ownedHomes.has(p.id))?.id||"crossroads";renderHouseModal(activePropertyId);openModal("houseModal")}
   else if(o.type==="house"){openHouse(o.propertyId)}
   else if(o.type==="starterHome"){startTransition(()=>{loadLevel(HOME_INDEX,"start",false);message("TU RENTRES CHEZ TOI · TA CABANE")},"y",1)}
@@ -904,6 +906,7 @@ function executeMouseInteraction(t){
   else if(t.kind==="world")interactWorldObject(t.obj)
 }
 function interactNPC(){
+  if(interior.active){interiorInteract();return}
   const n=nearestNPC();
   if(n){interactWithNPC(n);return}
   const ch=nearestChest();
@@ -980,7 +983,7 @@ function drawHomeDecor(){
 function drawWorldObjects(){
  worldObjects().forEach(o=>{
    if(o.type==="gate"){const unlocked=gateUnlocked(o);ctx.fillStyle=unlocked?"#d9c76e":"#4c4c4c";ctx.fillRect(o.x,o.y+5,o.w,o.h-5);ctx.fillStyle=unlocked?"#7952a7":"#252525";ctx.fillRect(o.x+5,o.y+10,o.w-10,o.h-12);ctx.fillStyle="#fff";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(String(o.level+1),o.x+o.w/2,o.y+24);ctx.fillStyle="#fff3bd";ctx.font="7px monospace";ctx.fillText(o.name.split(" ")[0],o.x+o.w/2,o.y-2);ctx.textAlign="left"}
-   else if(o.type==="shop")drawShopSprite(o)
+   else if(o.type==="shop"||o.type==="general"||o.type==="laboratory")drawShopSprite(o)
    else if(o.type==="forge")drawForgeSprite(o)
    else if(o.type==="realtor")drawRealtorSprite(o)
    else if(o.type==="starterHome")drawPlayerHomeSprite(o)
@@ -1254,6 +1257,7 @@ function maybeSpawnBoss(){
   }
 }
 function update(dt){
+  if(interior.active){updateInterior(dt);return}
   if(gameOver)return;
   time+=dt;msg.time=Math.max(0,msg.time-dt);doorGrace=Math.max(0,doorGrace-dt);updateEffects(dt);
   if(paused||transition.active)return;
@@ -1595,6 +1599,7 @@ function overlays(){
 }
 function render(){
   ctx.clearRect(0,0,W,H);if(!selected)return;
+  if(interior.active){drawInterior();return}
   const cam=cameraTransitionOffset();
   ctx.save();
   if(shake>0){ctx.translate((Math.random()-.5)*8,(Math.random()-.5)*8)}
@@ -1662,6 +1667,7 @@ document.querySelectorAll(".gameDrawer .btn").forEach(b=>b.addEventListener("cli
 function syncInteractionButton(){
   const b=document.getElementById("touchInteract");if(!b)return;
   const mobile=window.matchMedia("(max-width:900px)").matches;
+  if(interior.active){b.hidden=false;b.textContent="INTERAGIR";b.setAttribute("aria-label","Interagir avec le comptoir, la forge ou la porte");return}
   const wo=selected&&!paused&&!gameOver?nearestWorldObject():null;
   const n=selected&&!paused&&!gameOver?nearestNPC():null;
   const ch=selected&&!paused&&!gameOver?nearestChest():null;
@@ -1795,7 +1801,125 @@ function validateGameData(){
   if(errors.length)console.warn("VALIDATION JEU",errors);
   else console.info("VALIDATION JEU: aucun objet visible dans un mur et aucun chevauchement critique");
   window.__Q7R_VALIDATION_ERRORS__=errors.slice();return errors
-}function loop(now){const dt=clamp((now-last)/1000,0,.05);last=now;update(dt);syncInteractionButton();render();requestAnimationFrame(loop)}validateGameData();updateInventory();renderNewsHistory();updateNewsBadge();requestAnimationFrame(loop);
+}
+/* V6.2 - Bâtiments jouables. Indépendants des index de royaumes existants. */
+const ownedOutfits=new Set();
+const interior={active:false,kind:null,x:256,y:370,forgeLit:false,choice:0};
+const INTERIOR_NAMES={shop:"Boutique de Brik",general:"Comptoir des Voyageurs",laboratory:"Laboratoire des Arcanes",forge:"Forge de Cendre"};
+function enterInterior(kind){
+ if(!INTERIOR_NAMES[kind]||interior.active)return;
+ interior.active=true;interior.kind=kind;interior.x=256;interior.y=361;interior.forgeLit=false;
+ mouseTarget.active=false;pendingMouseInteract=null;doorGrace=1;
+ message("ENTRÉE : "+INTERIOR_NAMES[kind].toUpperCase()+" · APPROCHE-TOI DU COMPTOIR",2);
+}
+function leaveInterior(){
+ interior.active=false;interior.kind=null;doorGrace=1.5;
+ Object.keys(keys).forEach(k=>keys[k]=false);
+ message("TU RETOURNES AU VILLAGE DE CLAIRBOIS",1.5);
+}
+function updateInterior(dt){
+ msg.time=Math.max(0,msg.time-dt);time+=dt;
+ if(paused||transition.active)return;
+ let dx=0,dy=0;
+ if(keys.ArrowLeft||keys.KeyA||keys.KeyQ)dx--;
+ if(keys.ArrowRight||keys.KeyD)dx++;
+ if(keys.ArrowUp||keys.KeyW||keys.KeyZ)dy--;
+ if(keys.ArrowDown||keys.KeyS)dy++;
+ if(dx&&dy){dx*=.7071;dy*=.7071}
+ interior.x=clamp(interior.x+dx*115*dt,70,442);
+ interior.y=clamp(interior.y+dy*115*dt,247,402);
+ if(interior.y>392&&interior.x>210&&interior.x<302&&dy>0)leaveInterior();
+}
+function interiorInteract(){
+ if(!interior.active)return;
+ if(interior.y>355&&interior.x>210&&interior.x<302){leaveInterior();return}
+ if(interior.y>333){message("APPROCHE-TOI DU COMPTOIR OU DE LA STATION",1.3);return}
+ if(interior.kind==="forge"){
+  if(interior.x<230){
+   interior.forgeLit=true;sfx("level");message("FOYER ALLUMÉ · LA FORGE EST ACTIVE",2);return;
+  }
+  if(!interior.forgeLit){message("ALLUME D’ABORD LE FOYER À GAUCHE",2);return}
+  renderForge();openModal("forgeModal");return;
+ }
+ if(interior.kind==="shop"){renderShop();openModal("shopModal");return}
+ showCommerce();
+}
+function tradeMaterial(kind){
+ const stock=stats.parts;
+ if(kind==="sellWood"){
+  if(stock.wood<1)return message("AUCUN BOIS À VENDRE");
+  stock.wood--;stats.gold+=20;
+ }else if(kind==="sellGear"){
+  if(stock.gear<1)return message("AUCUN ENGRenAGE À VENDRE");
+  stock.gear--;stats.gold+=30;
+ }else if(kind==="exchange"){
+  if(stats.fragments<2)return message("IL FAUT DEUX FRAGMENTS");
+  stats.fragments-=2;stock.crystal=(stock.crystal||0)+1;
+ }else if(kind==="clothes"){
+  if(ownedOutfits.has("travel"))return message("TENUE DÉJÀ ACHETÉE");
+  if(stats.gold<80)return message("PAS ASSEZ D’OR");
+  stats.gold-=80;ownedOutfits.add("travel");
+ }else if(kind==="potion"){
+  if(stock.wood<1||stats.fragments<1)return message("IL FAUT UN BOIS ET UN FRAGMENT");
+  stock.wood--;stats.fragments--;player.hp=Math.min(player.maxHp,player.hp+3);
+ }else if(kind==="magic"){
+  if(stats.fragments<2||stock.crystal<1)return message("IL FAUT DEUX FRAGMENTS ET UN CRISTAL");
+  stats.fragments-=2;stock.crystal--;grantXP(100);
+ }
+ sfx("coin");updateInventory();showCommerce();message("TRANSACTION EFFECTUÉE",1.2);
+}
+function showCommerce(){
+ const lab=interior.kind==="laboratory";
+ const entries=lab
+ ? [["potion","Préparer une potion de soin","1 bois + 1 fragment"],["magic","Recherche magique · +100 XP","2 fragments + 1 cristal"],["exchange","Transmutation : 1 cristal","2 fragments"]]
+ : [["clothes","Tenue de voyage "+(ownedOutfits.has("travel")?"✓":""),"80 or · collection"],["sellWood","Vendre du bois","20 or / unité"],["sellGear","Vendre un engrenage","30 or / unité"],["exchange","Échanger 2 fragments","1 cristal"]];
+ const heading=lab?"CHIMIE & MAGIE — ALCHEMISTE":"MAGASIN GÉNÉRAL — MARCHAND";
+ const el=document.getElementById("shopContent");
+ el.innerHTML='<div class="merchantHead"><b>'+heading+'</b><p>Choisis une action. Les ressources sont vérifiées avant chaque transaction.</p></div><div class="shopgrid">'+entries.map(([id,name,cost])=>'<div class="shopitem"><h3>'+name+'</h3><div class="recipe">'+cost+'</div><button class="btn" data-interior-trade="'+id+'">CONFIRMER</button></div>').join("")+'</div>';
+ openModal("shopModal");
+}
+document.addEventListener("click",function(e){
+ const b=e.target.closest("[data-interior-trade]");
+ if(!b)return;tradeMaterial(b.dataset.interiorTrade);
+});
+canvas.addEventListener("pointerdown",function(e){
+ if(!interior.active||paused)return;
+ e.stopImmediatePropagation();
+ const p=canvasPoint(e);
+ if(p.y>370&&p.x>210&&p.x<305){leaveInterior();return}
+ if(p.y<235){interiorInteract();return}
+ interior.x=clamp(p.x,70,442);interior.y=clamp(p.y,247,402);
+},true);
+function drawInterior(){
+ const kind=interior.kind;const lab=kind==="laboratory",forge=kind==="forge";
+ ctx.fillStyle="#211b25";ctx.fillRect(0,0,W,H);
+ ctx.fillStyle="#9f805d";ctx.fillRect(28,72,456,354);
+ ctx.fillStyle="#6d523c";ctx.fillRect(38,82,436,338);
+ for(let x=48;x<462;x+=32){for(let y=104;y<416;y+=32){ctx.fillStyle=((x+y)/32)%2?"#776047":"#81694c";ctx.fillRect(x,y,30,30)}}
+ ctx.fillStyle="#392719";ctx.fillRect(60,174,392,50);
+ ctx.fillStyle="#bd9362";ctx.fillRect(60,218,392,17);
+ ctx.fillStyle="#2e3d44";ctx.fillRect(238,135,36,60);
+ ctx.fillStyle=lab?"#904ad3":forge?"#d56834":"#387b62";ctx.fillRect(242,145,28,34);
+ ctx.fillStyle="#f4d1a5";ctx.fillRect(247,120,18,19);
+ ctx.fillStyle="#291d16";ctx.fillRect(245,117,22,6);
+ ctx.fillStyle="#dac489";ctx.font="bold 15px monospace";ctx.textAlign="center";
+ ctx.fillText(INTERIOR_NAMES[kind].toUpperCase(),256,31);
+ ctx.font="11px monospace";ctx.fillText("MONTE AU COMPTOIR · H / ENTRÉE : PARLER",256,52);
+ if(forge){
+  ctx.fillStyle="#373333";ctx.fillRect(87,244,88,45);ctx.fillStyle=interior.forgeLit?"#ff892c":"#555";ctx.fillRect(99,256,62,26);
+  ctx.fillStyle="#fbe3a0";ctx.font="10px monospace";ctx.fillText(interior.forgeLit?"FOYER ACTIF":"ALLUMER FOYER",134,305);
+ }
+ if(lab){ctx.fillStyle="#45bdbc";ctx.fillRect(375,248,13,24);ctx.fillStyle="#ac76e7";ctx.fillRect(397,258,16,19)}
+ ctx.fillStyle="#23201c";ctx.fillRect(211,403,90,27);ctx.fillStyle="#e3cc80";ctx.font="10px monospace";ctx.fillText("SORTIE ↓",256,420);
+ ctx.fillStyle="#2c3a70";ctx.fillRect(interior.x-10,interior.y-13,20,24);
+ ctx.fillStyle="#eac196";ctx.fillRect(interior.x-7,interior.y-23,14,12);
+ ctx.fillStyle="#f9dc87";ctx.font="11px monospace";
+ ctx.fillText(forge?(interior.forgeLit?"FORGE PRÊTE":"ALLUME LE FEU"):"ACHETER · VENDRE · ÉCHANGER",256,338);
+ ctx.textAlign="left";
+ if(msg.time>0){ctx.fillStyle="#101010bb";ctx.fillRect(20,60,472,34);ctx.fillStyle="#fff1bd";ctx.font="11px monospace";ctx.fillText(msg.text.slice(0,73),28,81)}
+}
+
+function loop(now){const dt=clamp((now-last)/1000,0,.05);last=now;update(dt);syncInteractionButton();render();requestAnimationFrame(loop)}validateGameData();updateInventory();renderNewsHistory();updateNewsBadge();requestAnimationFrame(loop);
 </script>
 </body>
 </html>
