@@ -897,8 +897,8 @@ function interactWithNPC(n){
   if(!n)return false;
   pendingMouseInteract=null;mouseTarget.active=false;mouseHeld=false;
   message(n.name+" : "+n.line);
-  if(n.role==="shop"){renderShop();openModal("shopModal")}
-  else if(n.role==="forge"){renderForge();openModal("forgeModal")}
+  if(n.role==="shop"){enterInterior("shop")}
+  else if(n.role==="forge"){enterInterior("forge")}
   else{renderQuests();openModal("questsModal")}
   return true
 }
