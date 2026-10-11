@@ -715,7 +715,7 @@ function deserializeState(s){
   }
 }
 function saveGame(){
-  const data={v:62,outfits:[...ownedOutfits],portableCaches:JSON.parse(JSON.stringify(portableCaches)),selected,levelIndex,states:states.map(serializeState),arts:[...arts],ownedGear:[...ownedGear],skills:[...skills],gearLevels:{...gearLevels},crafted:[...crafted],claimedQuests:[...claimedQuests],ownedHomes:[...ownedHomes],completedKingdoms:[...completedKingdoms],homeStorage:{...homeStorage},stats:JSON.parse(JSON.stringify(stats)),jetpack:{fuel:jetFuel,active:jetActive},player:{hp:player.hp,x:player.x,y:player.y,dir:player.dir,oxygen:player.oxygen??100,gear:{...player.gear},activeSkill:player.activeSkill,artHp:player.artHp,artAtk:player.artAtk,artSpeed:player.artSpeed}};
+  const data={v:62,outfits:[...ownedOutfits],portableCaches:JSON.parse(JSON.stringify(portableCaches)),groundDrops:JSON.parse(JSON.stringify(groundDrops)),selected,levelIndex,states:states.map(serializeState),arts:[...arts],ownedGear:[...ownedGear],skills:[...skills],gearLevels:{...gearLevels},crafted:[...crafted],claimedQuests:[...claimedQuests],ownedHomes:[...ownedHomes],completedKingdoms:[...completedKingdoms],homeStorage:{...homeStorage},stats:JSON.parse(JSON.stringify(stats)),jetpack:{fuel:jetFuel,active:jetActive},player:{hp:player.hp,x:player.x,y:player.y,dir:player.dir,oxygen:player.oxygen??100,gear:{...player.gear},activeSkill:player.activeSkill,artHp:player.artHp,artAtk:player.artAtk,artSpeed:player.artSpeed}};
   localStorage.setItem("q7r_v6_save",JSON.stringify(data));message("PARTIE SAUVEGARDÉE",1.5);sfx("pickup");
 }
 function positionInDoorTrigger(x,y){
@@ -727,7 +727,7 @@ function positionInDoorTrigger(x,y){
 function loadGame(){
   const raw=localStorage.getItem("q7r_v6_save")||localStorage.getItem("q7r_v5_6_save")||localStorage.getItem("q7r_v5_5_save")||localStorage.getItem("q7r_v5_4_save")||localStorage.getItem("q7r_v3_save");if(!raw){message("AUCUNE SAUVEGARDE",1.5);return}
   try{
-    const d=JSON.parse(raw);resetCaches(d.portableCaches);ownedOutfits.clear();(d.outfits||[]).forEach(x=>ownedOutfits.add(x));chooseHero(d.selected||"fox");selected=d.selected||"fox";
+    const d=JSON.parse(raw);resetCaches(d.portableCaches);restoreGroundDrops(d.groundDrops);ownedOutfits.clear();(d.outfits||[]).forEach(x=>ownedOutfits.add(x));chooseHero(d.selected||"fox");selected=d.selected||"fox";
     states=(d.states||[]).map(deserializeState);while(states.length<LEVELS.length)states.push(createStates()[states.length]);
     arts.clear();(d.arts||[]).forEach(x=>arts.add(x));ownedGear.clear();(d.ownedGear||[]).forEach(x=>ownedGear.add(x));skills.clear();(d.skills||[]).forEach(x=>skills.add(x));
     Object.keys(gearLevels).forEach(k=>delete gearLevels[k]);Object.assign(gearLevels,d.gearLevels||{});crafted.clear();(d.crafted||[]).forEach(x=>crafted.add(x));claimedQuests.clear();(d.claimedQuests||[]).forEach(x=>claimedQuests.add(x));
@@ -911,6 +911,7 @@ function executeMouseInteraction(t){
 }
 function interactNPC(){
   if(interior.active){interiorInteract();return}
+  if(pickupNearbyGroundDrop())return;
   const n=nearestNPC();
   if(n){interactWithNPC(n);return}
   const ch=nearestChest();
@@ -1086,7 +1087,7 @@ function exitOpen(){
 function spawn(side){if(side==="start")return pos(level.start[0],level.start[1],player.w,player.h);const c=side==="right"?14:1;for(const r of [5,4,6,3,7,2,8,1,9])if(level.map[r][c]===GROUND)return pos(c,r,player.w,player.h);return pos(level.start[0],level.start[1],player.w,player.h)}
 function loadLevel(index,side="start",preservePosition=true){if(index<0)return;const oldScreenPos={x:player.x,y:player.y};pickups=[];projectiles=[];enemyProjectiles=[];ambient=[];musicStep=0;musicTimer=.15;if(index>=LEVELS.length){victory=gameOver=true;return}levelIndex=index;level=LEVELS[index];const p=spawn(side);player.x=p.x;player.y=p.y;if(preservePosition&&transition.active&&Number.isFinite(oldScreenPos.x)&&Number.isFinite(oldScreenPos.y)){const tx=clamp(oldScreenPos.x,34,W-58),ty=clamp(oldScreenPos.y,HUD+24,H-44);if(!hitsMap(tx,ty,player.w,player.h,false)){player.x=tx;player.y=ty}}player.dir=side==="right"?"left":"right";player.attack=false;player.cool=0;player.inv=0;enemies=level.enemies.map(createEnemy).filter(e=>!state().dead.has(e.id));loot=level.loot.map(createLoot);artItems=level.arts.map(createArt);gearItems=level.gear.map(createGear);grass=level.grass.map(createGrass);hidden=level.hidden.map(createHidden);lockedChests=level.locked.map(createLocked);repairParts=(level.repairParts||[]).map(createRepairPart);player.oxygen=100;jetActive=false;doorGrace=1.0;if(hasJetpack())jetFuel=Math.max(jetFuel,Math.min(100,70+levelIndex*5));if(level.skill&&!skills.has(level.skill))unlockSkill(level.skill);if(index===WORLD_INDEX){message("MONDE OUVERT · EXPLORE LES SENTIERS ET LES VILLAGES")}else{message("ROYAUME "+(index+1)+" : "+level.name)}
 updateInventory()}
-function restart(){resetCaches();ownedOutfits.clear();stats.gold=stats.score=stats.treasures=stats.fragments=stats.kills=0;stats.xp=0;stats.rank=1;stats.combo=0;stats.bestCombo=0;stats.damageDone=0;stats.treesCut=0;stats.grassCut=0;stats.parts={wood:0,gear:0,valve:0,crystal:0};particles=[];floatTexts=[];shake=0;flash=0;arts.clear();ownedGear.clear();skills.clear();crafted.clear();claimedQuests.clear();ownedHomes.clear();ownedHomes.add("starter_cabin");completedKingdoms.clear();Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0});Object.keys(gearLevels).forEach(id=>delete gearLevels[id]);states=createStates();chooseHero(selected);jetFuel=100;jetActive=false;gameOver=victory=false;time=0;loadLevel(HOME_INDEX,"start");message("TU TE RÉVEILLES DANS TA PETITE CABANE · REJOINS LE VILLAGE DE CLAIRBOIS")}
+function restart(){resetCaches();groundDrops=[];ownedOutfits.clear();stats.gold=stats.score=stats.treasures=stats.fragments=stats.kills=0;stats.xp=0;stats.rank=1;stats.combo=0;stats.bestCombo=0;stats.damageDone=0;stats.treesCut=0;stats.grassCut=0;stats.parts={wood:0,gear:0,valve:0,crystal:0};particles=[];floatTexts=[];shake=0;flash=0;arts.clear();ownedGear.clear();skills.clear();crafted.clear();claimedQuests.clear();ownedHomes.clear();ownedHomes.add("starter_cabin");completedKingdoms.clear();Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0});Object.keys(gearLevels).forEach(id=>delete gearLevels[id]);states=createStates();chooseHero(selected);jetFuel=100;jetActive=false;gameOver=victory=false;time=0;loadLevel(HOME_INDEX,"start");message("TU TE RÉVEILLES DANS TA PETITE CABANE · REJOINS LE VILLAGE DE CLAIRBOIS")}
 function safeTile(c,r){
   const ok=(cc,rr)=>{
     if(cc<1||cc>14||rr<1||rr>9)return false;
@@ -1604,18 +1605,18 @@ function overlays(){
 }
 function render(){
   ctx.clearRect(0,0,W,H);if(!selected)return;
-  if(interior.active){drawInterior();return}
+  if(interior.active){drawInterior();drawGroundDrops();return}
   const cam=cameraTransitionOffset();
   ctx.save();
   if(shake>0){ctx.translate((Math.random()-.5)*8,(Math.random()-.5)*8)}
   ctx.translate(cam.x,cam.y);
-  drawMap();drawHomeDecor();drawAmbient();drawWorldObjects();drawGrass();drawObjects();drawNPCs();drawPickups();drawEnemies();drawProjectiles();drawSword();drawEffects();
+  drawMap();drawHomeDecor();drawAmbient();drawWorldObjects();drawGrass();drawObjects();drawGroundDrops();drawNPCs();drawPickups();drawEnemies();drawProjectiles();drawSword();drawEffects();
   ctx.restore();
   drawPlayer();
   vignette();hud();overlays();drawTransition();
   if(flash>0){ctx.fillStyle="rgba(255,255,255,.12)";ctx.fillRect(0,HUD,W,H-HUD)}
 }
-function updateInventory(){renderPlayerDashboards();const r=document.getElementById("res"),g=document.getElementById("gear"),k=document.getElementById("keys");r.innerHTML=`<div class="line">Or : <b>${stats.gold}</b></div><div class="line">Trésors : <b>${stats.treasures}</b></div><div class="line">Fragments : <b>${stats.fragments}</b></div><div class="line">Jetpack : <b>${hasJetpack()?Math.round(jetFuel)+"%"+(jetActive?" actif":" prêt"):"non fabriqué"}</b></div><div class="line">Arbres coupés ici : <b>${state().trees.size}</b></div><div class="line">Réparation : Bois ${stats.parts.wood||0} · Engrenage ${stats.parts.gear||0} · Valve ${stats.parts.valve||0} · Cristal ${stats.parts.crystal||0}</div><div class="line">Rang : <b>${stats.rank}</b> · XP ${stats.xp}/${xpNeed()} · Combo record x${stats.bestCombo}</div>`;g.innerHTML=Object.entries(player.gear).map(([slot,id])=>`<div class="line ${id?"":"muted"}">${slot} : ${id?GEAR[id].name:"vide"}</div>`).join("")+`<div class="line">ATQ ${atk()} · DEF ${def()} · Élément ${ELEMENTS[activeElement()].name}</div>`;k.innerHTML=Object.entries(ART).map(([id,a])=>`<span class="token">${arts.has(id)?"✓ "+a.name:"🔒 ???"}</span>`).join("")+Object.entries(CRAFT_ARTIFACTS).filter(([id])=>crafted.has(id)).map(([id,a])=>`<span class="token">⚒ ${a.name}</span>`).join("")+`<div class="line">Skill : ${player.activeSkill?SKILLS[player.activeSkill].name:"aucun"}</div><div class="line">Commande spéciale : G active le jetpack si fabriqué.</div>`;const gearHtml=Object.entries(GEAR).map(([id,x])=>{const own=ownedGear.has(id),c=upgradeCost(id),equipped=player.gear[x.slot]===id;return `<div class="item ${own?"":"locked"}"><b class="element-${x.element}">${own?x.name:"Équipement inconnu"}</b><div>${own?x.desc:"À découvrir"}</div>${own?`<button class="equipBtn" data-equip="${id}" ${equipped?"disabled":""}>${equipped?"ÉQUIPÉ":"ÉQUIPER"}</button> <button class="upgrade" data-up="${id}" ${(gearLevels[id]||0)>=2?"disabled":""}>${(gearLevels[id]||0)>=2?"NIVEAU MAX":"AMÉLIORER "+c.gold+" OR + "+c.frag+" FRAG"}</button>`:""}</div>`}).join("");const artHtml=Object.entries(ART).map(([id,a])=>`<div class="item ${arts.has(id)?"":"locked"}"><b>${arts.has(id)?a.name:"Artéfact inconnu"}</b><div>${arts.has(id)?a.desc:"À découvrir"}</div></div>`).join("");const skillHtml=Object.entries(SKILLS).map(([id,s])=>`<div class="item ${skills.has(id)?"":"locked"}"><b>${skills.has(id)?s.name:"Skill verrouillé"}</b><div>${skills.has(id)?s.desc:"Progresse dans les niveaux"}</div>${skills.has(id)?`<button class="equipBtn" data-skill="${id}" ${player.activeSkill===id?"disabled":""}>${player.activeSkill===id?"ACTIF":"ACTIVER"}</button>`:""}</div>`).join("");document.getElementById("fullInventory").innerHTML=`<h3>RESSOURCES</h3>${r.innerHTML}<h3>ÉQUIPEMENT ÉLÉMENTAIRE</h3>${gearHtml}<h3>ARTÉFACTS-CLÉS</h3>${artHtml}<h3>SKILLS</h3>${skillHtml}`;syncInfoBubbleContent()}
+function updateInventory(){renderPlayerDashboards();renderGroundManager();const r=document.getElementById("res"),g=document.getElementById("gear"),k=document.getElementById("keys");r.innerHTML=`<div class="line">Or : <b>${stats.gold}</b></div><div class="line">Trésors : <b>${stats.treasures}</b></div><div class="line">Fragments : <b>${stats.fragments}</b></div><div class="line">Jetpack : <b>${hasJetpack()?Math.round(jetFuel)+"%"+(jetActive?" actif":" prêt"):"non fabriqué"}</b></div><div class="line">Arbres coupés ici : <b>${state().trees.size}</b></div><div class="line">Réparation : Bois ${stats.parts.wood||0} · Engrenage ${stats.parts.gear||0} · Valve ${stats.parts.valve||0} · Cristal ${stats.parts.crystal||0}</div><div class="line">Rang : <b>${stats.rank}</b> · XP ${stats.xp}/${xpNeed()} · Combo record x${stats.bestCombo}</div>`;g.innerHTML=Object.entries(player.gear).map(([slot,id])=>`<div class="line ${id?"":"muted"}">${slot} : ${id?GEAR[id].name:"vide"}</div>`).join("")+`<div class="line">ATQ ${atk()} · DEF ${def()} · Élément ${ELEMENTS[activeElement()].name}</div>`;k.innerHTML=Object.entries(ART).map(([id,a])=>`<span class="token">${arts.has(id)?"✓ "+a.name:"🔒 ???"}</span>`).join("")+Object.entries(CRAFT_ARTIFACTS).filter(([id])=>crafted.has(id)).map(([id,a])=>`<span class="token">⚒ ${a.name}</span>`).join("")+`<div class="line">Skill : ${player.activeSkill?SKILLS[player.activeSkill].name:"aucun"}</div><div class="line">Commande spéciale : G active le jetpack si fabriqué.</div>`;const gearHtml=Object.entries(GEAR).map(([id,x])=>{const own=ownedGear.has(id),c=upgradeCost(id),equipped=player.gear[x.slot]===id;return `<div class="item ${own?"":"locked"}"><b class="element-${x.element}">${own?x.name:"Équipement inconnu"}</b><div>${own?x.desc:"À découvrir"}</div>${own?`<button class="equipBtn" data-equip="${id}" ${equipped?"disabled":""}>${equipped?"ÉQUIPÉ":"ÉQUIPER"}</button> <button class="upgrade" data-up="${id}" ${(gearLevels[id]||0)>=2?"disabled":""}>${(gearLevels[id]||0)>=2?"NIVEAU MAX":"AMÉLIORER "+c.gold+" OR + "+c.frag+" FRAG"}</button>`:""}</div>`}).join("");const artHtml=Object.entries(ART).map(([id,a])=>`<div class="item ${arts.has(id)?"":"locked"}"><b>${arts.has(id)?a.name:"Artéfact inconnu"}</b><div>${arts.has(id)?a.desc:"À découvrir"}</div></div>`).join("");const skillHtml=Object.entries(SKILLS).map(([id,s])=>`<div class="item ${skills.has(id)?"":"locked"}"><b>${skills.has(id)?s.name:"Skill verrouillé"}</b><div>${skills.has(id)?s.desc:"Progresse dans les niveaux"}</div>${skills.has(id)?`<button class="equipBtn" data-skill="${id}" ${player.activeSkill===id?"disabled":""}>${player.activeSkill===id?"ACTIF":"ACTIVER"}</button>`:""}</div>`).join("");document.getElementById("fullInventory").innerHTML=`<h3>RESSOURCES</h3>${r.innerHTML}<h3>ÉQUIPEMENT ÉLÉMENTAIRE</h3>${gearHtml}<h3>ARTÉFACTS-CLÉS</h3>${artHtml}<h3>SKILLS</h3>${skillHtml}`;syncInfoBubbleContent()}
 const intro=document.getElementById("intro"),startGameBtn=document.getElementById("startGame"),continueGameBtn=document.getElementById("continueGame");
 function openHeroSelection(){intro.style.display="none";paused=true;document.getElementById("select").classList.remove("hidden")}
 startGameBtn.onclick=()=>openHeroSelection();
@@ -1837,6 +1838,7 @@ function updateInterior(dt){
 }
 function interiorInteract(){
  if(!interior.active)return;
+ if(pickupNearbyGroundDrop())return;
  if(interior.y>355&&interior.x>210&&interior.x<302){leaveInterior();return}
  if(interior.y>333){message("APPROCHE-TOI DU COMPTOIR OU DE LA STATION",1.3);return}
  if(interior.kind==="forge"){
@@ -1931,7 +1933,43 @@ function walletCount(type){return type==="gold"?stats.gold:type==="fragments"?st
 function adjustWallet(type,delta){if(type==="gold")stats.gold+=delta;else if(type==="fragments")stats.fragments+=delta;else stats.parts[type]=(stats.parts[type]||0)+delta}
 function openPortableCache(id,name){if(!/^(wardrobe|hollow_world|hollow_[0-6])$/.test(id))return;activeCacheId=id;activeCacheName=name;if(!portableCaches[id])portableCaches[id]={};renderPortableCache();openModal("houseModal")}
 function renderPortableCache(){if(!activeCacheId)return;const list=[["gold","Or"],["fragments","Fragments"],["wood","Bois ancien"],["gear","Engrenage"],["valve","Valves"],["crystal","Cristaux"]];document.getElementById("houseContent").innerHTML='<div class="merchantHead"><b>'+activeCacheName+'</b><div class="smallnote">Chaque cache conserve ses propres ressources</div></div>'+list.map(([id,name])=>'<div class="storageRow"><b>'+name+'</b><span>Sur toi : '+walletCount(id)+' · Ici : '+(portableCaches[activeCacheId][id]||0)+'</span><div><button class="btn storageBtn" data-store="'+id+'">DÉPOSER 1</button> <button class="btn storageBtn" data-take="'+id+'">REPRENDRE 1</button></div></div>').join("")+'<button class="btn" data-home-save>SAUVEGARDER</button>'}
-function moveCacheItem(type,amount,deposit){if(!activeCacheId||!CACHE_TYPES.includes(type)||!Number.isSafeInteger(amount)||amount<=0)return;const cache=portableCaches[activeCacheId],available=deposit?walletCount(type):(cache[type]||0);if(available<amount){message("QUANTITÉ INSUFFISANTE");return}if(deposit){adjustWallet(type,-amount);cache[type]=(cache[type]||0)+amount}else{cache[type]-=amount;adjustWallet(type,amount)}renderPortableCache();updateInventory();message(deposit?"OBJET DÉPOSÉ":"OBJET RÉCUPÉRÉ",1)}
+function moveCacheItem(type,amount,deposit){if(!activeCacheId||!CACHE_TYPES.includes(type)||!Number.isSafeInteger(amount)||amount<=0)return;const cache=portableCaches[activeCacheId],available=deposit?walletCount(type):(cache[type]||0);if(available<amount){message("QUANTITÉ INSUFFISANTE");return}if(!deposit&&carryCount()+amount>CARRY_LIMIT){message("SAC PLEIN");return}if(deposit){adjustWallet(type,-amount);cache[type]=(cache[type]||0)+amount}else{cache[type]-=amount;adjustWallet(type,amount)}renderPortableCache();updateInventory();message(deposit?"OBJET DÉPOSÉ":"OBJET RÉCUPÉRÉ",1)}
+
+/* Physical dropped item stacks. Ids are stable per level and remain available after reload. */
+const CARRY_LIMIT=30;let groundDrops=[];
+function carryCount(){return CACHE_TYPES.reduce((n,k)=>n+Math.max(0,Math.floor(walletCount(k)||0)),0)}
+function groundKey(){return interior.active?"interior:"+interior.kind:"level:"+levelIndex}
+function restoreGroundDrops(data){groundDrops=Array.isArray(data)?data.filter(d=>d&&typeof d==="object"&&CACHE_TYPES.includes(d.type)&&typeof d.place==="string"&&/^(level:\\d+|interior:(shop|general|laboratory|forge))$/.test(d.place)&&Number.isFinite(d.x)&&Number.isFinite(d.y)&&Number.isSafeInteger(d.amount)&&d.amount>0&&d.amount<=999999).slice(0,400).map(d=>({type:d.type,place:d.place,x:clamp(d.x,28,484),y:clamp(d.y,80,420),amount:d.amount})):[]}
+function dropPhysical(type,amount=1){
+ if(!CACHE_TYPES.includes(type)||!Number.isSafeInteger(amount)||amount<=0||walletCount(type)<amount){message("RESSOURCE INSUFFISANTE");return false}
+ if(groundDrops.length>=400){message("TROP D’OBJETS DÉPOSÉS");return false}
+ const x=interior.active?interior.x:player.x+player.w/2,y=interior.active?interior.y:player.y+player.h/2;
+ adjustWallet(type,-amount);groundDrops.push({type,amount,x,y,place:groundKey()});message("OBJET DÉPOSÉ · REPRENDS-LE PLUS TARD");updateInventory();return true
+}
+function pickupNearbyGroundDrop(){
+ const x=interior.active?interior.x:player.x+player.w/2,y=interior.active?interior.y:player.y+player.h/2;
+ let i=groundDrops.findIndex(d=>d.place===groundKey()&&Math.hypot(d.x-x,d.y-y)<43);
+ if(i<0)return false;const d=groundDrops[i];
+ if(carryCount()+d.amount>CARRY_LIMIT){message("SAC PLEIN · DÉPOSE DES RESSOURCES");return true}
+ adjustWallet(d.type,d.amount);groundDrops.splice(i,1);message("RAMASSÉ : "+d.type.toUpperCase()+" ×"+d.amount);updateInventory();return true
+}
+function drawGroundDrops(){
+ for(const d of groundDrops){if(d.place!==groundKey())continue;
+ ctx.fillStyle="#201712";ctx.fillRect(d.x-9,d.y-8,19,18);
+ ctx.fillStyle=d.type==="gold"?"#f9d159":d.type==="crystal"?"#8be1ff":d.type==="wood"?"#a76a38":"#bba7c9";
+ ctx.fillRect(d.x-6,d.y-6,13,13);ctx.strokeStyle="#faebae";ctx.strokeRect(d.x-7,d.y-7,15,15);
+ ctx.fillStyle="#fff";ctx.font="9px monospace";ctx.fillText(String(d.amount),d.x+9,d.y-5);
+ }
+}
+function renderGroundManager(){
+ const e=document.getElementById("groundDropPanel");if(!e)return;
+ e.innerHTML='<div class="invbox"><h3>🎒 SAC · '+carryCount()+'/'+CARRY_LIMIT+' unités de ressources</h3><div class="smallnote">Choisis une ressource à poser au sol. Approche-toi et utilise INTERAGIR pour la reprendre. Les caches et les maisons restent disponibles.</div><div class="shopgrid">'+CACHE_TYPES.map(t=>'<button class="btn" data-ground-drop="'+t+'" '+(walletCount(t)<1?'disabled':'')+'>'+t+' · '+walletCount(t)+' · DÉPOSER 1</button>').join("")+'</div></div>'
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-ground-drop]");if(b)dropPhysical(b.dataset.groundDrop,1)});
+(function setupGroundDropPanel(){
+ const target=document.getElementById("res");if(!target)return;
+ const panel=document.createElement("div");panel.id="groundDropPanel";target.parentElement.appendChild(panel);
+})();
 function loop(now){const dt=clamp((now-last)/1000,0,.05);last=now;update(dt);syncInteractionButton();render();requestAnimationFrame(loop)}validateGameData();updateInventory();renderNewsHistory();updateNewsBadge();requestAnimationFrame(loop);
 </script>
 </body>
