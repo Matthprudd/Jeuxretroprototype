@@ -1939,7 +1939,7 @@ function moveCacheItem(type,amount,deposit){if(!activeCacheId||!CACHE_TYPES.incl
 const CARRY_LIMIT=30;let groundDrops=[];
 function carryCount(){return CACHE_TYPES.reduce((n,k)=>n+Math.max(0,Math.floor(walletCount(k)||0)),0)}
 function groundKey(){return interior.active?"interior:"+interior.kind:"level:"+levelIndex}
-function restoreGroundDrops(data){groundDrops=Array.isArray(data)?data.filter(d=>d&&typeof d==="object"&&CACHE_TYPES.includes(d.type)&&typeof d.place==="string"&&/^(level:\\d+|interior:(shop|general|laboratory|forge))$/.test(d.place)&&Number.isFinite(d.x)&&Number.isFinite(d.y)&&Number.isSafeInteger(d.amount)&&d.amount>0&&d.amount<=999999).slice(0,400).map(d=>({type:d.type,place:d.place,x:clamp(d.x,28,484),y:clamp(d.y,80,420),amount:d.amount})):[]}
+function restoreGroundDrops(data){groundDrops=Array.isArray(data)?data.filter(d=>d&&typeof d==="object"&&CACHE_TYPES.includes(d.type)&&typeof d.place==="string"&&/^(level:\d+|interior:(shop|general|laboratory|forge))$/.test(d.place)&&Number.isFinite(d.x)&&Number.isFinite(d.y)&&Number.isSafeInteger(d.amount)&&d.amount>0&&d.amount<=999999).slice(0,400).map(d=>({type:d.type,place:d.place,x:clamp(d.x,28,484),y:clamp(d.y,80,420),amount:d.amount})):[]}
 function dropPhysical(type,amount=1){
  if(!CACHE_TYPES.includes(type)||!Number.isSafeInteger(amount)||amount<=0||walletCount(type)<amount){message("RESSOURCE INSUFFISANTE");return false}
  if(groundDrops.length>=400){message("TROP D’OBJETS DÉPOSÉS");return false}
