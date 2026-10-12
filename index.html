@@ -1957,32 +1957,60 @@ function meydenArtInterior(kind){
  }
 }
 function drawInterior(){
- const kind=interior.kind;const lab=kind==="laboratory",forge=kind==="forge";
- ctx.fillStyle="#211b25";ctx.fillRect(0,0,W,H);
- ctx.fillStyle="#9f805d";ctx.fillRect(28,72,456,354);
- ctx.fillStyle="#6d523c";ctx.fillRect(38,82,436,338);
- for(let x=48;x<462;x+=32){for(let y=104;y<416;y+=32){ctx.fillStyle=((x+y)/32)%2?"#776047":"#81694c";ctx.fillRect(x,y,30,30)}}
+ const kind=interior.kind,lab=kind==="laboratory",forge=kind==="forge";
+ // Forest-fantasy room, with the actual game collisions and interactions unchanged.
+ ctx.fillStyle="#161d1b";ctx.fillRect(0,0,W,H);
+ ctx.fillStyle="#b48b56";ctx.fillRect(29,71,454,358);
+ ctx.fillStyle="#392e28";ctx.fillRect(36,79,440,342);
+ // Upper wall: dark warm timber, vertical posts, wainscot.
+ ctx.fillStyle="#394136";ctx.fillRect(43,85,426,100);
+ for(let x=47;x<469;x+=34){ctx.fillStyle="#53604a";ctx.fillRect(x,86,4,98);ctx.fillStyle="#202f29";ctx.fillRect(x+6,86,2,94)}
+ ctx.fillStyle="#a66c3d";ctx.fillRect(43,172,426,8);
+ // Wooden floor boards; subtle horizontal plank joints.
+ ctx.fillStyle="#805a38";ctx.fillRect(43,180,426,237);
+ for(let y=183;y<417;y+=28){ctx.fillStyle="#997046";ctx.fillRect(43,y,426,2);ctx.fillStyle="#5c402d";ctx.fillRect(43,y+25,426,2);
+   for(let x=52+(Math.floor(y/28)%2)*31;x<466;x+=66){ctx.fillStyle="#5e4834";ctx.fillRect(x,y+3,2,21);}}
+ // Carpet and a navigable walkway.
+ ctx.fillStyle="#4d3028";ctx.fillRect(191,243,131,153);
+ ctx.fillStyle="#bf8b4a";ctx.fillRect(195,247,123,145);
+ ctx.fillStyle="#26473c";ctx.fillRect(201,253,111,133);
+ for(let i=0;i<7;i++){ctx.fillStyle=i%2?"#8f6e36":"#d1a354";ctx.fillRect(207+i*15,258,7,4);ctx.fillRect(207+i*15,377,7,4)}
+ ctx.fillStyle="#bfa66a";ctx.fillRect(216,312,82,2);
+ // Lanterns hang in front of the upper wall.
+ for(const x of [66,443]){ctx.fillStyle="#e9a33a";ctx.fillRect(x-7,99,14,17);ctx.fillStyle="#5a3421";ctx.fillRect(x-10,96,20,3);ctx.fillRect(x-10,116,20,3);ctx.fillStyle="#fbe29a";ctx.fillRect(x-2,103,5,11);}
  meydenShopFurniture(kind);
  meydenArtInterior(kind);
- ctx.fillStyle="#392719";ctx.fillRect(60,174,392,50);ctx.fillStyle="#533824";ctx.fillRect(62,176,388,7);
- ctx.fillStyle="#bd9362";ctx.fillRect(60,218,392,17);ctx.fillStyle="#d5ad76";ctx.fillRect(66,220,380,3);
- ctx.fillStyle="#2e3d44";ctx.fillRect(238,135,36,60);
- ctx.fillStyle=lab?"#904ad3":forge?"#d56834":"#387b62";ctx.fillRect(242,145,28,34);
- ctx.fillStyle="#f4d1a5";ctx.fillRect(247,120,18,19);
- ctx.fillStyle="#291d16";ctx.fillRect(245,117,22,6);
- ctx.fillStyle="#dac489";ctx.font="bold 15px monospace";ctx.textAlign="center";
- ctx.fillText(INTERIOR_NAMES[kind].toUpperCase(),256,31);
- ctx.font="11px monospace";ctx.fillText("MONTE AU COMPTOIR · H / ENTRÉE : PARLER",256,52);
- if(forge){
-  ctx.fillStyle=interior.forgeLit?"#ff892c":"#555";ctx.fillRect(109,270,46,12);
-  ctx.fillStyle="#fbe3a0";ctx.font="10px monospace";ctx.fillText(interior.forgeLit?"FOYER ACTIF":"ALLUMER FOYER",134,305);
- }
+ // Side props break up empty floor without blocking the path or exits.
+ for(const [x,y] of [[62,279],[430,315]]){ctx.fillStyle="#4b3526";ctx.fillRect(x-13,y-7,26,20);ctx.fillStyle="#ad7548";ctx.fillRect(x-10,y-13,20,10);ctx.fillStyle="#304d36";ctx.fillRect(x-5,y-25,10,13);ctx.fillRect(x-12,y-20,24,6)}
+ ctx.fillStyle="#4b3524";ctx.fillRect(370,288,55,26);ctx.fillStyle="#c69b58";ctx.fillRect(374,290,47,5);
+ for(let i=0;i<3;i++){ctx.fillStyle=["#a44f3a","#516b9e","#d9bc6c"][i];ctx.fillRect(379+i*14,280,9,10)}
+ // Wooden merchant counter; it is decorative and keeps its current game collision.
+ ctx.fillStyle="#211a17";ctx.fillRect(60,170,392,67);
+ ctx.fillStyle="#80502f";ctx.fillRect(62,178,388,46);
+ for(let x=69;x<446;x+=54){ctx.fillStyle="#9b6941";ctx.fillRect(x,186,4,31)}
+ ctx.fillStyle="#c3945d";ctx.fillRect(60,170,392,13);
+ ctx.fillStyle="#f1c481";ctx.fillRect(65,172,382,3);
+ ctx.fillStyle="#bb8350";ctx.fillRect(60,221,392,14);ctx.fillStyle="#e2b076";ctx.fillRect(65,222,382,3);
+ // Merchant pixel character, clear head/hair/ears and costume silhouette.
+ ctx.fillStyle="#1b2d2d";ctx.fillRect(231,135,50,42);
+ ctx.fillStyle=forge?"#be5e35":lab?"#7857b0":"#327660";ctx.fillRect(239,139,34,35);
+ ctx.fillStyle="#cfab77";ctx.fillRect(246,123,20,19);
+ ctx.fillStyle="#291d16";ctx.fillRect(243,119,26,6);ctx.fillRect(245,125,3,5);
+ ctx.fillStyle="#301c18";ctx.fillRect(248,132,3,2);ctx.fillRect(260,132,3,2);
+ ctx.fillStyle="#f2d7aa";ctx.fillRect(253,138,7,2);
+ ctx.fillStyle="#c79e61";ctx.fillRect(238,146,4,15);ctx.fillRect(270,146,4,15);
+ // The forge and lab retain their original interactions.
+ if(forge){ctx.fillStyle="#2c2927";ctx.fillRect(90,252,80,30);ctx.fillStyle=interior.forgeLit?"#e77e27":"#5a4d43";ctx.fillRect(109,270,46,12);ctx.fillStyle="#fbe3a0";ctx.font="10px monospace";ctx.textAlign="center";ctx.fillText(interior.forgeLit?"FOYER ACTIF":"ALLUMER FOYER",132,305);}
  if(lab){ctx.fillStyle="#45bdbc";ctx.fillRect(375,248,13,24);ctx.fillStyle="#ac76e7";ctx.fillRect(397,258,16,19)}
- ctx.fillStyle="#23201c";ctx.fillRect(211,403,90,27);ctx.fillStyle="#e3cc80";ctx.font="10px monospace";ctx.fillText("SORTIE ↓",256,420);
+ ctx.fillStyle="#241b18";ctx.fillRect(211,400,90,25);
+ ctx.fillStyle="#b78a4e";ctx.fillRect(215,400,82,3);
+ ctx.fillStyle="#f3d296";ctx.font="10px monospace";ctx.textAlign="center";ctx.fillText("SORTIE ↓",256,418);
+ // Player kept at exact physics coordinates.
  ctx.fillStyle="#2c3a70";ctx.fillRect(interior.x-10,interior.y-13,20,24);
  ctx.fillStyle="#eac196";ctx.fillRect(interior.x-7,interior.y-23,14,12);
- ctx.fillStyle="#f9dc87";ctx.font="11px monospace";
- ctx.fillText(forge?(interior.forgeLit?"FORGE PRÊTE":"ALLUME LE FEU"):"ACHETER · VENDRE · ÉCHANGER",256,338);
+ ctx.fillStyle="#e9d7a3";ctx.font="bold 15px monospace";ctx.fillText(INTERIOR_NAMES[kind].toUpperCase(),256,31);
+ ctx.font="11px monospace";ctx.fillText("MONTE AU COMPTOIR · H / ENTRÉE : PARLER",256,52);
+ ctx.fillText(forge?(interior.forgeLit?"FORGE PRÊTE":"ALLUME LE FEU"): "ACHETER · VENDRE · ÉCHANGER",256,338);
  ctx.textAlign="left";
  if(msg.time>0){ctx.fillStyle="#101010bb";ctx.fillRect(20,60,472,34);ctx.fillStyle="#fff1bd";ctx.font="11px monospace";ctx.fillText(msg.text.slice(0,73),28,81)}
 }
