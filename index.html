@@ -631,12 +631,16 @@ async function toggleFullscreen(){
     else{await document.exitFullscreen?.()}
   }catch(e){}
 }
+const padKeys={ArrowLeft:false,ArrowRight:false,ArrowUp:false,ArrowDown:false};
 function gamepadInput(){
   if(typeof navigator==="undefined"||!navigator.getGamepads)return;
-  const pads=navigator.getGamepads()||[],p=[...pads].find(Boolean);if(!p)return;
+  const pads=navigator.getGamepads()||[],p=[...pads].find(p=>p&&p.connected!==false);
+  if(!p){Object.keys(padKeys).forEach(k=>padKeys[k]=false);return;}
   const dz=.25;
-  keys.ArrowLeft=(p.axes?.[0]||0)<-dz;keys.ArrowRight=(p.axes?.[0]||0)>dz;
-  keys.ArrowUp=(p.axes?.[1]||0)<-dz;keys.ArrowDown=(p.axes?.[1]||0)>dz;
+  padKeys.ArrowLeft=(p.axes?.[0]||0)<-dz||!!p.buttons?.[14]?.pressed;
+  padKeys.ArrowRight=(p.axes?.[0]||0)>dz||!!p.buttons?.[15]?.pressed;
+  padKeys.ArrowUp=(p.axes?.[1]||0)<-dz||!!p.buttons?.[12]?.pressed;
+  padKeys.ArrowDown=(p.axes?.[1]||0)>dz||!!p.buttons?.[13]?.pressed;
   if(p.buttons?.[0]?.pressed&&!player._padA){attack();player._padA=true}else if(!p.buttons?.[0]?.pressed)player._padA=false;
   if(p.buttons?.[1]?.pressed&&!player._padB){useSkill();player._padB=true}else if(!p.buttons?.[1]?.pressed)player._padB=false;
   if(selected==="mage"&&p.buttons?.[2]?.pressed&&!player._padX){fireProjectile();player._padX=true}else if(!p.buttons?.[2]?.pressed)player._padX=false;
@@ -718,7 +722,7 @@ function deserializeState(s){
   }
 }
 function saveGame(){
-  const data={v:62,outfits:[...ownedOutfits],portableCaches:JSON.parse(JSON.stringify(portableCaches)),groundDrops:JSON.parse(JSON.stringify(groundDrops)),selected,levelIndex,states:states.map(serializeState),arts:[...arts],ownedGear:[...ownedGear],skills:[...skills],gearLevels:{...gearLevels},crafted:[...crafted],claimedQuests:[...claimedQuests],ownedHomes:[...ownedHomes],completedKingdoms:[...completedKingdoms],homeStorage:{...homeStorage},stats:JSON.parse(JSON.stringify(stats)),jetpack:{fuel:jetFuel,active:jetActive},player:{hp:player.hp,x:player.x,y:player.y,dir:player.dir,oxygen:player.oxygen??100,gear:{...player.gear},activeSkill:player.activeSkill,artHp:player.artHp,artAtk:player.artAtk,artSpeed:player.artSpeed}};
+  const data={v:63,interior:interior.active?{kind:interior.kind,x:interior.x,y:interior.y,forgeLit:interior.forgeLit}:null,outfits:[...ownedOutfits],portableCaches:JSON.parse(JSON.stringify(portableCaches)),groundDrops:JSON.parse(JSON.stringify(groundDrops)),selected,levelIndex,states:states.map(serializeState),arts:[...arts],ownedGear:[...ownedGear],skills:[...skills],gearLevels:{...gearLevels},crafted:[...crafted],claimedQuests:[...claimedQuests],ownedHomes:[...ownedHomes],completedKingdoms:[...completedKingdoms],homeStorage:{...homeStorage},stats:JSON.parse(JSON.stringify(stats)),jetpack:{fuel:jetFuel,active:jetActive},player:{hp:player.hp,x:player.x,y:player.y,dir:player.dir,oxygen:player.oxygen??100,gear:{...player.gear},activeSkill:player.activeSkill,artHp:player.artHp,artAtk:player.artAtk,artSpeed:player.artSpeed}};
   localStorage.setItem("q7r_v6_save",JSON.stringify(data));message("PARTIE SAUVEGARDÉE",1.5);sfx("pickup");
 }
 function positionInDoorTrigger(x,y){
@@ -728,6 +732,7 @@ function positionInDoorTrigger(x,y){
   return vertical&&(cx<44||cx>W-44)
 }
 function loadGame(){
+  interior.active=false;interior.kind=null;
   const raw=localStorage.getItem("q7r_v6_save")||localStorage.getItem("q7r_v5_6_save")||localStorage.getItem("q7r_v5_5_save")||localStorage.getItem("q7r_v5_4_save")||localStorage.getItem("q7r_v3_save");if(!raw){message("AUCUNE SAUVEGARDE",1.5);return}
   try{
     const d=JSON.parse(raw);resetCaches(d.portableCaches);restoreGroundDrops(d.groundDrops);ownedOutfits.clear();(d.outfits||[]).forEach(x=>ownedOutfits.add(x));chooseHero(d.selected||"fox");selected=d.selected||"fox";
@@ -737,7 +742,15 @@ function loadGame(){
     Object.assign(stats,d.stats||{});stats.parts ||= {wood:0,gear:0,valve:0,crystal:0};ownedHomes.clear();(d.ownedHomes||[]).forEach(x=>ownedHomes.add(x));ownedHomes.add("starter_cabin");completedKingdoms.clear();(d.completedKingdoms||[]).forEach(x=>completedKingdoms.add(x));Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0},d.homeStorage||{});
     jetFuel=d.jetpack?.fuel ?? (crafted.has("jetpackCore")?100:0);jetActive=false;
     player.artHp=d.player?.artHp||0;player.artAtk=d.player?.artAtk||0;player.artSpeed=d.player?.artSpeed||0;player.gear={helmet:null,armor:null,sword:null,shield:null,...(d.player?.gear||{})};player.activeSkill=d.player?.activeSkill||[...skills][0];
-    recalc(true);player.hp=Math.min(player.maxHp,d.player?.hp??player.maxHp);gameOver=victory=false;paused=false;document.getElementById("select").classList.add("hidden");loadLevel(clamp(d.levelIndex??0,0,LEVELS.length-1),"start");if(Number.isFinite(d.player?.x)&&Number.isFinite(d.player?.y)&&!hitsMap(d.player.x,d.player.y,player.w,player.h,false)&&!positionInDoorTrigger(d.player.x,d.player.y)){player.x=d.player.x;player.y=d.player.y}if(d.player?.dir)player.dir=d.player.dir;player.oxygen=d.player?.oxygen??100;message("PARTIE CHARGÉE — POSITION RESTAURÉE",1.8);sfx("level");
+    recalc(true);player.hp=Math.min(player.maxHp,d.player?.hp??player.maxHp);gameOver=victory=false;paused=false;document.getElementById("select").classList.add("hidden");loadLevel(clamp(d.levelIndex??0,0,LEVELS.length-1),"start");if(Number.isFinite(d.player?.x)&&Number.isFinite(d.player?.y)&&!hitsMap(d.player.x,d.player.y,player.w,player.h,false)&&!positionInDoorTrigger(d.player.x,d.player.y)){player.x=d.player.x;player.y=d.player.y}if(d.player?.dir)player.dir=d.player.dir;
+    interior.active=false;interior.kind=null;
+    if(levelIndex===WORLD_INDEX&&d.interior&&INTERIOR_NAMES[d.interior.kind]){
+      interior.active=true;interior.kind=d.interior.kind;
+      interior.x=clamp(Number(d.interior.x)||256,70,442);
+      interior.y=clamp(Number(d.interior.y)||361,267,402);
+      interior.forgeLit=!!d.interior.forgeLit;
+    }
+    player.oxygen=d.player?.oxygen??100;message("PARTIE CHARGÉE — POSITION RESTAURÉE",1.8);sfx("level");
   }catch(e){console.error(e);message("SAUVEGARDE INCOMPATIBLE",2)}
 }
 function isWorld(){return levelIndex===WORLD_INDEX}
@@ -1136,7 +1149,7 @@ function exitOpen(){
 function spawn(side){if(side==="start")return pos(level.start[0],level.start[1],player.w,player.h);const c=side==="right"?14:1;for(const r of [5,4,6,3,7,2,8,1,9])if(level.map[r][c]===GROUND)return pos(c,r,player.w,player.h);return pos(level.start[0],level.start[1],player.w,player.h)}
 function loadLevel(index,side="start",preservePosition=true){if(index<0)return;const oldScreenPos={x:player.x,y:player.y};pickups=[];projectiles=[];enemyProjectiles=[];ambient=[];musicStep=0;musicTimer=.15;if(index>=LEVELS.length){victory=gameOver=true;return}levelIndex=index;level=LEVELS[index];const p=spawn(side);player.x=p.x;player.y=p.y;if(preservePosition&&transition.active&&Number.isFinite(oldScreenPos.x)&&Number.isFinite(oldScreenPos.y)){const tx=clamp(oldScreenPos.x,34,W-58),ty=clamp(oldScreenPos.y,HUD+24,H-44);if(!hitsMap(tx,ty,player.w,player.h,false)){player.x=tx;player.y=ty}}player.dir=side==="right"?"left":"right";player.attack=false;player.cool=0;player.inv=0;enemies=level.enemies.map(createEnemy).filter(e=>!state().dead.has(e.id));loot=level.loot.map(createLoot);artItems=level.arts.map(createArt);gearItems=level.gear.map(createGear);grass=level.grass.map(createGrass);hidden=level.hidden.map(createHidden);lockedChests=level.locked.map(createLocked);repairParts=(level.repairParts||[]).map(createRepairPart);player.oxygen=100;jetActive=false;doorGrace=1.0;if(hasJetpack())jetFuel=Math.max(jetFuel,Math.min(100,70+levelIndex*5));if(level.skill&&!skills.has(level.skill))unlockSkill(level.skill);if(index===WORLD_INDEX){message("MONDE OUVERT · EXPLORE LES SENTIERS ET LES VILLAGES")}else{message("ROYAUME "+(index+1)+" : "+level.name)}
 updateInventory()}
-function restart(){resetCaches();groundDrops=[];ownedOutfits.clear();stats.gold=stats.score=stats.treasures=stats.fragments=stats.kills=0;stats.xp=0;stats.rank=1;stats.combo=0;stats.bestCombo=0;stats.damageDone=0;stats.treesCut=0;stats.grassCut=0;stats.parts={wood:0,gear:0,valve:0,crystal:0};particles=[];floatTexts=[];shake=0;flash=0;arts.clear();ownedGear.clear();skills.clear();crafted.clear();claimedQuests.clear();ownedHomes.clear();ownedHomes.add("starter_cabin");completedKingdoms.clear();Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0});Object.keys(gearLevels).forEach(id=>delete gearLevels[id]);states=createStates();chooseHero(selected);jetFuel=100;jetActive=false;gameOver=victory=false;time=0;loadLevel(HOME_INDEX,"start");message("TU TE RÉVEILLES DANS TA PETITE CABANE · REJOINS LE VILLAGE DE CLAIRBOIS")}
+function restart(){interior.active=false;interior.kind=null;resetCaches();groundDrops=[];ownedOutfits.clear();stats.gold=stats.score=stats.treasures=stats.fragments=stats.kills=0;stats.xp=0;stats.rank=1;stats.combo=0;stats.bestCombo=0;stats.damageDone=0;stats.treesCut=0;stats.grassCut=0;stats.parts={wood:0,gear:0,valve:0,crystal:0};particles=[];floatTexts=[];shake=0;flash=0;arts.clear();ownedGear.clear();skills.clear();crafted.clear();claimedQuests.clear();ownedHomes.clear();ownedHomes.add("starter_cabin");completedKingdoms.clear();Object.assign(homeStorage,{gold:0,fragments:0,wood:0,gear:0,valve:0,crystal:0});Object.keys(gearLevels).forEach(id=>delete gearLevels[id]);states=createStates();chooseHero(selected);jetFuel=100;jetActive=false;gameOver=victory=false;time=0;loadLevel(HOME_INDEX,"start");message("TU TE RÉVEILLES DANS TA PETITE CABANE · REJOINS LE VILLAGE DE CLAIRBOIS")}
 function safeTile(c,r){
   const ok=(cc,rr)=>{
     if(cc<1||cc>14||rr<1||rr>9)return false;
@@ -1238,7 +1251,7 @@ function updatePlayer(dt){
       if(d>7){dx=mx/d;dy=my/d}else mouseTarget.active=false;
     }
   }else{
-    if(keys.ArrowUp||keys.KeyZ||keys.KeyW)dy--;if(keys.ArrowDown||keys.KeyS)dy++;if(keys.ArrowLeft||keys.KeyQ||keys.KeyA)dx--;if(keys.ArrowRight||keys.KeyD)dx++;
+    if((keys.ArrowUp||padKeys.ArrowUp)||keys.KeyZ||keys.KeyW)dy--;if((keys.ArrowDown||padKeys.ArrowDown)||keys.KeyS)dy++;if((keys.ArrowLeft||padKeys.ArrowLeft)||keys.KeyQ||keys.KeyA)dx--;if((keys.ArrowRight||padKeys.ArrowRight)||keys.KeyD)dx++;
   }
   if(dx&&dy){dx*=Math.SQRT1_2;dy*=Math.SQRT1_2}
   player.vx=dx*speed();player.vy=dy*speed();
@@ -1294,7 +1307,7 @@ function lockedDoorMessage(){
 
   message(reasons.length?"SORTIE BLOQUÉE · "+reasons.join(" · "):"SORTIE BLOQUÉE",2.2)
 }function updateEffects(dt){
-  animClock+=dt;gamepadInput();updateAmbient(dt);updateProjectiles(dt);bossRangedAttack(dt);updatePickups(dt);updateTransition(dt);synthMusic(dt);
+  animClock+=dt;updateAmbient(dt);updateProjectiles(dt);bossRangedAttack(dt);updatePickups(dt);updateTransition(dt);synthMusic(dt);
   if(comboTimer>0){comboTimer-=dt;if(comboTimer<=0)resetCombo()}
   shake=Math.max(0,shake-dt);flash=Math.max(0,flash-dt);
   particles.forEach(p=>{p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.94;p.vy*=.94});
@@ -1875,14 +1888,13 @@ function leaveInterior(){
  message("TU RETOURNES AU VILLAGE DE CLAIRBOIS",1.5);
 }
 function updateInterior(dt){
- gamepadInput();
  msg.time=Math.max(0,msg.time-dt);time+=dt;
  if(paused||transition.active)return;
  let dx=0,dy=0;
- if(keys.ArrowLeft||keys.KeyA||keys.KeyQ)dx--;
- if(keys.ArrowRight||keys.KeyD)dx++;
- if(keys.ArrowUp||keys.KeyW||keys.KeyZ)dy--;
- if(keys.ArrowDown||keys.KeyS)dy++;
+ if((keys.ArrowLeft||padKeys.ArrowLeft)||keys.KeyA||keys.KeyQ)dx--;
+ if((keys.ArrowRight||padKeys.ArrowRight)||keys.KeyD)dx++;
+ if((keys.ArrowUp||padKeys.ArrowUp)||keys.KeyW||keys.KeyZ)dy--;
+ if((keys.ArrowDown||padKeys.ArrowDown)||keys.KeyS)dy++;
  if(dx&&dy){dx*=.7071;dy*=.7071}
  interior.x=clamp(interior.x+dx*115*dt,70,442);
  interior.y=clamp(interior.y+dy*115*dt,267,402);
@@ -2131,7 +2143,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-ground-dro
  const target=document.getElementById("res");if(!target)return;
  const panel=document.createElement("div");panel.id="groundDropPanel";target.parentElement.appendChild(panel);
 })();
-function loop(now){const dt=clamp((now-last)/1000,0,.05);last=now;update(dt);syncInteractionButton();render();requestAnimationFrame(loop)}validateGameData();updateInventory();renderNewsHistory();updateNewsBadge();prepareHeroPreviews();requestAnimationFrame(loop);
+function loop(now){const dt=clamp((now-last)/1000,0,.05);last=now;gamepadInput();update(dt);syncInteractionButton();render();requestAnimationFrame(loop)}validateGameData();updateInventory();renderNewsHistory();updateNewsBadge();prepareHeroPreviews();requestAnimationFrame(loop);
 </script>
 </body>
 </html>
