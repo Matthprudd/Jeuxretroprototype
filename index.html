@@ -203,11 +203,11 @@ html,body{font-size:16px;line-height:1.5}
 <body>
 <section id="intro"><div class="introCard"><div class="heroFox"><i class="body"></i><i class="head"></i><i class="ear1"></i><i class="ear2"></i><i class="muzzle"></i><i class="eye1"></i><i class="eye2"></i><i class="tail"></i><i class="tailTip"></i></div><div class="introTitle">LA QUÊTE DES<br>SEPT ROYAUMES</div><div class="introSub">V7.0 · MEYDEN · Sept royaumes · Forêt féérique</div><div class="introBtns"><button id="startGame" class="introBtn">COMMENCER</button><button id="continueGame" class="introBtn">CONTINUER</button></div><div class="smallnote" style="margin-top:15px">Réveille-toi dans ta cabane · traverse la forêt · découvre les villages · libère les sept royaumes.</div></div></section>
 <section id="select" class="overlay hidden"><div class="panel"><h1>CHOISIS TON HÉROS</h1><div class="cards">
-<button class="card" data-char="fox"><div class="preview"><i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#f28c28"></i><i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#ff9c35"></i><i style="position:absolute;left:24px;top:8px;width:11px;height:16px;background:#c9651d"></i><i style="position:absolute;left:51px;top:8px;width:11px;height:16px;background:#c9651d"></i></div><h3>🦊 RENARD ORANGE</h3><ul><li>Vie 3</li><li>Vitesse très élevée</li><li>+15 % d'or</li><li>Skill initial : Esquive</li></ul></button>
-<button class="card" data-char="warrior"><div class="preview"><i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#3175d6"></i><i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#d7a46d"></i><i style="position:absolute;left:24px;top:9px;width:38px;height:12px;background:#858e99"></i></div><h3>🥷 GUERRIER</h3><ul><li>Vie 5</li><li>Attaque 2</li><li>Défense 1</li><li>Skill initial : Coup puissant</li></ul></button>
-<button class="card" data-char="mage"><div class="preview"><i style="position:absolute;left:24px;top:35px;width:38px;height:34px;background:#7e46c4"></i><i style="position:absolute;left:28px;top:17px;width:30px;height:27px;background:#d9ac79"></i><i style="position:absolute;left:25px;top:4px;width:36px;height:20px;background:#552a8d"></i></div><h3>🧙 MAGE</h3><ul><li>Vie 3</li><li>Portée accrue</li><li>Recharge rapide</li><li>Skill initial : Onde magique</li></ul></button>
+<button class="card" data-char="fox"><div class="preview"><canvas width="64" height="64" data-hero-preview="fox" style="width:78px;height:78px;image-rendering:pixelated"></canvas></div><h3>🦊 RENARD ORANGE</h3><ul><li>Vie 3</li><li>Vitesse très élevée</li><li>+15 % d'or</li><li>Skill initial : Esquive</li></ul></button>
+<button class="card" data-char="warrior"><div class="preview"><canvas width="64" height="64" data-hero-preview="warrior" style="width:78px;height:78px;image-rendering:pixelated"></canvas></div><h3>🥷 GUERRIER</h3><ul><li>Vie 5</li><li>Attaque 2</li><li>Défense 1</li><li>Skill initial : Coup puissant</li></ul></button>
+<button class="card" data-char="mage"><div class="preview"><canvas width="64" height="64" data-hero-preview="mage" style="width:78px;height:78px;image-rendering:pixelated"></canvas></div><h3>🧙 MAGE</h3><ul><li>Vie 3</li><li>Portée accrue</li><li>Recharge rapide</li><li>Skill initial : Onde magique</li></ul></button>
 </div></div></section>
-<main class="shell"><header class="top compactTop"><button id="leftMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau jeu">☰ JEU</button><div class="title">SEPT ROYAUMES · V6.2</div><button id="rightMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau aventure">AVENTURE ☰</button></header>
+<main class="shell"><header class="top compactTop"><button id="leftMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau jeu">☰ JEU</button><div class="title">SEPT ROYAUMES · V7.1</div><button id="rightMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau aventure">AVENTURE ☰</button></header>
 <div id="drawerShade" class="drawerShade"></div>
 <aside id="leftDrawer" class="gameDrawer leftDrawer" aria-hidden="true"><div class="drawerHead"><b>MENU JEU</b><button class="drawerClose" data-close-drawer>×</button></div><div class="drawerButtons"><button id="controlsBtn" class="btn">COMMANDES</button><button id="inventoryBtn" class="btn">INVENTAIRE</button><button id="saveBtn" class="btn">SAUVER</button><button id="loadBtn" class="btn">CHARGER</button><button id="audioBtn" class="btn">SON ON</button><button id="pauseBtn" class="btn">PAUSE</button><button id="fullBtn" class="btn">PLEIN ÉCRAN</button><button id="changeBtn" class="btn">PERSONNAGE</button></div></aside>
 <aside id="rightDrawer" class="gameDrawer rightDrawer" aria-hidden="true"><div class="drawerHead"><b>AVENTURE</b><button class="drawerClose" data-close-drawer>×</button></div><div class="drawerButtons"><button id="journalBtn" class="btn">JOURNAL</button><button id="questsBtn" class="btn">QUÊTES</button><button id="worldReturnBtn" class="btn">CARTE / MONDE</button><button id="homesBtn" class="btn">MES MAISONS</button></div><button id="shopBtn" hidden></button><button id="forgeBtn" hidden></button></aside><div class="layout"><div><canvas id="game" width="512" height="448"></canvas><div class="touch"><div class="pad"><button class="tbtn up" data-key="ArrowUp">▲</button><button class="tbtn left" data-key="ArrowLeft">◀</button><button class="tbtn down" data-key="ArrowDown">▼</button><button class="tbtn right" data-key="ArrowRight">▶</button></div><div class="action"><button id="touchAttack" class="tbtn attack">ÉPÉE</button><button id="touchSkill" class="tbtn skillbtn">SKILL</button><button id="touchMagic" class="tbtn skillbtn">MAGIE</button><button id="touchJet" class="tbtn skillbtn">JET</button><button id="touchInteract" class="tbtn interactbtn" hidden>PARLER</button></div></div><div class="mobileUtility"><button id="quickGameMenu" class="utilityBtn">☰ JEU</button><button id="quickAdventureMenu" class="utilityBtn">★ AVENTURE</button><button id="quickSave" class="utilityBtn">💾 SAUVE</button><button id="quickPause" class="utilityBtn">Ⅱ PAUSE</button></div></div><aside class="inventory"><details class="invbox" id="resBox" open><summary>RESSOURCES</summary><div id="res"></div></details><details class="invbox" id="gearBox"><summary>ÉQUIPEMENT ACTIF</summary><div id="gear"></div></details><details class="invbox" id="keysBox"><summary>ARTÉFACTS & SKILLS</summary><div id="keys"></div></details></aside></div><div class="status">Porte droite : avancer · Porte gauche : revenir · ESPACE : épée · F : skill · Niveau aquatique : nage en vue de côté</div></main>
@@ -1460,56 +1460,56 @@ function drawEnemies(){
     ctx.fillStyle=e.boss?"#d96cff":"#ff765d";ctx.fillRect(x,y-7,e.w*Math.max(0,e.hp)/e.max,4);
   });
 }
-function drawPlayer(){
-  if(player.inv&&Math.floor(player.inv*14)%2)return;
-  const x=Math.round(player.x),y=Math.round(player.y);
-  const moving=(Math.abs(player.vx||0)+Math.abs(player.vy||0))>1;
-  const bob=moving?Math.round(Math.sin(time*12)*1):0;
-  const yy=y+bob;
-  ctx.fillStyle="#0007";ctx.fillRect(x+4,yy+22,16,3);
-  if(selected==="fox"){
-    ctx.fillStyle="#b95b19";
-    if(player.dir==="left"){ctx.fillRect(x+17,yy+11,8,10);ctx.fillRect(x+20,yy+9,5,5);ctx.fillStyle="#fff1d7";ctx.fillRect(x+22,yy+14,3,5);} else {ctx.fillRect(x-1,yy+11,8,10);ctx.fillRect(x-1,yy+9,5,5);ctx.fillStyle="#fff1d7";ctx.fillRect(x-1,yy+14,3,5);}
-    ctx.fillStyle="#f28c28";ctx.fillRect(x+4,yy+8,16,13);
-    ctx.fillStyle="#ffd6a2";ctx.fillRect(x+7,yy+13,10,6);
-    ctx.fillStyle="#cf6b20";ctx.fillRect(x+4,yy+19,16,2);
-    ctx.fillStyle="#f28c28";ctx.fillRect(x+5,yy,14,11);
-    ctx.fillStyle="#b95b19";ctx.fillRect(x+3,yy-5,6,7);ctx.fillRect(x+15,yy-5,6,7);ctx.fillStyle="#f28c28";ctx.fillRect(x+5,yy-7,3,4);ctx.fillRect(x+17,yy-7,3,4);
-    ctx.fillStyle="#ffd6a2";ctx.fillRect(x+7,yy+6,10,4);ctx.fillRect(x+9,yy+9,6,3);
-    ctx.fillStyle="#1d1d1d";ctx.fillRect(x+7,yy+4,2,2);ctx.fillRect(x+15,yy+4,2,2);ctx.fillRect(x+11,yy+8,2,2);
-    ctx.fillStyle="#fff";ctx.fillRect(x+8,yy+4,1,1);ctx.fillRect(x+16,yy+4,1,1);
-    ctx.fillStyle="#7a3b14";ctx.fillRect(x+6,yy+21,4,3);ctx.fillRect(x+14,yy+21,4,3);
-    ctx.fillStyle="#76d0ff";ctx.fillRect(x+7,yy+10,10,2);
-  }else if(selected==="warrior"){
-    ctx.fillStyle="#2b2b2b";ctx.fillRect(x+6,yy+18,4,6);ctx.fillRect(x+14,yy+18,4,6);
-    ctx.fillStyle="#2e72d1";ctx.fillRect(x+4,yy+8,16,12);
-    ctx.fillStyle="#5c9af1";ctx.fillRect(x+6,yy+10,12,3);
-    ctx.fillStyle="#1f4a92";ctx.fillRect(x+6,yy+15,12,4);
-    ctx.fillStyle="#6d4c2e";ctx.fillRect(x+5,yy+17,14,2);ctx.fillStyle="#d8a85f";ctx.fillRect(x+11,yy+17,3,2);
-    ctx.fillStyle="#d7a46d";ctx.fillRect(x+7,yy+2,10,8);
-    ctx.fillStyle="#9aa8b8";ctx.fillRect(x+4,yy,16,5);ctx.fillRect(x+6,yy-3,12,3);ctx.fillStyle="#cfd9e3";ctx.fillRect(x+9,yy-4,6,2);
-    ctx.fillStyle="#1b1b1b";ctx.fillRect(x+9,yy+5,2,2);ctx.fillRect(x+13,yy+5,2,2);
-    ctx.fillStyle="#7d8ba0";ctx.fillRect(x+2,yy+8,3,7);ctx.fillRect(x+19,yy+8,3,7);
-    if(player.gear.shield){ctx.fillStyle=ELEMENTS[GEAR[player.gear.shield].element].color;ctx.fillRect(player.dir==="left"?x+18:x-2,yy+9,6,12);ctx.fillStyle="#fff5";ctx.fillRect(player.dir==="left"?x+19:x-1,yy+11,2,6);}
-  }else{
-    ctx.fillStyle="#6b39b4";ctx.fillRect(x+5,yy+7,14,14);
-    ctx.fillStyle="#8c63d1";ctx.fillRect(x+7,yy+10,10,3);ctx.fillStyle="#4d237f";ctx.fillRect(x+7,yy+17,10,3);
-    ctx.fillStyle="#5d2f9d";ctx.fillRect(x+3,yy+10,3,7);ctx.fillRect(x+18,yy+10,3,7);
-    ctx.fillStyle="#d9ac79";ctx.fillRect(x+8,yy+3,8,7);
-    ctx.fillStyle="#4c237f";ctx.fillRect(x+5,yy,14,5);ctx.fillRect(x+8,yy-4,8,4);ctx.fillStyle="#a889e0";ctx.fillRect(x+9,yy-5,6,2);
-    ctx.fillStyle="#1b1b1b";ctx.fillRect(x+9,yy+5,2,2);ctx.fillRect(x+13,yy+5,2,2);
-    ctx.fillStyle="#caa0ff";ctx.fillRect(x+8,yy+21,2,3);ctx.fillRect(x+14,yy+21,2,3);
-    ctx.fillStyle="#7de8ff";ctx.fillRect(x+11,yy+12,3,3);
-  }
-  if(player.gear.helmet){ctx.fillStyle=ELEMENTS[GEAR[player.gear.helmet].element].color;ctx.fillRect(x+4,yy-2,16,3);ctx.fillStyle="#fff6";ctx.fillRect(x+6,yy-2,5,1);}
-  if(player.gear.armor){ctx.fillStyle=ELEMENTS[GEAR[player.gear.armor].element].color;ctx.fillRect(x+5,yy+13,14,5);ctx.fillStyle="#0005";ctx.fillRect(x+7,yy+17,10,1);}
-  if(player.gear.sword){ctx.fillStyle=ELEMENTS[GEAR[player.gear.sword].element].color;ctx.fillRect(player.dir==="left"?x+1:x+19,yy+11,3,7);}
-  if(hasJetpack()){
-    ctx.fillStyle="#4d5563";ctx.fillRect(x+2,yy+10,4,8);ctx.fillRect(x+18,yy+10,4,8);
-    ctx.fillStyle="#a9b4c1";ctx.fillRect(x+3,yy+11,2,4);ctx.fillRect(x+19,yy+11,2,4);
-    if(jetActive){ctx.fillStyle="#ffd35e";ctx.fillRect(x+3,yy+18,2,2);ctx.fillRect(x+19,yy+18,2,2);ctx.fillStyle="#ff7d4f";ctx.fillRect(x+3,yy+20,2,4);ctx.fillRect(x+19,yy+20,2,4);}
-  }
+// V7.1: Shared pixel-animal renderer, consistent across all scenes.
+function paintAnimal(c,kind,x,y,scale=1,dir="down",step=0){
+ c.save();c.translate(Math.round(x),Math.round(y));c.scale(scale,scale);
+ const r=(color,x,y,w,h)=>{c.fillStyle=color;c.fillRect(x,y,w,h)};
+ const isFox=kind==="fox"||kind==="shop",wolf=kind==="warrior",owl=kind==="mage"||kind==="laboratory";
+ const badger=kind==="forge",raccoon=kind==="general";
+ const fur=isFox?"#e97c26":wolf?"#809098":owl?"#a17b53":badger?"#6d6d62":raccoon?"#81796e":"#d28c50";
+ const dark=isFox?"#7b381c":wolf?"#394954":owl?"#654429":"#3c3936";
+ const cream=owl?"#edd8a4":"#efcf9e";
+ const coat=wolf?"#4776b6":owl?"#66439b":badger?"#995332":raccoon?"#437c62":"#32765b";
+ const frame=step%2;
+ // cast shadow and expressive tail
+ r("#17211a88",2,27,23,3);
+ if(!owl){r(dark,kind==="fox"?-6:21,16,9,7);r(fur,kind==="fox"?-7:23,13,9,6);r(cream,kind==="fox"?-7:27,20,5,3);}
+ // footwear, animated step
+ r(dark,6,24+frame,5,5);r(dark,16,24+(1-frame),5,5);
+ r(coat,5,15,18,11);r(dark,6,24,16,2);
+ r(fur,2,16,4,8);r(fur,23,16,4,8);
+ // ears or feather tufts
+ if(owl){r(dark,4,2,6,7);r(dark,20,2,6,7);r(cream,5,3,4,5);r(cream,21,3,4,5)}
+ else{r(dark,4,0,7,10);r(dark,19,0,7,10);r(fur,5,2,5,7);r(fur,20,2,5,7);r(cream,7,3,2,4);r(cream,22,3,2,4)}
+ r(dark,5,7,21,12);r(fur,6,7,19,11);
+ if(badger){r("#dcd6bd",12,7,7,11);r("#eee6ca",8,10,4,7);r("#eee6ca",22,10,3,7)}
+ if(raccoon){r("#343b40",7,11,18,5);r(cream,12,17,8,3)}
+ if(owl){r(cream,8,10,7,7);r(cream,18,10,7,7);r("#f1bc3f",15,16,4,5)}
+ else{r(cream,11,16,11,5);r(dark,15,18,5,3)}
+ r("#142027",10,12,3,3);r("#142027",21,12,3,3);r("#fff8d4",10,12,1,1);r("#fff8d4",21,12,1,1);
+ // class equipment, readable at a glance
+ if(wolf){r("#a9b9c1",8,17,15,3);r("#d6e4e8",10,20,11,2);r("#e9c86a",25,6,2,19);r("#cdd5dd",24,4,4,10)}
+ if(owl){r("#3e2863",5,3,22,3);r("#b58dec",8,22,15,2);r("#8a6a43",27,8,2,22);r("#78ddf0",25,5,6,6);}
+ if(isFox){r("#dfb85e",8,21,15,3);r("#92bb95",17,21,4,3);}
+ if(badger){r("#d1ab70",9,19,14,6);r("#5c4e44",26,18,3,10);r("#bec8ca",23,16,8,5)}
+ if(raccoon){r("#d0a05f",9,21,14,3);r("#5c4631",23,18,7,7)}
+ if(dir==="up"){r(dark,8,9,14,7);r(coat,9,16,14,8)}
+ if(dir==="left"){r(dark,5,17,3,3)}
+ if(dir==="right"){r(dark,23,17,3,3)}
+ c.restore();
 }
+function drawPlayer(){
+ if(player.inv&&Math.floor(player.inv*14)%2)return;
+ const walking=(Math.abs(player.vx||0)+Math.abs(player.vy||0))>1;
+ paintAnimal(ctx,selected,Math.round(player.x)-2,Math.round(player.y)-7,0.84,player.dir,walking?Math.floor(time*9):0);
+}
+function prepareHeroPreviews(){
+ document.querySelectorAll("canvas[data-hero-preview]").forEach(el=>{
+  const p=el.getContext("2d");p.imageSmoothingEnabled=false;
+  p.clearRect(0,0,64,64);paintAnimal(p,el.dataset.heroPreview,9,3,1.55,"down",0);
+ });
+}
+
 function drawSword(){
   if(!player.attack)return;
   const s=sword(),col=ELEMENTS[activeElement()].color;
@@ -2006,23 +2006,16 @@ function drawInterior(){
  ctx.fillStyle="#c3945d";ctx.fillRect(60,170,392,13);
  ctx.fillStyle="#f1c481";ctx.fillRect(65,172,382,3);
  ctx.fillStyle="#bb8350";ctx.fillRect(60,221,392,14);ctx.fillStyle="#e2b076";ctx.fillRect(65,222,382,3);
- // Merchant pixel character, clear head/hair/ears and costume silhouette.
- ctx.fillStyle="#1b2d2d";ctx.fillRect(231,135,50,42);
- ctx.fillStyle=forge?"#be5e35":lab?"#7857b0":"#327660";ctx.fillRect(239,139,34,35);
- ctx.fillStyle="#cfab77";ctx.fillRect(246,123,20,19);
- ctx.fillStyle="#291d16";ctx.fillRect(243,119,26,6);ctx.fillRect(245,125,3,5);
- ctx.fillStyle="#301c18";ctx.fillRect(248,132,3,2);ctx.fillRect(260,132,3,2);
- ctx.fillStyle="#f2d7aa";ctx.fillRect(253,138,7,2);
- ctx.fillStyle="#c79e61";ctx.fillRect(238,146,4,15);ctx.fillRect(270,146,4,15);
+ // Animal shopkeeper; role and interaction positions unchanged.
+ paintAnimal(ctx,kind,230,120,1.72,"down",0);
  // The forge and lab retain their original interactions.
  if(forge){/* preserve visible illustrated forge: no opaque rectangle */ctx.fillStyle=interior.forgeLit?"#f8aa4a":"#8d674a";ctx.fillRect(118,286,24,3);ctx.fillStyle="#fbe3a0";ctx.font="9px monospace";ctx.textAlign="center";ctx.fillText(interior.forgeLit?"FOYER ACTIF":"ALLUMER FOYER",132,315);}
  if(lab){ctx.fillStyle="#45bdbc";ctx.fillRect(375,248,13,24);ctx.fillStyle="#ac76e7";ctx.fillRect(397,258,16,19)}
  ctx.fillStyle="#241b18";ctx.fillRect(211,400,90,25);
  ctx.fillStyle="#b78a4e";ctx.fillRect(215,400,82,3);
  ctx.fillStyle="#f3d296";ctx.font="10px monospace";ctx.textAlign="center";ctx.fillText("SORTIE ↓",256,418);
- // Player kept at exact physics coordinates.
- ctx.fillStyle="#2c3a70";ctx.fillRect(interior.x-10,interior.y-13,20,24);
- ctx.fillStyle="#eac196";ctx.fillRect(interior.x-7,interior.y-23,14,12);
+ // Same selected hero renderer inside and outside buildings.
+ paintAnimal(ctx,selected,interior.x-13,interior.y-23,0.9,"down",Math.floor(time*5));
  ctx.fillStyle="#e9d7a3";ctx.font="bold 15px monospace";ctx.fillText(INTERIOR_NAMES[kind].toUpperCase(),256,31);
  ctx.font="11px monospace";ctx.fillText("MONTE AU COMPTOIR · H / ENTRÉE : PARLER",256,52);
  ctx.fillStyle="#172a25";ctx.fillRect(180,57,152,18);ctx.fillStyle="#f5d894";ctx.font="bold 9px monospace";ctx.fillText(forge?(interior.forgeLit?"FORGE PRÊTE":"ALLUME LE FEU"): "ACHETER · VENDRE · ÉCHANGER",256,69);
@@ -2077,7 +2070,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-ground-dro
  const target=document.getElementById("res");if(!target)return;
  const panel=document.createElement("div");panel.id="groundDropPanel";target.parentElement.appendChild(panel);
 })();
-function loop(now){const dt=clamp((now-last)/1000,0,.05);last=now;update(dt);syncInteractionButton();render();requestAnimationFrame(loop)}validateGameData();updateInventory();renderNewsHistory();updateNewsBadge();requestAnimationFrame(loop);
+function loop(now){const dt=clamp((now-last)/1000,0,.05);last=now;update(dt);syncInteractionButton();render();requestAnimationFrame(loop)}validateGameData();updateInventory();renderNewsHistory();updateNewsBadge();prepareHeroPreviews();requestAnimationFrame(loop);
 </script>
 </body>
 </html>
