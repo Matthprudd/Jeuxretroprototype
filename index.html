@@ -1926,6 +1926,34 @@ function meydenShopFurniture(kind){
  }
 }
 
+/* MEYDEN fantasy artwork: the approved sheets are loaded only when installed.
+   Keep existing canvas primitives as a fallback, without altering gameplay. */
+const meydenArt={};
+const meydenAssetPaths={
+  inventory:"assets/inventaire_fantasy_meyden.png",
+  forest:"assets/foret_feerique_meyden.png",
+  interiors:"assets/interieurs_fantasy_meyden.png"
+};
+for(const [key,path] of Object.entries(meydenAssetPaths)){
+ const img=new Image();img.onload=()=>{meydenArt[key]=img};img.onerror=()=>{meydenArt[key]=null};img.src=path;
+}
+function meydenArtCrop(key,box,xywh){
+ const img=meydenArt[key];if(!img||!img.complete)return false;
+ const [sx,sy,sw,sh]=box,[x,y,w,h]=xywh;
+ ctx.imageSmoothingEnabled=false;
+ try{ctx.drawImage(img,sx,sy,sw,sh,x,y,w,h);return true}catch(e){return false}
+}
+function meydenArtInterior(kind){
+ if(!meydenArt.interiors)return;
+ // Artwork segments from the hand-approved fantasy interior sheet.
+ // These are decorative overlays, not colliders or interactive entities.
+ const shelf=kind==="laboratory"?[6,192,148,186]:[171,192,157,185];
+ meydenArtCrop("interiors",shelf,[68,90,104,98]);
+ meydenArtCrop("interiors",[343,192,163,185],[340,90,104,98]);
+ if(kind==="forge"){meydenArtCrop("interiors",[350,752,154,185],[62,245,97,86]);}
+ else if(kind==="laboratory"){meydenArtCrop("interiors",[5,967,173,165],[67,248,120,83]);}
+ meydenArtCrop("interiors",[2,10,212,169],[174,171,165,60]);
+}
 function drawInterior(){
  const kind=interior.kind;const lab=kind==="laboratory",forge=kind==="forge";
  ctx.fillStyle="#211b25";ctx.fillRect(0,0,W,H);
@@ -1933,6 +1961,7 @@ function drawInterior(){
  ctx.fillStyle="#6d523c";ctx.fillRect(38,82,436,338);
  for(let x=48;x<462;x+=32){for(let y=104;y<416;y+=32){ctx.fillStyle=((x+y)/32)%2?"#776047":"#81694c";ctx.fillRect(x,y,30,30)}}
  meydenShopFurniture(kind);
+ meydenArtInterior(kind);
  ctx.fillStyle="#392719";ctx.fillRect(60,174,392,50);
  ctx.fillStyle="#bd9362";ctx.fillRect(60,218,392,17);
  ctx.fillStyle="#2e3d44";ctx.fillRect(238,135,36,60);
