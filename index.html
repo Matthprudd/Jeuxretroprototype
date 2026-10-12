@@ -1024,19 +1024,23 @@ function drawFantasyPortal(o){
  ctx.fillText(String(o.level+1),x+w/2,y+h-4);
  ctx.font="7px monospace";ctx.fillText(o.name.split(" ")[0],x+w/2,y-3);ctx.textAlign="left";ctx.restore();
 }
+// Original MEYDEN graphical resources: independently addressable transparent sprites.
+const meydenOriginal={};
+for(const id of ["renarde","cabane","arbre","coffre","boutique"]){const im=new Image();im.onload=()=>{meydenOriginal[id]=im};im.src="assets/meyden_original/"+id+"_meyden.svg";}
+function drawMeydenOriginal(id,x,y,w,h){const im=meydenOriginal[id];if(!im||!im.complete||!im.naturalWidth)return false;ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(im,x,y,w,h);ctx.restore();return true;}
 function drawWorldObjects(){
  worldObjects().forEach(o=>{
    if(!isHome()&&meydenWorldAccent(o))return;
    if(o.type==="gate")drawFantasyPortal(o)
-   else if(o.type==="shop"||o.type==="general"||o.type==="laboratory")drawShopSprite(o)
+   else if(o.type==="shop"||o.type==="general"||o.type==="laboratory"){if(!drawMeydenOriginal("boutique",o.x-4,o.y-5,o.w+8,o.h+8))drawShopSprite(o)}
    else if(o.type==="forge")drawForgeSprite(o)
    else if(o.type==="realtor")drawRealtorSprite(o)
-   else if(o.type==="starterHome")drawPlayerHomeSprite(o)
+   else if(o.type==="starterHome"){if(!drawMeydenOriginal("cabane",o.x-4,o.y-5,o.w+8,o.h+8))drawPlayerHomeSprite(o)}
    else if(o.type==="house")drawHouseSprite(o)
    else if(o.type==="cache"){ctx.fillStyle="#684a2f";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#21170e";ctx.fillRect(o.x+7,o.y+8,o.w-14,o.h-13);ctx.fillStyle="#dcc583";ctx.font="8px monospace";ctx.fillText("CACHE",o.x,o.y-3)}
    else if(o.type==="sign"){ctx.fillStyle="#65401f";ctx.fillRect(o.x+11,o.y+12,6,18);ctx.fillStyle="#b17a3d";ctx.fillRect(o.x,o.y,28,16);ctx.fillStyle="#fff0aa";ctx.font="bold 6px monospace";ctx.fillText("CLAIRBOIS",o.x+2,o.y+10)}
    else if(o.type==="homeExit"){ctx.fillStyle="#3a2418";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#9a6031";ctx.fillRect(o.x+4,o.y+2,o.w-8,o.h-4);ctx.fillStyle="#e1c169";ctx.fillRect(o.x+23,o.y+10,3,3)}
-   else if(o.type==="starterChest"){ctx.fillStyle="#5b351c";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#9b622d";ctx.fillRect(o.x+2,o.y+3,o.w-4,8);ctx.fillStyle="#e5c363";ctx.fillRect(o.x+14,o.y+9,6,9)}
+   else if(o.type==="starterChest"){if(drawMeydenOriginal("coffre",o.x,o.y,o.w,o.h))return;ctx.fillStyle="#5b351c";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#9b622d";ctx.fillRect(o.x+2,o.y+3,o.w-4,8);ctx.fillStyle="#e5c363";ctx.fillRect(o.x+14,o.y+9,6,9)}
    else if(o.type==="bed"){ctx.fillStyle="#5a3926";ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle="#b9a476";ctx.fillRect(o.x+3,o.y+4,o.w-6,o.h-8);ctx.fillStyle="#ddd0a7";ctx.fillRect(o.x+5,o.y+5,o.w-10,12)}
  });
  const o=nearestWorldObject();if(o){ctx.fillStyle="#0a0d0acc";ctx.fillRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.strokeStyle="#d8c37a";ctx.strokeRect(Math.max(4,o.x-10),Math.max(HUD+2,o.y-22),Math.min(170,W-o.x+10),14);ctx.fillStyle="#fff3bd";ctx.font="bold 7px monospace";ctx.fillText(o.type==="gate"?"TRAVERSE LE PORTAIL":(window.matchMedia("(pointer:coarse)").matches?"INTERAGIR":"CLIQUE / H"),Math.max(8,o.x-5),Math.max(HUD+12,o.y-12))}
