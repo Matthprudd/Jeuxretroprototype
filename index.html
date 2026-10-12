@@ -1902,12 +1902,37 @@ canvas.addEventListener("pointerdown",function(e){
  if(p.y<235){interior.y=290;interior.x=p.x;interiorInteract();return}
  interior.x=clamp(p.x,70,442);interior.y=clamp(p.y,247,402);
 },true);
+
+/* Optional MEYDEN fantasy atlas layer. Existing canvas art remains fallback when an atlas is unavailable. */
+const meydenAtlases={};
+for(const [key,file] of Object.entries({inventory:"inventaire_fantasy_meyden.png",forest:"foret_feerique_meyden.png",interior:"interieurs_fantasy_meyden.png"})){
+ const im=new Image();im.onload=()=>{meydenAtlases[key]=im};im.onerror=()=>console.warn("Atlas MEYDEN absent:",file);im.src="assets/"+file;
+}
+function meydenCrop(sheet,sx,sy,sw,sh,dx,dy,dw,dh){
+ const im=meydenAtlases[sheet];if(!im||!im.complete||im.naturalWidth===0)return false;
+ ctx.drawImage(im,sx,sy,sw,sh,dx,dy,dw,dh);return true;
+}
+function meydenShopFurniture(kind){
+ // Deliberately decorative: existing interaction and collision zones do not change.
+ if(kind==="shop"||kind==="general"){
+  meydenCrop("interior",22,180,176,237,75,94,115,94);
+  meydenCrop("interior",203,182,181,235,322,94,112,94);
+ }else if(kind==="laboratory"){
+  meydenCrop("interior",24,811,245,220,65,95,132,98);
+  meydenCrop("interior",277,814,213,215,332,102,107,95);
+ }else if(kind==="forge"){
+  meydenCrop("interior",20,615,240,204,72,112,110,103);
+  meydenCrop("interior",486,605,147,215,336,116,96,93);
+ }
+}
+
 function drawInterior(){
  const kind=interior.kind;const lab=kind==="laboratory",forge=kind==="forge";
  ctx.fillStyle="#211b25";ctx.fillRect(0,0,W,H);
  ctx.fillStyle="#9f805d";ctx.fillRect(28,72,456,354);
  ctx.fillStyle="#6d523c";ctx.fillRect(38,82,436,338);
  for(let x=48;x<462;x+=32){for(let y=104;y<416;y+=32){ctx.fillStyle=((x+y)/32)%2?"#776047":"#81694c";ctx.fillRect(x,y,30,30)}}
+ meydenShopFurniture(kind);
  ctx.fillStyle="#392719";ctx.fillRect(60,174,392,50);
  ctx.fillStyle="#bd9362";ctx.fillRect(60,218,392,17);
  ctx.fillStyle="#2e3d44";ctx.fillRect(238,135,36,60);
