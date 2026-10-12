@@ -201,7 +201,7 @@ html,body{font-size:16px;line-height:1.5}
 </style>
 </head>
 <body>
-<section id="intro"><div class="introCard"><div class="heroFox"><i class="body"></i><i class="head"></i><i class="ear1"></i><i class="ear2"></i><i class="muzzle"></i><i class="eye1"></i><i class="eye2"></i><i class="tail"></i><i class="tailTip"></i></div><div class="introTitle">LA QUÊTE DES<br>SEPT ROYAUMES</div><div class="introSub">V7.0 · MEYDEN · Sept royaumes · Forêt féérique</div><div class="introBtns"><button id="startGame" class="introBtn">COMMENCER</button><button id="continueGame" class="introBtn">CONTINUER</button></div><div class="smallnote" style="margin-top:15px">Réveille-toi dans ta cabane · traverse la forêt · découvre les villages · libère les sept royaumes.</div></div></section>
+<section id="intro"><div class="introCard"><div class="heroFox" style="width:180px;height:180px;display:flex;align-items:center;justify-content:center"><canvas id="introFoxPortrait" width="96" height="96" style="width:160px;height:160px;image-rendering:pixelated"></canvas></div><div class="introTitle">LA QUÊTE DES<br>SEPT ROYAUMES</div><div class="introSub">V7.0 · MEYDEN · Sept royaumes · Forêt féérique</div><div class="introBtns"><button id="startGame" class="introBtn">COMMENCER</button><button id="continueGame" class="introBtn">CONTINUER</button></div><div class="smallnote" style="margin-top:15px">Réveille-toi dans ta cabane · traverse la forêt · découvre les villages · libère les sept royaumes.</div></div></section>
 <section id="select" class="overlay hidden"><div class="panel"><h1>CHOISIS TON HÉROS</h1><div class="cards">
 <button class="card" data-char="fox"><div class="preview"><canvas width="64" height="64" data-hero-preview="fox" style="width:78px;height:78px;image-rendering:pixelated"></canvas></div><h3>🦊 RENARD ORANGE</h3><ul><li>Vie 3</li><li>Vitesse très élevée</li><li>+15 % d'or</li><li>Skill initial : Esquive</li></ul></button>
 <button class="card" data-char="warrior"><div class="preview"><canvas width="64" height="64" data-hero-preview="warrior" style="width:78px;height:78px;image-rendering:pixelated"></canvas></div><h3>🥷 GUERRIER</h3><ul><li>Vie 5</li><li>Attaque 2</li><li>Défense 1</li><li>Skill initial : Coup puissant</li></ul></button>
@@ -1504,6 +1504,7 @@ function drawPlayer(){
  paintAnimal(ctx,selected,Math.round(player.x)-2,Math.round(player.y)-7,0.84,player.dir,walking?Math.floor(time*9):0);
 }
 function prepareHeroPreviews(){
+ const intro=document.getElementById("introFoxPortrait");if(intro){const p=intro.getContext("2d");p.imageSmoothingEnabled=false;p.clearRect(0,0,96,96);paintAnimal(p,"fox",22,11,2,"down",0)}
  document.querySelectorAll("canvas[data-hero-preview]").forEach(el=>{
   const p=el.getContext("2d");p.imageSmoothingEnabled=false;
   p.clearRect(0,0,64,64);paintAnimal(p,el.dataset.heroPreview,9,3,1.55,"down",0);
@@ -1965,13 +1966,9 @@ function meydenArtInterior(kind){
   meydenArtCrop("interiors",[9,980,173,159],[65,242,118,63]);
  }
 }
-function meydenWorldAccent(o){
- if(o.type==="gate")return meydenArtCrop("forest",[707,733,136,144],[o.x-4,o.y,o.w+8,o.h]);
- if(o.type==="starterChest")return false; // Preserve readable, interactive chest
- if(o.type==="cache")return false; // Prevent cropped tree art on storage UI
- if(o.type==="sign")return meydenArtCrop("forest",[8,477,132,180],[o.x-3,o.y-5,o.w+6,o.h+6]);
- return false;
-}
+// Keep the proven portal rendering: the forest atlas has no verified isolated portal crop.
+// Never draw atlas thumbnails or their printed captions as world objects.
+function meydenWorldAccent(o){return false;}
 function drawInterior(){
  const kind=interior.kind,lab=kind==="laboratory",forge=kind==="forge";
  // Forest-fantasy room, with the actual game collisions and interactions unchanged.
