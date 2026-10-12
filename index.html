@@ -207,7 +207,7 @@ html,body{font-size:16px;line-height:1.5}
 <button class="card" data-char="warrior"><div class="preview"><canvas width="64" height="64" data-hero-preview="warrior" style="width:78px;height:78px;image-rendering:pixelated"></canvas></div><h3>🥷 GUERRIER</h3><ul><li>Vie 5</li><li>Attaque 2</li><li>Défense 1</li><li>Skill initial : Coup puissant</li></ul></button>
 <button class="card" data-char="mage"><div class="preview"><canvas width="64" height="64" data-hero-preview="mage" style="width:78px;height:78px;image-rendering:pixelated"></canvas></div><h3>🧙 MAGE</h3><ul><li>Vie 3</li><li>Portée accrue</li><li>Recharge rapide</li><li>Skill initial : Onde magique</li></ul></button>
 </div></div></section>
-<main class="shell"><header class="top compactTop"><button id="leftMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau jeu">☰ JEU</button><div class="title">SEPT ROYAUMES · V7.1</div><button id="rightMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau aventure">AVENTURE ☰</button></header>
+<main class="shell"><header class="top compactTop"><button id="leftMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau jeu">☰ JEU</button><div class="title">SEPT ROYAUMES · V7.2</div><button id="rightMenuToggle" class="menuToggle" aria-label="Ouvrir le panneau aventure">AVENTURE ☰</button></header>
 <div id="drawerShade" class="drawerShade"></div>
 <aside id="leftDrawer" class="gameDrawer leftDrawer" aria-hidden="true"><div class="drawerHead"><b>MENU JEU</b><button class="drawerClose" data-close-drawer>×</button></div><div class="drawerButtons"><button id="controlsBtn" class="btn">COMMANDES</button><button id="inventoryBtn" class="btn">INVENTAIRE</button><button id="saveBtn" class="btn">SAUVER</button><button id="loadBtn" class="btn">CHARGER</button><button id="audioBtn" class="btn">SON ON</button><button id="pauseBtn" class="btn">PAUSE</button><button id="fullBtn" class="btn">PLEIN ÉCRAN</button><button id="changeBtn" class="btn">PERSONNAGE</button></div></aside>
 <aside id="rightDrawer" class="gameDrawer rightDrawer" aria-hidden="true"><div class="drawerHead"><b>AVENTURE</b><button class="drawerClose" data-close-drawer>×</button></div><div class="drawerButtons"><button id="journalBtn" class="btn">JOURNAL</button><button id="questsBtn" class="btn">QUÊTES</button><button id="worldReturnBtn" class="btn">CARTE / MONDE</button><button id="homesBtn" class="btn">MES MAISONS</button></div><button id="shopBtn" hidden></button><button id="forgeBtn" hidden></button></aside><div class="layout"><div><canvas id="game" width="512" height="448"></canvas><div class="touch"><div class="pad"><button class="tbtn up" data-key="ArrowUp">▲</button><button class="tbtn left" data-key="ArrowLeft">◀</button><button class="tbtn down" data-key="ArrowDown">▼</button><button class="tbtn right" data-key="ArrowRight">▶</button></div><div class="action"><button id="touchAttack" class="tbtn attack">ÉPÉE</button><button id="touchSkill" class="tbtn skillbtn">SKILL</button><button id="touchMagic" class="tbtn skillbtn">MAGIE</button><button id="touchJet" class="tbtn skillbtn">JET</button><button id="touchInteract" class="tbtn interactbtn" hidden>PARLER</button></div></div><div class="mobileUtility"><button id="quickGameMenu" class="utilityBtn">☰ JEU</button><button id="quickAdventureMenu" class="utilityBtn">★ AVENTURE</button><button id="quickSave" class="utilityBtn">💾 SAUVE</button><button id="quickPause" class="utilityBtn">Ⅱ PAUSE</button></div></div><aside class="inventory"><details class="invbox" id="resBox" open><summary>RESSOURCES</summary><div id="res"></div></details><details class="invbox" id="gearBox"><summary>ÉQUIPEMENT ACTIF</summary><div id="gear"></div></details><details class="invbox" id="keysBox"><summary>ARTÉFACTS & SKILLS</summary><div id="keys"></div></details></aside></div><div class="status">Porte droite : avancer · Porte gauche : revenir · ESPACE : épée · F : skill · Niveau aquatique : nage en vue de côté</div></main>
@@ -994,6 +994,11 @@ function drawHomeDecor(){
  ctx.fillStyle="#6d4933";ctx.fillRect(105,HUD+127,73,5);
  ctx.fillStyle="#b78d50";ctx.fillRect(107,HUD+130,69,3);
  ctx.fillStyle="#b7aa86";ctx.font="bold 8px monospace";ctx.fillText("TA CABANE",7*T,HUD+T+10);
+ // V7.2 forest interior: broad, distinctive roots and timber framing.
+ ctx.save();
+ ctx.strokeStyle="#5b3a28";ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(26,HUD+9);ctx.bezierCurveTo(95,HUD+35,75,HUD+61,141,HUD+63);ctx.moveTo(485,HUD+13);ctx.bezierCurveTo(413,HUD+33,451,HUD+66,379,HUD+69);ctx.stroke();
+ ctx.strokeStyle="#a57742";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(25,HUD+11);ctx.bezierCurveTo(95,HUD+38,75,HUD+58,141,HUD+64);ctx.moveTo(485,HUD+15);ctx.bezierCurveTo(413,HUD+36,451,HUD+64,379,HUD+69);ctx.stroke();ctx.restore();
+ for(let i=0;i<9;i++){const xx=67+i*45;ctx.fillStyle=i%2?"#77814b":"#b79c54";ctx.fillRect(xx,HUD+27+(i%3)*4,10,7);}
  // Consistent handmade pixel-art furniture, away from the interactive chest and cache.
  ctx.fillStyle="#4d2c20";ctx.fillRect(360,HUD+97,65,43);
  ctx.fillStyle="#b58358";ctx.fillRect(365,HUD+102,55,33);
@@ -1537,7 +1542,7 @@ function drawPlayer(){
  paintAnimal(ctx,selected,Math.round(player.x)-2,Math.round(player.y)-7,0.84,player.dir,walking?Math.floor(time*9):0);
 }
 function prepareHeroPreviews(){
- const intro=document.getElementById("introFoxPortrait");if(intro){const p=intro.getContext("2d");p.imageSmoothingEnabled=false;p.clearRect(0,0,96,96);paintAnimal(p,"fox",22,11,2,"down",0)}
+ const intro=document.getElementById("introFoxPortrait");if(intro){const p=intro.getContext("2d");p.imageSmoothingEnabled=false;p.clearRect(0,0,96,96);paintAnimal(p,"fox",22,11,2,"down",0);const fox=new Image();fox.onload=()=>{p.clearRect(0,0,96,96);p.imageSmoothingEnabled=false;p.drawImage(fox,10,1,76,94)};fox.src="assets/meyden_original/renarde_meyden.svg"}
  document.querySelectorAll("canvas[data-hero-preview]").forEach(el=>{
   const p=el.getContext("2d");p.imageSmoothingEnabled=false;
   p.clearRect(0,0,64,64);paintAnimal(p,el.dataset.heroPreview,9,3,1.55,"down",0);
@@ -2003,6 +2008,11 @@ function pixelShelf(x,y,w,h,kind){
  ctx.fillStyle="#3c271d";ctx.fillRect(x+3,y+h-7,w-6,5);ctx.restore();
 }
 function meydenArtInterior(kind){
+ // V7.2 signature forest-lodge upper wall, visibly different from the stock prototype.
+ for(const x of [53,457]){ctx.fillStyle="#634528";ctx.fillRect(x,86,10,93);ctx.fillStyle="#c3944c";ctx.fillRect(x+2,89,3,86);}
+ for(const x of [180,305]){ctx.fillStyle="#7e392c";ctx.fillRect(x,87,27,78);ctx.fillStyle="#d0a45c";ctx.fillRect(x+2,89,23,3);ctx.fillRect(x+11,106,6,31);ctx.fillRect(x+7,132,14,5);}
+ ctx.fillStyle="#a36a3b";ctx.fillRect(43,164,426,6);
+ ctx.fillStyle="#d8b477";ctx.fillRect(45,165,422,2);
  pixelShelf(79,105,92,72,kind);
  pixelShelf(341,105,92,72,kind);
  // Visible decor kept inside the room; no unverified source-image regions.
