@@ -986,11 +986,18 @@ function drawHomeDecor(){
  ctx.fillStyle="#4e301e";ctx.fillRect(6*T,HUD+2*T,4*T,3);
  ctx.fillStyle="#d37a35";ctx.fillRect(7*T+10,HUD+4*T+10,28,18);ctx.fillStyle="#ffbd58";ctx.fillRect(7*T+17,HUD+4*T+5,14,23);
  ctx.fillStyle="#6e4b2c";ctx.fillRect(5*T,HUD+7*T,52,20);ctx.fillStyle="#c9a467";ctx.fillRect(5*T+4,HUD+7*T+4,44,4);
+ // Decorative home-only lighting and planks. All existing interactive objects remain.
+ ctx.fillStyle="#936a43";ctx.fillRect(55,HUD+27,402,4);
+ for(let xx=60;xx<450;xx+=55){ctx.fillStyle="#59402f";ctx.fillRect(xx,HUD+32,3,27);}
+ ctx.fillStyle="#e4b164";ctx.fillRect(295,HUD+53,25,4);
+ ctx.fillStyle="#66452f";ctx.fillRect(308,HUD+55,3,27);
+ ctx.fillStyle="#6d4933";ctx.fillRect(105,HUD+127,73,5);
+ ctx.fillStyle="#b78d50";ctx.fillRect(107,HUD+130,69,3);
  ctx.fillStyle="#b7aa86";ctx.font="bold 8px monospace";ctx.fillText("TA CABANE",7*T,HUD+T+10);
 }
 function drawWorldObjects(){
  worldObjects().forEach(o=>{
-   if(meydenWorldAccent(o))return;
+   if(!isHome()&&meydenWorldAccent(o))return;
    if(o.type==="gate"){const unlocked=gateUnlocked(o);ctx.fillStyle=unlocked?"#d9c76e":"#4c4c4c";ctx.fillRect(o.x,o.y+5,o.w,o.h-5);ctx.fillStyle=unlocked?"#7952a7":"#252525";ctx.fillRect(o.x+5,o.y+10,o.w-10,o.h-12);ctx.fillStyle="#fff";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(String(o.level+1),o.x+o.w/2,o.y+24);ctx.fillStyle="#fff3bd";ctx.font="7px monospace";ctx.fillText(o.name.split(" ")[0],o.x+o.w/2,o.y-2);ctx.textAlign="left"}
    else if(o.type==="shop"||o.type==="general"||o.type==="laboratory")drawShopSprite(o)
    else if(o.type==="forge")drawForgeSprite(o)
@@ -1960,8 +1967,8 @@ function meydenArtInterior(kind){
 }
 function meydenWorldAccent(o){
  if(o.type==="gate")return meydenArtCrop("forest",[707,733,136,144],[o.x-4,o.y,o.w+8,o.h]);
- if(o.type==="starterChest")return meydenArtCrop("forest",[344,740,121,124],[o.x,o.y-7,o.w,o.h+8]);
- if(o.type==="cache")return meydenArtCrop("forest",[414,49,139,168],[o.x-3,o.y-6,o.w+6,o.h+7]);
+ if(o.type==="starterChest")return false; // Preserve readable, interactive chest
+ if(o.type==="cache")return false; // Prevent cropped tree art on storage UI
  if(o.type==="sign")return meydenArtCrop("forest",[8,477,132,180],[o.x-3,o.y-5,o.w+6,o.h+6]);
  return false;
 }
@@ -2018,7 +2025,7 @@ function drawInterior(){
  ctx.fillStyle="#eac196";ctx.fillRect(interior.x-7,interior.y-23,14,12);
  ctx.fillStyle="#e9d7a3";ctx.font="bold 15px monospace";ctx.fillText(INTERIOR_NAMES[kind].toUpperCase(),256,31);
  ctx.font="11px monospace";ctx.fillText("MONTE AU COMPTOIR · H / ENTRÉE : PARLER",256,52);
- ctx.fillText(forge?(interior.forgeLit?"FORGE PRÊTE":"ALLUME LE FEU"): "ACHETER · VENDRE · ÉCHANGER",256,338);
+ ctx.fillStyle="#172a25";ctx.fillRect(180,57,152,18);ctx.fillStyle="#f5d894";ctx.font="bold 9px monospace";ctx.fillText(forge?(interior.forgeLit?"FORGE PRÊTE":"ALLUME LE FEU"): "ACHETER · VENDRE · ÉCHANGER",256,69);
  ctx.textAlign="left";
  if(msg.time>0){ctx.fillStyle="#101010bb";ctx.fillRect(20,60,472,34);ctx.fillStyle="#fff1bd";ctx.font="11px monospace";ctx.fillText(msg.text.slice(0,73),28,81)}
 }
