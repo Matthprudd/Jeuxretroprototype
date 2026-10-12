@@ -1,0 +1,65 @@
+{
+  "version": "MEYDEN-V2-preparation",
+  "status": "source images supplied in chat; not yet uploaded as playable binary sprites",
+  "renderPolicy": {
+    "camera": "existing top-down gameplay; near-isometric aesthetic without modifying physics",
+    "sprites": "transparent isolated objects only, not labeled contact sheets",
+    "collision": "existing physical worldObjects and tile solidity remain authoritative",
+    "naming": "preserve all existing in-game names and seven WORLD_GATES"
+  },
+  "atlasCategories": [
+    {
+      "id": "terrain",
+      "source": "MEYDEN terrain and ground tiles",
+      "usage": "terrain textures only, obstacles from map unchanged"
+    },
+    {
+      "id": "nature",
+      "source": "MEYDEN forest nature props",
+      "usage": "trees foliage decoration"
+    },
+    {
+      "id": "furniture",
+      "source": "MEYDEN interior furnishing sheet",
+      "usage": "cabin, shops, forge"
+    },
+    {
+      "id": "buildings",
+      "source": "MEYDEN building exteriors sheet",
+      "usage": "village house shop forge stage"
+    },
+    {
+      "id": "village",
+      "source": "MEYDEN street and village props",
+      "usage": "benches signs lamps fences"
+    },
+    {
+      "id": "dungeon",
+      "source": "MEYDEN cave dungeon and ruins props",
+      "usage": "seven realm decorations"
+    },
+    {
+      "id": "architecture",
+      "source": "MEYDEN interior architecture and floor modules",
+      "usage": "floor and wall art, independent collision"
+    },
+    {
+      "id": "biomes",
+      "source": "MEYDEN landscape biome visual references",
+      "usage": "realm-specific look, no renaming"
+    },
+    {
+      "id": "interactive",
+      "source": "MEYDEN chests portals and interactive props",
+      "usage": "replace artwork only, keep object IDs"
+    }
+  ],
+  "safeImplementationOrder": [
+    "isolate PNG sprites and inspect alpha bounds",
+    "register manifest with verified dimensions",
+    "cabin proof-of-concept behind development feature flag",
+    "verify door collision and interactable hitboxes",
+    "shops and open world",
+    "extend biomes without renaming regions"
+  ]
+}
