@@ -1267,8 +1267,8 @@ function doors(){
   const verticallyInside=pc.y>doorTop&&pc.y<doorBottom;
 
   // Une porte ne se déclenche qu'après franchissement réel du seuil.
-  const crossedLeft=verticallyInside&&pc.x<=11;
-  const crossedRight=verticallyInside&&pc.x>=W-11;
+  const crossedLeft=verticallyInside&&pc.x<=17;
+  const crossedRight=verticallyInside&&pc.x>=W-17;
 
   if(crossedLeft){
     startTransition(()=>{loadLevel(WORLD_INDEX,"start",false);message("RETOUR AU CARREFOUR")},"x",-1);return
@@ -1864,7 +1864,7 @@ const ownedOutfits=new Set();
 const interior={active:false,kind:null,x:256,y:370,forgeLit:false,choice:0};
 const INTERIOR_NAMES={shop:"Boutique de Brik",general:"Comptoir des Voyageurs",laboratory:"Laboratoire des Arcanes",forge:"Forge de Cendre"};
 function enterInterior(kind){
- if(!INTERIOR_NAMES[kind]||interior.active)return;
+ if(!INTERIOR_NAMES[kind]||interior.active||transition.active)return;
  interior.active=true;interior.kind=kind;interior.x=256;interior.y=361;interior.forgeLit=false;
  mouseTarget.active=false;pendingMouseInteract=null;doorGrace=1;
  message("ENTRÉE : "+INTERIOR_NAMES[kind].toUpperCase()+" · APPROCHE-TOI DU COMPTOIR",2);
@@ -1885,8 +1885,8 @@ function updateInterior(dt){
  if(keys.ArrowDown||keys.KeyS)dy++;
  if(dx&&dy){dx*=.7071;dy*=.7071}
  interior.x=clamp(interior.x+dx*115*dt,70,442);
- interior.y=clamp(interior.y+dy*115*dt,247,402);
- if(interior.y>392&&interior.x>210&&interior.x<302&&dy>0)leaveInterior();
+ interior.y=clamp(interior.y+dy*115*dt,267,402);
+ if(interior.y>=392&&interior.x>210&&interior.x<302&&dy>0)leaveInterior();
 }
 function interiorInteract(){
  if(!interior.active||paused)return;
@@ -1946,8 +1946,13 @@ canvas.addEventListener("pointerdown",function(e){
  e.stopImmediatePropagation();
  const p=canvasPoint(e);
  if(p.y>370&&p.x>210&&p.x<305){leaveInterior();return}
- if(p.y<235){interior.y=290;interior.x=p.x;interiorInteract();return}
- interior.x=clamp(p.x,70,442);interior.y=clamp(p.y,247,402);
+ if(p.y<235){
+   // No teleportation through the counter. Clicking a merchant works only nearby.
+   if(interior.y<=338&&Math.abs(interior.x-p.x)<115){interiorInteract()}
+   else message("APPROCHE-TOI DU COMPTOIR AVEC LES FLÈCHES",1.5);
+   return;
+ }
+ interior.x=clamp(p.x,70,442);interior.y=clamp(p.y,267,402);
 },true);
 
 /* Optional MEYDEN fantasy atlas layer. Existing canvas art remains fallback when an atlas is unavailable. */
