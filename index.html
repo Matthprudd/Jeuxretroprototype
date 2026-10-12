@@ -994,6 +994,17 @@ function drawHomeDecor(){
  ctx.fillStyle="#6d4933";ctx.fillRect(105,HUD+127,73,5);
  ctx.fillStyle="#b78d50";ctx.fillRect(107,HUD+130,69,3);
  ctx.fillStyle="#b7aa86";ctx.font="bold 8px monospace";ctx.fillText("TA CABANE",7*T,HUD+T+10);
+ // Consistent handmade pixel-art furniture, away from the interactive chest and cache.
+ ctx.fillStyle="#4d2c20";ctx.fillRect(360,HUD+97,65,43);
+ ctx.fillStyle="#b58358";ctx.fillRect(365,HUD+102,55,33);
+ ctx.fillStyle="#e7cfaa";ctx.fillRect(370,HUD+105,45,12);
+ ctx.fillStyle="#e0b075";ctx.fillRect(366,HUD+122,53,5);
+ ctx.fillStyle="#4c3424";ctx.fillRect(79,HUD+176,63,17);
+ ctx.fillStyle="#aa7646";ctx.fillRect(81,HUD+176,59,5);
+ ctx.fillStyle="#825736";ctx.fillRect(83,HUD+182,5,14);ctx.fillRect(132,HUD+182,5,14);
+ ctx.fillStyle="#9a6b40";ctx.fillRect(420,HUD+128,20,32);
+ ctx.fillStyle="#d0a56b";ctx.fillRect(423,HUD+131,14,25);
+ ctx.fillStyle="#573720";ctx.fillRect(428,HUD+144,3,3);
 }
 // Pixel-art stone arch for each of the seven portals. No unverified atlas crops.
 function drawFantasyPortal(o){
@@ -1971,19 +1982,33 @@ function meydenItemIcon(type,x,y,size=19){
  // Preserve a predictable painted fallback until sprites are correctly extracted.
  return false;
 }
+// Purpose-built, clean pixel furniture. No rectangular cuts from a composite sheet.
+function pixelShelf(x,y,w,h,kind){
+ ctx.save();ctx.fillStyle="#2b1d17";ctx.fillRect(x-3,y-3,w+6,h+6);
+ ctx.fillStyle="#7f4a2d";ctx.fillRect(x,y,w,h);ctx.fillStyle="#bd8050";ctx.fillRect(x+3,y+2,w-6,5);
+ for(let row=0;row<3;row++){
+  const ry=y+15+row*18;ctx.fillStyle="#302b27";ctx.fillRect(x+6,ry,w-12,14);
+  for(let i=0;i<5;i++){let px=x+12+i*(w-24)/5;
+   let color=kind==="forge"?["#c1c3c8","#8b908c","#b9773f","#c4a86e","#808b90"][i]:
+     kind==="laboratory"?["#50b2a1","#7c55c9","#dcae49","#b9699f","#74a9c5"][i]:
+     ["#ce744b","#f5ba5b","#72ad83","#9375c8","#d29767"][i];
+   ctx.fillStyle=color;ctx.fillRect(px,ry+3,8,8);ctx.fillStyle="#ebd6a2";ctx.fillRect(px+2,ry+2,4,2);
+  }
+  ctx.fillStyle="#b77c4d";ctx.fillRect(x+3,ry+13,w-6,4);
+ }
+ ctx.fillStyle="#3c271d";ctx.fillRect(x+3,y+h-7,w-6,5);ctx.restore();
+}
 function meydenArtInterior(kind){
- // Shelves deliberately sit on the upper wall, behind the merchant.
- if(kind==="shop"||kind==="general"){
-  meydenArtCrop("interiors",[22,184,156,198],[77,99,98,75]);
-  meydenArtCrop("interiors",[178,185,156,198],[335,99,101,75]);
- }else if(kind==="forge"){
-  meydenArtCrop("interiors",[188,183,152,198],[77,99,97,75]);
-  meydenArtCrop("interiors",[348,183,150,198],[342,99,94,75]);
-  meydenArtCrop("interiors",[348,766,155,150],[82,245,83,59]);
+ pixelShelf(79,105,92,72,kind);
+ pixelShelf(341,105,92,72,kind);
+ // Visible decor kept inside the room; no unverified source-image regions.
+ if(kind==="forge"){
+   ctx.fillStyle="#4e4842";ctx.fillRect(91,271,65,12);ctx.fillRect(108,261,32,11);
+   ctx.fillStyle="#aeb7bc";ctx.fillRect(105,257,38,6);
  }else if(kind==="laboratory"){
-  meydenArtCrop("interiors",[5,190,150,198],[77,99,98,75]);
-  meydenArtCrop("interiors",[348,184,150,198],[335,99,101,75]);
-  meydenArtCrop("interiors",[9,980,173,159],[65,242,118,63]);
+   for(let i=0;i<3;i++){ctx.fillStyle=["#5bc4b4","#a87be1","#dbac59"][i];ctx.fillRect(88+i*22,256,12,21);ctx.fillStyle="#e3d7bf";ctx.fillRect(91+i*22,252,6,5)}
+ }else{
+   ctx.fillStyle="#a87346";ctx.fillRect(85,255,68,17);ctx.fillStyle="#e1bc7f";ctx.fillRect(91,251,56,5);
  }
 }
 // Keep the proven portal rendering: the forest atlas has no verified isolated portal crop.
