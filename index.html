@@ -995,10 +995,28 @@ function drawHomeDecor(){
  ctx.fillStyle="#b78d50";ctx.fillRect(107,HUD+130,69,3);
  ctx.fillStyle="#b7aa86";ctx.font="bold 8px monospace";ctx.fillText("TA CABANE",7*T,HUD+T+10);
 }
+// Pixel-art stone arch for each of the seven portals. No unverified atlas crops.
+function drawFantasyPortal(o){
+ const unlocked=gateUnlocked(o),x=Math.round(o.x),y=Math.round(o.y),w=o.w,h=o.h;
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ const stone=unlocked?"#c6aa70":"#6b6d68",edge=unlocked?"#f4d88c":"#969893";
+ const t=(Math.sin(time*3+o.level)+1)*.5;
+ ctx.fillStyle="#273029";ctx.fillRect(x-3,y+5,w+6,h-3);
+ ctx.fillStyle=stone;ctx.fillRect(x,y+3,w,h-2);
+ ctx.fillStyle="#48392b";ctx.fillRect(x+4,y+8,w-8,h-7);
+ ctx.fillStyle=unlocked?"#47376d":"#242b33";ctx.fillRect(x+7,y+10,w-14,h-11);
+ if(unlocked){ctx.fillStyle=t>.5?"#8f69d4":"#7154ac";ctx.fillRect(x+10,y+12,w-20,h-15);
+ ctx.fillStyle="#c8b5fa";ctx.fillRect(x+11+Math.floor(t*3),y+15,2,3);ctx.fillRect(x+w-15,y+20,2,4);}
+ ctx.fillStyle=edge;ctx.fillRect(x+2,y+3,w-4,3);ctx.fillRect(x+2,y+6,3,h-8);ctx.fillRect(x+w-5,y+6,3,h-8);
+ ctx.fillStyle="#edca7e";ctx.fillRect(x+Math.floor(w/2)-2,y+5,4,4);
+ ctx.fillStyle="#fff5c3";ctx.textAlign="center";ctx.font="bold 8px monospace";
+ ctx.fillText(String(o.level+1),x+w/2,y+h-4);
+ ctx.font="7px monospace";ctx.fillText(o.name.split(" ")[0],x+w/2,y-3);ctx.textAlign="left";ctx.restore();
+}
 function drawWorldObjects(){
  worldObjects().forEach(o=>{
    if(!isHome()&&meydenWorldAccent(o))return;
-   if(o.type==="gate"){const unlocked=gateUnlocked(o);ctx.fillStyle=unlocked?"#d9c76e":"#4c4c4c";ctx.fillRect(o.x,o.y+5,o.w,o.h-5);ctx.fillStyle=unlocked?"#7952a7":"#252525";ctx.fillRect(o.x+5,o.y+10,o.w-10,o.h-12);ctx.fillStyle="#fff";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(String(o.level+1),o.x+o.w/2,o.y+24);ctx.fillStyle="#fff3bd";ctx.font="7px monospace";ctx.fillText(o.name.split(" ")[0],o.x+o.w/2,o.y-2);ctx.textAlign="left"}
+   if(o.type==="gate")drawFantasyPortal(o)
    else if(o.type==="shop"||o.type==="general"||o.type==="laboratory")drawShopSprite(o)
    else if(o.type==="forge")drawForgeSprite(o)
    else if(o.type==="realtor")drawRealtorSprite(o)
@@ -1949,7 +1967,9 @@ const MEYDEN_ITEM_SPRITES={
  wood:[22,858,74,88],gear:[201,858,71,80],valve:[198,854,72,80]
 };
 function meydenItemIcon(type,x,y,size=19){
- const rect=MEYDEN_ITEM_SPRITES[type];return rect?meydenArtCrop("inventory",rect,[x,y,size,size]):false;
+ // Only use manually verified isolated icons; atlas grid guesses displayed captions.
+ // Preserve a predictable painted fallback until sprites are correctly extracted.
+ return false;
 }
 function meydenArtInterior(kind){
  // Shelves deliberately sit on the upper wall, behind the merchant.
