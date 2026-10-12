@@ -1945,14 +1945,16 @@ function meydenArtCrop(key,box,xywh){
 }
 function meydenArtInterior(kind){
  if(!meydenArt.interiors)return;
- // Artwork segments from the hand-approved fantasy interior sheet.
- // These are decorative overlays, not colliders or interactive entities.
- const shelf=kind==="laboratory"?[6,192,148,186]:[171,192,157,185];
- meydenArtCrop("interiors",shelf,[68,90,104,98]);
- meydenArtCrop("interiors",[343,192,163,185],[340,90,104,98]);
- if(kind==="forge"){meydenArtCrop("interiors",[350,752,154,185],[62,245,97,86]);}
- else if(kind==="laboratory"){meydenArtCrop("interiors",[5,967,173,165],[67,248,120,83]);}
- meydenArtCrop("interiors",[2,10,212,169],[174,171,165,60]);
+ // Keep each prop in its room zone; never paste a complete atlas row over the counter.
+ const shelf=kind==="laboratory"?[7,190,157,183]:[175,190,166,183];
+ meydenArtCrop("interiors",shelf,[77,102,92,71]);
+ meydenArtCrop("interiors",[351,190,157,183],[345,102,92,71]);
+ // Small wall decorations maintain the fairy-world identity.
+ if(kind==="forge"){
+   meydenArtCrop("interiors",[345,755,170,170],[76,249,90,53]);
+ }else if(kind==="laboratory"){
+   meydenArtCrop("interiors",[12,974,170,160],[80,248,103,61]);
+ }
 }
 function drawInterior(){
  const kind=interior.kind;const lab=kind==="laboratory",forge=kind==="forge";
@@ -1962,8 +1964,8 @@ function drawInterior(){
  for(let x=48;x<462;x+=32){for(let y=104;y<416;y+=32){ctx.fillStyle=((x+y)/32)%2?"#776047":"#81694c";ctx.fillRect(x,y,30,30)}}
  meydenShopFurniture(kind);
  meydenArtInterior(kind);
- ctx.fillStyle="#392719";ctx.fillRect(60,174,392,50);
- ctx.fillStyle="#bd9362";ctx.fillRect(60,218,392,17);
+ ctx.fillStyle="#392719";ctx.fillRect(60,174,392,50);ctx.fillStyle="#533824";ctx.fillRect(62,176,388,7);
+ ctx.fillStyle="#bd9362";ctx.fillRect(60,218,392,17);ctx.fillStyle="#d5ad76";ctx.fillRect(66,220,380,3);
  ctx.fillStyle="#2e3d44";ctx.fillRect(238,135,36,60);
  ctx.fillStyle=lab?"#904ad3":forge?"#d56834":"#387b62";ctx.fillRect(242,145,28,34);
  ctx.fillStyle="#f4d1a5";ctx.fillRect(247,120,18,19);
@@ -1972,7 +1974,7 @@ function drawInterior(){
  ctx.fillText(INTERIOR_NAMES[kind].toUpperCase(),256,31);
  ctx.font="11px monospace";ctx.fillText("MONTE AU COMPTOIR · H / ENTRÉE : PARLER",256,52);
  if(forge){
-  ctx.fillStyle="#373333";ctx.fillRect(87,244,88,45);ctx.fillStyle=interior.forgeLit?"#ff892c":"#555";ctx.fillRect(99,256,62,26);
+  ctx.fillStyle=interior.forgeLit?"#ff892c":"#555";ctx.fillRect(109,270,46,12);
   ctx.fillStyle="#fbe3a0";ctx.font="10px monospace";ctx.fillText(interior.forgeLit?"FOYER ACTIF":"ALLUMER FOYER",134,305);
  }
  if(lab){ctx.fillStyle="#45bdbc";ctx.fillRect(375,248,13,24);ctx.fillStyle="#ac76e7";ctx.fillRect(397,258,16,19)}
