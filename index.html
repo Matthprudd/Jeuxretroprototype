@@ -1044,14 +1044,14 @@ function drawFantasyPortal(o){
 }
 // Original MEYDEN graphical resources: independently addressable transparent sprites.
 const meydenOriginal={};
-for(const id of ["renarde","cabane","arbre","coffre","boutique"]){const im=new Image();im.onload=()=>{meydenOriginal[id]=im};im.src="assets/meyden_original/"+id+"_meyden.svg";}
+for(const id of ["cabane","arbre","coffre","boutique","forge"]){const im=new Image();im.onload=()=>{meydenOriginal[id]=im};im.src="assets/meyden_iso/"+id+".svg";}
 function drawMeydenOriginal(id,x,y,w,h){const im=meydenOriginal[id];if(!im||!im.complete||!im.naturalWidth)return false;ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(im,x,y,w,h);ctx.restore();return true;}
 function drawWorldObjects(){
  worldObjects().forEach(o=>{
    if(!isHome()&&meydenWorldAccent(o))return;
    if(o.type==="gate")drawFantasyPortal(o)
    else if(o.type==="shop"||o.type==="general"||o.type==="laboratory"){if(!drawMeydenOriginal("boutique",o.x-4,o.y-5,o.w+8,o.h+8))drawShopSprite(o)}
-   else if(o.type==="forge")drawForgeSprite(o)
+   else if(o.type==="forge"){if(!drawMeydenOriginal("forge",o.x-4,o.y-5,o.w+8,o.h+8))drawForgeSprite(o)}
    else if(o.type==="realtor")drawRealtorSprite(o)
    else if(o.type==="starterHome"){if(!drawMeydenOriginal("cabane",o.x-4,o.y-5,o.w+8,o.h+8))drawPlayerHomeSprite(o)}
    else if(o.type==="house")drawHouseSprite(o)
