@@ -990,6 +990,7 @@ function drawHomeDecor(){
 }
 function drawWorldObjects(){
  worldObjects().forEach(o=>{
+   if(meydenWorldAccent(o))return;
    if(o.type==="gate"){const unlocked=gateUnlocked(o);ctx.fillStyle=unlocked?"#d9c76e":"#4c4c4c";ctx.fillRect(o.x,o.y+5,o.w,o.h-5);ctx.fillStyle=unlocked?"#7952a7":"#252525";ctx.fillRect(o.x+5,o.y+10,o.w-10,o.h-12);ctx.fillStyle="#fff";ctx.font="bold 8px monospace";ctx.textAlign="center";ctx.fillText(String(o.level+1),o.x+o.w/2,o.y+24);ctx.fillStyle="#fff3bd";ctx.font="7px monospace";ctx.fillText(o.name.split(" ")[0],o.x+o.w/2,o.y-2);ctx.textAlign="left"}
    else if(o.type==="shop"||o.type==="general"||o.type==="laboratory")drawShopSprite(o)
    else if(o.type==="forge")drawForgeSprite(o)
@@ -1926,35 +1927,43 @@ function meydenShopFurniture(kind){
  }
 }
 
-/* MEYDEN fantasy artwork: the approved sheets are loaded only when installed.
-   Keep existing canvas primitives as a fallback, without altering gameplay. */
-const meydenArt={};
-const meydenAssetPaths={
-  inventory:"assets/inventaire_fantasy_meyden.png",
-  forest:"assets/foret_feerique_meyden.png",
-  interiors:"assets/interieurs_fantasy_meyden.png"
-};
-for(const [key,path] of Object.entries(meydenAssetPaths)){
- const img=new Image();img.onload=()=>{meydenArt[key]=img};img.onerror=()=>{meydenArt[key]=null};img.src=path;
-}
+// One asset manager for all three official MEYDEN fantasy sheets.
 function meydenArtCrop(key,box,xywh){
- const img=meydenArt[key];if(!img||!img.complete)return false;
+ const alias={interiors:"interior"};const img=meydenAtlases[alias[key]||key];
+ if(!img||!img.naturalWidth)return false;
  const [sx,sy,sw,sh]=box,[x,y,w,h]=xywh;
- ctx.imageSmoothingEnabled=false;
- try{ctx.drawImage(img,sx,sy,sw,sh,x,y,w,h);return true}catch(e){return false}
+ if([sx,sy,sw,sh,x,y,w,h].some(v=>!Number.isFinite(v))||sw<=0||sh<=0)return false;
+ const scale=img.naturalWidth/1254;
+ try{ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(img,sx*scale,sy*scale,sw*scale,sh*scale,x,y,w,h);ctx.restore();return true}catch(e){ctx.restore();return false}
+}
+const MEYDEN_ITEM_SPRITES={
+ gold:[30,55,62,69],fragments:[76,556,67,93],crystal:[111,554,70,92],
+ wood:[22,858,74,88],gear:[201,858,71,80],valve:[198,854,72,80]
+};
+function meydenItemIcon(type,x,y,size=19){
+ const rect=MEYDEN_ITEM_SPRITES[type];return rect?meydenArtCrop("inventory",rect,[x,y,size,size]):false;
 }
 function meydenArtInterior(kind){
- if(!meydenArt.interiors)return;
- // Keep each prop in its room zone; never paste a complete atlas row over the counter.
- const shelf=kind==="laboratory"?[7,190,157,183]:[175,190,166,183];
- meydenArtCrop("interiors",shelf,[77,102,92,71]);
- meydenArtCrop("interiors",[351,190,157,183],[345,102,92,71]);
- // Small wall decorations maintain the fairy-world identity.
- if(kind==="forge"){
-   meydenArtCrop("interiors",[345,755,170,170],[76,249,90,53]);
+ // Shelves deliberately sit on the upper wall, behind the merchant.
+ if(kind==="shop"||kind==="general"){
+  meydenArtCrop("interiors",[22,184,156,198],[77,99,98,75]);
+  meydenArtCrop("interiors",[178,185,156,198],[335,99,101,75]);
+ }else if(kind==="forge"){
+  meydenArtCrop("interiors",[188,183,152,198],[77,99,97,75]);
+  meydenArtCrop("interiors",[348,183,150,198],[342,99,94,75]);
+  meydenArtCrop("interiors",[348,766,155,150],[82,245,83,59]);
  }else if(kind==="laboratory"){
-   meydenArtCrop("interiors",[12,974,170,160],[80,248,103,61]);
+  meydenArtCrop("interiors",[5,190,150,198],[77,99,98,75]);
+  meydenArtCrop("interiors",[348,184,150,198],[335,99,101,75]);
+  meydenArtCrop("interiors",[9,980,173,159],[65,242,118,63]);
  }
+}
+function meydenWorldAccent(o){
+ if(o.type==="gate")return meydenArtCrop("forest",[707,733,136,144],[o.x-4,o.y,o.w+8,o.h]);
+ if(o.type==="starterChest")return meydenArtCrop("forest",[344,740,121,124],[o.x,o.y-7,o.w,o.h+8]);
+ if(o.type==="cache")return meydenArtCrop("forest",[414,49,139,168],[o.x-3,o.y-6,o.w+6,o.h+7]);
+ if(o.type==="sign")return meydenArtCrop("forest",[8,477,132,180],[o.x-3,o.y-5,o.w+6,o.h+6]);
+ return false;
 }
 function drawInterior(){
  const kind=interior.kind,lab=kind==="laboratory",forge=kind==="forge";
@@ -1978,7 +1987,6 @@ function drawInterior(){
  ctx.fillStyle="#bfa66a";ctx.fillRect(216,312,82,2);
  // Lanterns hang in front of the upper wall.
  for(const x of [66,443]){ctx.fillStyle="#e9a33a";ctx.fillRect(x-7,99,14,17);ctx.fillStyle="#5a3421";ctx.fillRect(x-10,96,20,3);ctx.fillRect(x-10,116,20,3);ctx.fillStyle="#fbe29a";ctx.fillRect(x-2,103,5,11);}
- meydenShopFurniture(kind);
  meydenArtInterior(kind);
  // Side props break up empty floor without blocking the path or exits.
  for(const [x,y] of [[62,279],[430,315]]){ctx.fillStyle="#4b3526";ctx.fillRect(x-13,y-7,26,20);ctx.fillStyle="#ad7548";ctx.fillRect(x-10,y-13,20,10);ctx.fillStyle="#304d36";ctx.fillRect(x-5,y-25,10,13);ctx.fillRect(x-12,y-20,24,6)}
@@ -2044,10 +2052,13 @@ function pickupNearbyGroundDrop(){
 }
 function drawGroundDrops(){
  for(const d of groundDrops){if(d.place!==groundKey())continue;
- ctx.fillStyle="#201712";ctx.fillRect(d.x-9,d.y-8,19,18);
- ctx.fillStyle=d.type==="gold"?"#f9d159":d.type==="crystal"?"#8be1ff":d.type==="wood"?"#a76a38":"#bba7c9";
- ctx.fillRect(d.x-6,d.y-6,13,13);ctx.strokeStyle="#faebae";ctx.strokeRect(d.x-7,d.y-7,15,15);
- ctx.fillStyle="#fff";ctx.font="9px monospace";ctx.fillText(String(d.amount),d.x+9,d.y-5);
+  ctx.fillStyle="#201712";ctx.fillRect(d.x-9,d.y-8,19,18);
+  if(!meydenItemIcon(d.type,d.x-7,d.y-7,16)){
+   ctx.fillStyle=d.type==="gold"?"#f9d159":d.type==="crystal"?"#8be1ff":d.type==="wood"?"#a76a38":"#bba7c9";
+   ctx.fillRect(d.x-6,d.y-6,13,13);
+  }
+  ctx.strokeStyle="#faebae";ctx.strokeRect(d.x-8,d.y-8,17,17);
+  ctx.fillStyle="#fff";ctx.font="9px monospace";ctx.fillText(String(d.amount),d.x+9,d.y-5);
  }
 }
 function renderGroundManager(){
