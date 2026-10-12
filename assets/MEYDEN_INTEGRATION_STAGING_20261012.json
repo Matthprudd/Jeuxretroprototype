@@ -1,0 +1,89 @@
+{
+  "project": "MEYDEN — La Quête des Sept Royaumes",
+  "branch": "integration-assets-meyden-20261012",
+  "created": "2026-10-12",
+  "source_branch": "audit-v6-2-preservation-20261011",
+  "purpose": "Non-destructive asset integration staging. Never replace validated character sprites or gameplay physics.",
+  "existing_original_atlases": [
+    {
+      "path": "assets/foret_atlas.png",
+      "status": "present_on_source_branch",
+      "usable_as_isolated_sprite": false
+    },
+    {
+      "path": "assets/interactives_atlas.png",
+      "status": "present_on_source_branch",
+      "usable_as_isolated_sprite": false
+    },
+    {
+      "path": "assets/mobilier_atlas.png",
+      "status": "present_on_source_branch",
+      "usable_as_isolated_sprite": false
+    },
+    {
+      "path": "assets/paysage_reference.png",
+      "status": "present_on_source_branch",
+      "usable_as_isolated_sprite": false
+    },
+    {
+      "path": "assets/terrain_atlas.png",
+      "status": "present_on_source_branch",
+      "usable_as_isolated_sprite": false
+    },
+    {
+      "path": "assets/village_atlas.png",
+      "status": "present_on_source_branch",
+      "usable_as_isolated_sprite": false
+    }
+  ],
+  "required_original_pngs": [
+    "architecture_atlas.png",
+    "batiments_atlas.png",
+    "biomes_atlas.png",
+    "donjons_atlas.png",
+    "foret_atlas.png",
+    "interactives_atlas.png",
+    "mobilier_atlas.png",
+    "terrain_atlas.png",
+    "village_atlas.png",
+    "paysage_reference.png",
+    "cabane_scene.png",
+    "boutique_scene.png",
+    "carte_reference.png"
+  ],
+  "staging": {
+    "sprites_dir": "assets/meyden_sprites/",
+    "scenes_dir": "assets/meyden_scenes/",
+    "atlas_source_dir": "assets/meyden_sources/"
+  },
+  "priority": [
+    "cabane",
+    "boutique de Brik",
+    "forge de Cendre",
+    "village",
+    "sept royaumes et carte"
+  ],
+  "rules": [
+    "Use pre-existing validated fox and animal sprites; do not overwrite them.",
+    "Transparent PNG per object; don't use atlas posters with labels as sprites.",
+    "Normalize alpha bounding boxes and pivot feet/door at consistent reference points.",
+    "Preserve game physics, object IDs, WORLD_GATES, saving and keyboard/touch/controller handling.",
+    "No change to main or public deployment until QA confirms baseline."
+  ],
+  "qa": [
+    "PNG loaded/no 404",
+    "alpha edges visually inspected",
+    "object scale/pivot checked",
+    "door transitions work",
+    "collision matches old hitbox",
+    "mobile and desktop controls work",
+    "save/load backwards compatible"
+  ],
+  "progress": {
+    "branch_created": true,
+    "individual_sprite_extraction_done": false,
+    "engine_integration_done": false,
+    "playtesting_done": false,
+    "preview_deployed": false
+  }
+}
